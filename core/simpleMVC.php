@@ -7,7 +7,6 @@
  */
 header('Content-Type:text/html;charset=utf-8');
 
-
 if (version_compare(PHP_VERSION, '5.2.0', '<')) { //判断php的版本是不是为php5
     die('require PHP > 5.2.0 !');
 }
@@ -16,7 +15,6 @@ if (!defined('CORE_PATH')) {
     define('CORE_PATH', __DIR__);
 }
 
-!defined('APP_DEBUG') && define('APP_DEBUG', true);
 
 !defined('SMVC_DEBUG') && define('SMVC_DEBUG', true); //debug
 //  版本信息
@@ -47,13 +45,8 @@ set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH); //???VENDOR
 
 include __DIR__ . '/Importer.class.php';
 
-include ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php';
-//
-////include ROOT_PATH . '/core/I18N.class.php';
-////include ROOT_PATH . '/core/i18n/IniI18N.class.php';
-////include ROOT_PATH . '/core/i18n/ArrayI18N.class.php';
-////include ROOT_PATH . '/core/i18n/JsonI18N.class.php';
-////include ROOT_PATH . '/core/i18n/XmlI18N.class.php';
+Importer::importFileByFullPath(ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php');
+
 /**
  * 实现自动加载功能
  */
@@ -92,7 +85,8 @@ class SimpleMVC
         set_error_handler(array('SimpleMVC', 'appError'));
         set_exception_handler(array('SimpleMVC', 'appException'));
 
-        if (defined('APP_DEBUG') && APP_DEBUG) {
+        $isDebugMode = C('APP_DEBUG');
+        if ($isDebugMode) {
             error_reporting(E_ALL);
             ini_set('display_errors', 'on');
         } else {
@@ -130,13 +124,10 @@ class SimpleMVC
         /**
          * 加载所有的配置文件
          */
-        //TODO 加载配置项也可以进行优化
-        //        Importer::importConfigFile(CONF_PATH, 'inc.php');
-
         SmvcConf::instance()->loadConfigFileList(CONF_PATH, 'inc.php');
 
         //设置加载路径
-        $autoloadPath = SmvcConf::instance()->get('APP_AUTOLOAD_PATH');
+        $autoloadPath = C('APP_AUTOLOAD_PATH');
         if ($autoloadPath) {
             $autoloadPath = explode(',', $autoloadPath);
             $autoloadPath = implode(PATH_SEPARATOR, $autoloadPath);
