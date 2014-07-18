@@ -18,7 +18,7 @@ if (!defined('CORE_PATH')) {
 
 !defined('APP_DEBUG') && define('APP_DEBUG', true);
 
-!defined('SMVC_DEBUG') && define('SMVC_DEBUG', true);//debug
+!defined('SMVC_DEBUG') && define('SMVC_DEBUG', true); //debug
 //  版本信息
 define('SMVC_VERSION', '0.1.0');
 
@@ -46,7 +46,12 @@ define('VENDOR_PATH', dirname(CORE_PATH) . '/vendor/');
 set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH); //???VENDOR_PATH 需要定义。。。
 
 include __DIR__ . '/Importer.class.php';
-include ROOT_PATH .'/core/helper/SmvcDebugHelper.class.php';
+include ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php';
+include ROOT_PATH . '/core/I18N.class.php';
+include ROOT_PATH . '/core/i18n/IniI18N.class.php';
+include ROOT_PATH . '/core/i18n/ArrayI18N.class.php';
+include ROOT_PATH . '/core/i18n/JsonI18N.class.php';
+include ROOT_PATH . '/core/i18n/XmlI18N.class.php';
 /**
  * 实现自动加载功能
  */
@@ -85,7 +90,7 @@ class SimpleMVC
         set_error_handler(array('SimpleMVC', 'appError'));
         set_exception_handler(array('SimpleMVC', 'appException'));
 
-        if (defined('APP_DEBUG') && APP_DEBUG ) {
+        if (defined('APP_DEBUG') && APP_DEBUG) {
             error_reporting(E_ALL);
             ini_set('display_errors', 'on');
         } else {
@@ -114,8 +119,8 @@ class SimpleMVC
             Importer::importFile('core.model.Base', 'class.php', ROOT_PATH);
             Importer::importFile('core.dao.Base', 'class.php', ROOT_PATH);
             Importer::importFile('core.service.Base', 'class.php', ROOT_PATH);
-//            Importer::importFile('core.dao.db', 'class.php', ROOT_PATH);
-//            Importer::importFile('core.Driver.Db.DbMysql', 'class.php', ROOT_PATH);
+            //            Importer::importFile('core.dao.db', 'class.php', ROOT_PATH);
+            //            Importer::importFile('core.Driver.Db.DbMysql', 'class.php', ROOT_PATH);
             Importer::importFile('core.view.View', 'class.php', ROOT_PATH);
         }
 

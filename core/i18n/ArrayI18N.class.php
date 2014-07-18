@@ -1,17 +1,12 @@
 <?php
 
-// TODO  https://github.com/gr4y/i18n/blob/master/i18n.php  按照这个来。。。  重新修改 I18N
-//todo  https://github.com/appleboy/php-i18n/blob/master/libraries/Language.php
-//todo l10n https://github.com/dotroll/I18N/blob/master/src/I18N/Language.php
-//todo https://github.com/Philipp15b/php-i18n/blob/master/i18n.class.php
-
 
 /**
- * php- ini i18n
+ * php- array i18n
  *
  * I18N class for translating text to any language
  *
- *    Usage: IniI18N::t("user.name")  # =>  "Karl Metum"
+ *    Usage: ArrayI18N::t("user.name")  # =>  "Karl Metum"
  *    In the above example "name" is nested under "user"
  *
  * Make sure that the following constants are set in
@@ -20,7 +15,7 @@
  *    - DEFAULT_LOCALE = ""
  *    - DIR_LOCALE = ""    # full path to your locales
  */
-class IniI18N extends I18N
+class ArrayI18N extends I18N
 {
 
     public function _getData()
@@ -37,7 +32,7 @@ class IniI18N extends I18N
             self::setDirectory(ROOT_PATH . '/i18n/');
         }
 
-        $filename = sprintf("%s/%s/%s.ini", $this->getDirectory(), $this->locale, $this->fileName);
+        $filename = sprintf("%s/%s/%s.php", $this->getDirectory(), $this->locale, $this->fileName);
         SmvcDebugHelper::instance()->debug(
                 array(
                         'info'  => $filename,
@@ -47,7 +42,7 @@ class IniI18N extends I18N
         );
 
         if (file_exists($filename)) {
-            return parse_ini_file($filename, true);
+            return include $filename;
         } else {
             die(sprintf("localization file %s does not exist!", $filename));
         }

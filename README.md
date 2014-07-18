@@ -2,23 +2,23 @@
 ##todo
 1、router 的具体实现   `pending`  -- optional
 
-2、autoload 的具体实现   `doing`
+2、autoload 的具体实现   `doing` <font color="red">implement this first -- 比如 i18n 不能正常自动加载的问题</font>
 
    * include path 设置 (model的加载方式)  再Importer::autoLoad 方法中实现 （没有使用 set_include_path、get_include_path 系列函数）  `done`
-   * 第三方类库自动加载 `pending`
-   * HMVC 自动加载 `pending`
+   * 第三方类库自动加载 `pending`  -- optional
+   * HMVC 自动加载 `pending`  -- optional
 
 3、Conf配置的具体实现 (使用第三方 + 修改)   `doing`  -- required
 
    * core/SmvcConf.class.php  `done`
-   *  based on Configula `pending`
+   * based on Configula `pending`  -- optional
 
 4、template的具体实现 (使用第三方 smarty )   `pending`  -- optional
 
    * 使用 原生态的PHP 作为模板语言  `pending`
    * 使用 smarty (太庞大了)  `pending`
-   * 使用 twing  `pending`
-   * 使用 bootstrap  `pending`
+   * 使用 twing  `pending` -- optional
+   * 使用 bootstrap  `pending` -- optional
 
 5、session 的具体实现   `pending` -- optional
 
@@ -59,14 +59,19 @@
 
    * fileLog  `done`
    * socketLog `done`
-   * dbLog  `pending`
-   * consoleLog `pending`
+   * dbLog  `pending` -- optional
+   * consoleLog `pending` -- optional
       * 可以参考 panada 框架的实现方式 -- 正式我想要的实现方式。。
 
 12、I18N L10N   `doing`  -- required
 
    * I18N  `doing`
-   * L10N  `pending`
+      * ini `done`
+      * php `done`
+      * json `done`
+      * xml `done`
+      * db `pending` -- optional I18N多为file db不是很必要
+   * L10N  `pending` -- optional
 
 13、RBAC ACL  `pending`   -- optional
 

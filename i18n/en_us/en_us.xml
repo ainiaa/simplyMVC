@@ -1,0 +1,10 @@
+<root>
+    <first>
+        <hello>first Hello in xml</hello>
+        <world>first world! in xml</world>
+    </first>
+    <second>
+        <hello>second Hello in xml</hello>
+        <world>second world! in xml</world>
+    </second>
+</root>

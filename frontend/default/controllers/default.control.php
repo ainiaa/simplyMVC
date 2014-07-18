@@ -10,14 +10,29 @@ class defaultControl extends FrontendControl
 
     public function preIndexAction()
     {
-//        trace('本调试信息仅页面Trace中可见');
-        SmvcDebugHelper::instance()->debug(array(
-                        'info' => $_REQUEST,
+        //        trace('本调试信息仅页面Trace中可见');
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $_REQUEST,
                         'label' => '$_REQUEST ',
                         'level' => 'info',
-                ));
+                )
+        );
         echo __METHOD__, ' 在index之前执行 ... <br />';
-//        tag('ShowPageTrace');
+        echo IniI18N::t('first.hello', 'en_us'), IniI18N::t('first.world', 'en_us'), '<br />';
+        echo IniI18N::t('second.hello', 'en_us', 'other'), IniI18N::t('second.world', 'en_us', 'other'), '<br />';
+        echo IniI18N::t('first.hello', 'zh_tw'), IniI18N::t('first.world', 'zh_tw'), '<br />';
+
+        echo ArrayI18N::t('first.hello', 'en_us'), ArrayI18N::t('first.world', 'en_us'), '<br />';
+        echo ArrayI18N::t('second.hello', 'en_us', 'other'), ArrayI18N::t('second.world', 'en_us', 'other'), '<br />';
+
+
+        echo JsonI18N::t('first.hello', 'en_us'), JsonI18N::t('first.world', 'en_us'), '<br />';
+
+
+        echo XmlI18N::t('first.hello', 'en_us'), XmlI18N::t('first.world', 'en_us'), '<br />';
+
+        //        tag('ShowPageTrace');
     }
 
     public function indexAction()
@@ -33,7 +48,7 @@ class defaultControl extends FrontendControl
     public function preTest()
     {
         echo __METHOD__, ' 在Test之前执行.... <br />';
-//        tag('view_end');
+        //        tag('view_end');
     }
 
     /**
@@ -57,12 +72,12 @@ class defaultControl extends FrontendControl
     public function postTest()
     {
         echo '在Test之后执行.... <br />';
-//        tag('view_end');
+        //        tag('view_end');
     }
 
     public function postIndexAction()
     {
         echo '在index之后执行.... <br />';
-//        tag('view_end');
+        //        tag('view_end');
     }
 }

@@ -19,12 +19,25 @@ abstract class I18N
     /**
      * Holds the current locale
      */
-    private static $locale;
+    protected $locale;
+
+    /**
+     * Holds the current directory
+     */
+    protected $directory;
+
+    /**
+     * Holds the current file name
+     */
+    protected $fileName;
 
     /**
      * Holds the character which terms are seperated by
      */
-    private static $termSeparator = ".";
+    protected $termSeparator = ".";
+
+    private static $instance;
+
 
     /**
      * Main construct
@@ -34,37 +47,72 @@ abstract class I18N
     public function __construct($locale = null)
     {
         $this->setLocale($locale);
+        $this->dirctory = '';
     }
+
+    /**
+     * sets a new directory where i18n is searching for files
+     *
+     * @param string $directory
+     */
+    public function setDirectory($directory)
+    {
+        $this->directory = $directory;
+    }
+
+    /**
+     * gets the directory where i18n is searching in
+     */
+    public function getDirectory()
+    {
+        return $this->directory;
+    }
+
+
 
     /**
      * Sets the current locale
      */
-    private static function setLocale($locale = null)
+    protected function setLocale($locale = null)
     {
         !defined('DEFAULT_LOCALE') && define('DEFAULT_LOCALE', 'en_us');
         $locale       = is_null($locale) ? DEFAULT_LOCALE : $locale;
-        self::$locale = $locale;
+        $this->locale = $locale;
     }
 
     /**
      * Gets current locale
      */
-    private static function getLocale()
+    protected function getLocale()
     {
-        return self::$locale;
+        return $this->locale;
     }
 
     /**
      * Translates given term
      */
-    public static function _translate($term)
+    public function _translate($term)
     {
-        $parsedData = self::_getData();
-        return self::find($term, $parsedData);
+        $parsedData = $this->_getData();
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $parsedData,
+                        'label' => '$parsedData ',
+                        'level' => 'info',
+                )
+        );
+        return $this->find($term, $parsedData);
     }
 
-    public static function _getData()
+    public function _getData()
     {
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $this->locale,
+                        'label' => '$locale  xx ',
+                        'level' => 'info',
+                )
+        );
         return array();
     }
 
@@ -77,37 +125,89 @@ abstract class I18N
      *
      * @return string
      */
-    private static function find($term, $parsedData)
+    private function find($term, $parsedData)
     {
-        $locale = self::getLocale();
-        if (!empty($parsedData[$locale])) {
-            $lastData = $parsedData[$locale];
-            $terms    = explode(self::$termSeparator, $term);
-            foreach ($terms as $keyword) {
-                if (empty($lastData[$keyword])) {
-                    return "Translation missing for {$locale}#{$term}";
-                }
-                $lastData = $lastData[$keyword];
-            }
-            return $lastData;
-        }
+        $terms = explode($this->termSeparator, $term);
 
-        return "Translation missing for {$locale}";
+        $keyStr = '';
+        foreach ($terms as $keyword) {
+            $keyStr .= '.' . $keyword;
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => $keyword,
+                            'label' => '$keyword',
+                            'level' => 'info',
+                    )
+            );
+            if (empty($parsedData[$keyword])) {
+                return "Translation missing for #{$keyStr}";
+            } else {
+                $parsedData = $parsedData[$keyword];
+            }
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => $parsedData,
+                            'label' => '$parsedData',
+                            'level' => 'info',
+                    )
+            );
+        }
+        return $parsedData;
+
+    }
+
+    public function setFileName($fileName)
+    {
+        $this->fileName = $fileName;
+    }
+
+    public function getFileName()
+    {
+        return $this->fileName;
     }
 
     /**
      * Translates given term
      *
-     * @param string , the translation term
-     * @param string , (optional) the language which the term
+     * @param      $term
+     * @param null $locale
+     * @param null $fileName
+     *
+     * @internal     param $string , the translation term
+     * @internal     param $string , (optional) the language which the term
      *               should be translated into.
      *
      * @return string
      */
-    public static function translate($term, $locale = null)
+    public function translate($term, $locale = null, $fileName = null)
     {
-        self::setLocale($locale);
-        return self::_translate($term);
+        $this->setLocale($locale);
+        if (is_null($fileName)) {
+            $fileName = $this->getLocale();
+        }
+        $this->setFileName($fileName);
+        return $this->_translate($term);
+    }
+
+    /**
+     * @param $className
+     *
+     * @return $this
+     */
+    public static function instance($className)
+    {
+        if (empty(self::$instance[$className])) {
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => $className,
+                            'label' => '$className ',
+                            'level' => 'info',
+                    )
+            );
+            self::$instance[$className] = new $className();
+        }
+
+        return self::$instance[$className];
     }
 
     /**
@@ -115,6 +215,5 @@ abstract class I18N
      */
     public static function t($term, $locale = null)
     {
-        return self::translate($term, $locale);
     }
 }
