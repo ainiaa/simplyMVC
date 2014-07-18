@@ -16,7 +16,7 @@ return array(
     //COOKIE 域名
     'COOKIE_DOMAIN'            => '',
     //类自动加载目录 多个目录之间使用逗号分割
-    'APP_AUTOLOAD_PATH'        => CORE_PATH . ',' . CORE_PATH . '/Driver/Db/' . ',' . CORE_PATH . '/Behavior/' . ',' . CORE_PATH . '/lib/Behavior/',
+    'APP_AUTOLOAD_PATH'        => CORE_PATH . ',' . CORE_PATH . '/cache/' . ',' . CORE_PATH . '/i18n/' . ',' . CORE_PATH . '/helper/',
     //自动开启session
     'SESSION_AUTO_START'       => true,
     'SESSION_TYPE'             => 'db', //存储 session 的driver

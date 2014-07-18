@@ -3,12 +3,13 @@
 class SmvcConf implements ArrayAccess
 {
     private static $instance = null;
-    private $configInfo = null;
+    private $configData = null;
     private $configFileList = array();
     private $configPath = '';
 
     private function __construct()
     {
+        $this->initConfigPath();
     }
 
     private function __clone()
@@ -22,7 +23,6 @@ class SmvcConf implements ArrayAccess
     {
         if (self::$instance == null) {
             self::$instance = new SmvcConf();
-            self::$instance->initConfigPath();
         }
         return self::$instance;
     }
@@ -42,24 +42,27 @@ class SmvcConf implements ArrayAccess
 
     function offsetExists($index)
     {
-        return isset($this->configInfo[$index]);
+        return isset($this->configData[$index]);
     }
 
     function offsetGet($index)
     {
-        return isset($this->configInfo[$index]) ? $this->configInfo[$index] : null;
+        return isset($this->configData[$index]) ? $this->configData[$index] : null;
     }
 
     function offsetSet($index, $newValue)
     {
-        $this->configInfo[$index] = $newValue;
+        $this->configData[$index] = $newValue;
     }
 
     function offsetUnset($index)
     {
-        unset($this->configInfo[$index]);
+        unset($this->configData[$index]);
     }
 
+    /**
+     * @param null $configFile
+     */
     private function loadConfigFile($configFile = null)
     {
 
@@ -69,19 +72,31 @@ class SmvcConf implements ArrayAccess
             $configFile = $this->configPath . $configFile;
         }
 
-        if (is_readable($configFile)) {
-            $currentConfInfo = include $configFile;
-        } else {
-            throw new Exception('Could not load the config file: ' . $configFile);
-        }
+        $currentConfData = Importer::loadConfigFile($configFile);
 
-        if (is_array($this->configInfo)) {
-            $this->configInfo += $currentConfInfo;
+        if (is_array($this->configData)) {
+            $this->configData += $currentConfData;
         } else {
-            $this->configInfo = $currentConfInfo;
+            $this->configData = $currentConfData;
         }
 
     }
+
+    /**
+     * @param        $configPath
+     * @param string $configFileExt
+     */
+    public function loadConfigFileList($configPath, $configFileExt = 'inc.php')
+    {
+        $currentConfData = Importer::importConfigFile($configPath, $configFileExt);
+
+        if (is_array($this->configData)) {
+            $this->configData += $currentConfData;
+        } else {
+            $this->configData = $currentConfData;
+        }
+    }
+
 
     public function getfile($index, $configFile = null)
     {
@@ -120,13 +135,13 @@ class SmvcConf implements ArrayAccess
         return $this->configPath;
     }
 
-    public function get($key, $configFile, $default = '')
+    public function get($key, $configFile = '', $default = '')
     {
-        if (!is_array($this->configInfo) || !isset($this->configInfo[$key])) {
+        if (!is_array($this->configData) || !isset($this->configData[$key])) {
             $this->loadConfigFile($configFile);
         }
-        if (isset($this->configInfo[$key])) {
-            return $this->configInfo[$key];
+        if (isset($this->configData[$key])) {
+            return $this->configData[$key];
         } else {
             return $default;
         }

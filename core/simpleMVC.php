@@ -46,12 +46,14 @@ define('VENDOR_PATH', dirname(CORE_PATH) . '/vendor/');
 set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH); //???VENDOR_PATH 需要定义。。。
 
 include __DIR__ . '/Importer.class.php';
+
 include ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php';
-include ROOT_PATH . '/core/I18N.class.php';
-include ROOT_PATH . '/core/i18n/IniI18N.class.php';
-include ROOT_PATH . '/core/i18n/ArrayI18N.class.php';
-include ROOT_PATH . '/core/i18n/JsonI18N.class.php';
-include ROOT_PATH . '/core/i18n/XmlI18N.class.php';
+//
+////include ROOT_PATH . '/core/I18N.class.php';
+////include ROOT_PATH . '/core/i18n/IniI18N.class.php';
+////include ROOT_PATH . '/core/i18n/ArrayI18N.class.php';
+////include ROOT_PATH . '/core/i18n/JsonI18N.class.php';
+////include ROOT_PATH . '/core/i18n/XmlI18N.class.php';
 /**
  * 实现自动加载功能
  */
@@ -107,10 +109,12 @@ class SimpleMVC
      */
     private static function init()
     {
+
         //TODO 这块可以优化 直接第一次运行的时候 写入到一个文件里面 然后一次性加载完全，
         if (method_exists('Importer', 'importBaseFiles')) {
             Importer::importBaseFiles();
         } else {
+            Importer::importFile('core.Router', 'class.php', ROOT_PATH);
             Importer::importFile('core.Router', 'class.php', ROOT_PATH);
             Importer::importFile('core.Factory', 'class.php', ROOT_PATH);
             Importer::importFile('core.Dispatcher', 'class.php', ROOT_PATH);
@@ -119,17 +123,33 @@ class SimpleMVC
             Importer::importFile('core.model.Base', 'class.php', ROOT_PATH);
             Importer::importFile('core.dao.Base', 'class.php', ROOT_PATH);
             Importer::importFile('core.service.Base', 'class.php', ROOT_PATH);
-            //            Importer::importFile('core.dao.db', 'class.php', ROOT_PATH);
-            //            Importer::importFile('core.Driver.Db.DbMysql', 'class.php', ROOT_PATH);
             Importer::importFile('core.view.View', 'class.php', ROOT_PATH);
+            Importer::importFile('core.SmvcConf', 'class.php', ROOT_PATH);
         }
-
 
         /**
          * 加载所有的配置文件
          */
         //TODO 加载配置项也可以进行优化
-        Importer::importConfigFile(CONF_PATH, 'inc.php');
+        //        Importer::importConfigFile(CONF_PATH, 'inc.php');
+
+        SmvcConf::instance()->loadConfigFileList(CONF_PATH, 'inc.php');
+
+        //设置加载路径
+        $autoloadPath = SmvcConf::instance()->get('APP_AUTOLOAD_PATH');
+        if ($autoloadPath) {
+            $autoloadPath = explode(',', $autoloadPath);
+            $autoloadPath = implode(PATH_SEPARATOR, $autoloadPath);
+            Importer::setIncludePath($autoloadPath);
+        }
+
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => get_include_path(),
+                        'label' => 'get_include_path ',
+                        'level' => 'info',
+                )
+        );
 
         // 定义当前请求的系统常量
         define('NOW_TIME', $_SERVER['REQUEST_TIME']);

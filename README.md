@@ -4,13 +4,14 @@
 
 2、autoload 的具体实现   `doing` <font color="red">implement this first -- 比如 i18n 不能正常自动加载的问题</font>
 
-   * include path 设置 (model的加载方式)  再Importer::autoLoad 方法中实现 （没有使用 set_include_path、get_include_path 系列函数）  `done`
-   * 第三方类库自动加载 `pending`  -- optional
+   * include path 设置 (model的加载方式)  再Importer::autoLoad 方法中实现  <font color="green">`done`</font>
+   * 第三方类库自动加载 加载第三方类的时候需要调用Importer::setIncludePath() 设置路径 如果类不是以 CLASSNAME.php的形式
+     还需要调用 Importer::setFileExt() 方法 注册后缀 <font color="green">`done`</font>
    * HMVC 自动加载 `pending`  -- optional
 
 3、Conf配置的具体实现 (使用第三方 + 修改)   `doing`  -- required
 
-   * core/SmvcConf.class.php  `done`
+   * core/SmvcConf.class.php  <font color="green">`done`</font>
    * based on Configula `pending`  -- optional
 
 4、template的具体实现 (使用第三方 smarty )   `pending`  -- optional
@@ -40,12 +41,12 @@
 
 7、ORM的具体实现   `pending`   -- optional
 
-8、hook的具体实现   `done`  -- optional
+8、hook的具体实现   <font color="green">`done`</font>  -- optional
 
 9、debug的具体实现  `doing`   -- required
 
-  * fileDebug  `done`
-  * firephp Debug   `done`
+  * fileDebug  <font color="green">`done`</font>
+  * firephp Debug   <font color="green">`done`</font>
   * 类似 thinkphp 的 debugbar  `pending`
 
 10、cache(redis memcache)处理   `pending`   -- required
@@ -57,8 +58,8 @@
 
 11、log 的具体实现   fileLog  `doing`  -- required
 
-   * fileLog  `done`
-   * socketLog `done`
+   * fileLog  <font color="green">`done`</font>
+   * socketLog <font color="green">`done`</font>
    * dbLog  `pending` -- optional
    * consoleLog `pending` -- optional
       * 可以参考 panada 框架的实现方式 -- 正式我想要的实现方式。。
@@ -66,10 +67,10 @@
 12、I18N L10N   `doing`  -- required
 
    * I18N  `doing`
-      * ini `done`
-      * php `done`
-      * json `done`
-      * xml `done`
+      * ini <font color="green">`done`</font>
+      * php <font color="green">`done`</font>
+      * json <font color="green">`done`</font>
+      * xml <font color="green">`done`</font>
       * db `pending` -- optional I18N多为file db不是很必要
    * L10N  `pending` -- optional
 
