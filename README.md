@@ -2,7 +2,7 @@
 ##todo
 1、router 的具体实现   `pending`  -- optional
 
-2、autoload 的具体实现   `doing` <font color="red">implement this first -- 比如 i18n 不能正常自动加载的问题</font>
+2、autoload 的具体实现   `doing`
 
    * include path 设置 (model的加载方式)  再Importer::autoLoad 方法中实现  <font color="green">`done`</font>
    * 第三方类库自动加载 加载第三方类的时候需要调用Importer::setIncludePath() 设置路径 如果类不是以 CLASSNAME.php的形式
@@ -49,11 +49,11 @@
   * firephp Debug   <font color="green">`done`</font>
   * 类似 thinkphp 的 debugbar  `pending`
 
-10、cache(redis memcache)处理   `pending`   -- required
+10、cache(redis memcache)处理   `doing`   -- required <font color="red">implement this first</font>
 
    * memcache `pending`
    * redis   `pending`
-   * localCache  `pending`
+   * localCache  <font color="green">`done`</font>
 
 
 11、log 的具体实现   fileLog  `doing`  -- required
