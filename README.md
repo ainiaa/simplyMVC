@@ -27,7 +27,12 @@
    * db   `doing`  依赖于 db实例获取需要处理
    * file   `doing`
    * memcache   `doing`  依赖于 memcache实例获取需要处理
-   * redis   `doing`  依赖于redis实例获取需要处理
+   * redis   `doing`  依赖于redis实例获取需要处理   https://github.com/salimane/rediscluster-php/blob/master/src/RedisCluster/RedisCluster.php
+                                                 https://github.com/ysbaddaden/php5-redis/blob/master/lib/Redis/Client.php
+                                                 https://github.com/s1lent1um/phpredis-proxy/blob/master/RedisProxy.php
+
+
+                                                 http://www.cnblogs.com/leonkao/p/laravel-composer.html  composer 介绍
 
 6、db的 具体实现   `pending` -- optional
 
