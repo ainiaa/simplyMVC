@@ -195,7 +195,7 @@ class CoreMemcache
                             1,
                             30,
                             true,
-                            'mem_err_callback'
+                            'memcacheErrCallback'
                     );
                 }
             }

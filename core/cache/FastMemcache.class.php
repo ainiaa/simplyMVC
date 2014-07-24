@@ -6,7 +6,7 @@
  * @author  Jeff Liu
  * @package cache
  */
-class FastMemcache extends CoreMemCache
+class FastMemcache extends SmvcMemcache
 {
     /**
      * 本地缓存

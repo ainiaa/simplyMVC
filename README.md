@@ -56,8 +56,8 @@
 
 10、cache(redis memcache)处理   `doing`   -- required <font color="red">implement this at first of all</font>
 
-   * memcache `pending`
-   * redis   `pending`
+   * memcache <font color="green">`done`</font>
+   * redis   <font color="green">`done`</font>
    * localCache  <font color="green">`done`</font>
 
 
