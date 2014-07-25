@@ -52,10 +52,18 @@
         https://github.com/fridge-project/dbal
         https://github.com/maranemil/databasescomparer  -- dbtools db compare
         https://github.com/CDSGlobal/database-compare  -- dbtools db compare
+        https://github.com/krasimir/php-differ  -- dbtools db compare
         https://github.com/rulin/databaseDriver
         https://github.com/uzi88/PHP_MySQL_wrapper
         https://github.com/JonathanFrias/PHP-Database-Helper  -- orm
-        https://github.com/search?p=32&q=php+database+&ref=searchresults&type=Repositories  再公司继续
+        https://github.com/satyam2707/php_dbadptor
+        https://github.com/dmitry-vinogradov/PHP-DB
+        https://github.com/al-codepone/pajamaSQL
+        https://github.com/paulyg/DBALite/tree/master/src
+        https://github.com/nmmmnu/pdb
+        https://github.com/theodorejb/peachy-sql
+        https://github.com/gimler/MySQLndUhTool
+        https://github.com/patrichs/BootstrapFull -- admin framework
 
 5、ORM的具体实现
 
