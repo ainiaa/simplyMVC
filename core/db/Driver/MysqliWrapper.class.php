@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Class mysqliWrapper
+ * Class MysqliWrapper
  */
-class mysqliWrapper extends DatabaseAbstract implements DatabaseWrapper
+class MysqliWrapper extends DatabaseAbstract implements DatabaseWrapper
 {
     public $driverName = 'mysql';
 
     // lazy loading
     protected function initialization()
     {
-        if (!($this->link instanceof mysqli)) {
-            $this->link = call_user_func_array(array(new ReflectionClass('mysqli'), 'newInstance'), $this->initParams);
+        if (!($this->link instanceof MysqliWrapper)) {
+            $this->link = call_user_func_array(array(new ReflectionClass('MysqliWrapper'), 'newInstance'), $this->initParams);
             foreach ($this->initialization as $val) {
                 $this->link->query($val);
             }
@@ -74,6 +74,27 @@ class mysqliWrapper extends DatabaseAbstract implements DatabaseWrapper
         return $stmt->affected_rows;
     }
 
+    public function fetch($stmt, $result_type = Database::ASSOC)
+    {
+        $field  = $stmt->result_metadata()->fetch_fields();
+        $out    = array();
+        $fields = array();
+        foreach ($field as $val) {
+            $fields[] = & $out[$val->name];
+        }
+        call_user_func_array(array($stmt, 'bind_result'), $fields);
+        if (!$stmt->fetch()) {
+            return array();
+        }
+
+        if ($result_type == Database::ASSOC) {
+            return $out;
+        } elseif ($result_type == Database::NUM) {
+            return array_values($out);
+        }
+
+        return array_merge($out, array_values($out));
+    }
     public function getOne()
     {
         $param = func_get_args();
@@ -112,27 +133,7 @@ class mysqliWrapper extends DatabaseAbstract implements DatabaseWrapper
         return $result;
     }
 
-    public function fetch($stmt, $result_type = Database::ASSOC)
-    {
-        $field  = $stmt->result_metadata()->fetch_fields();
-        $out    = array();
-        $fields = array();
-        foreach ($field as $val) {
-            $fields[] = & $out[$val->name];
-        }
-        call_user_func_array(array($stmt, 'bind_result'), $fields);
-        if (!$stmt->fetch()) {
-            return array();
-        }
-
-        if ($result_type == Database::ASSOC) {
-            return $out;
-        } elseif ($result_type == Database::NUM) {
-            return array_values($out);
-        }
-
-        return array_merge($out, array_values($out));
-    }
+    
 
     public function lastInsertId()
     {

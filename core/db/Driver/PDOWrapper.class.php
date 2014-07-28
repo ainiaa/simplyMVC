@@ -5,6 +5,12 @@
  */
 class PDOWrapper extends DatabaseAbstract implements DatabaseWrapper
 {
+
+    /**
+     * @var PDO
+     */
+    public $link;
+
     // lazy loading
     protected function initialization()
     {
@@ -88,6 +94,12 @@ class PDOWrapper extends DatabaseAbstract implements DatabaseWrapper
         return array();
     }
 
+    /**
+     * @param Statement    $sth
+     * @param int $result_type
+     *
+     * @return mixed
+     */
     public function fetch($sth, $result_type = Database::ASSOC)
     {
         if ($result_type == Database::ASSOC) {

@@ -1,19 +1,17 @@
 <?php
 
 /**
- * Class mysqlWrapper
+ * Class MysqlWrapper
  */
-class mysqlWrapper extends DatabaseAbstract implements DatabaseWrapper
+class MysqlWrapper extends DatabaseAbstract implements DatabaseWrapper
 {
     public $driverName = 'mysql';
 
     // lazy loading
     protected function initialization()
     {
-        if ($this->link === null) {
-            $dbname     = array_pop($this->initParams);
-            $this->link = call_user_func_array('mysql_connect', $this->initParams);
-            mysql_select_db($dbname, $this->link);
+        if (!($this->link instanceof MysqlWrapper)) {
+            $this->link = call_user_func_array(array(new ReflectionClass('MysqlWrapper'), 'newInstance'), $this->initParams);
             foreach ($this->initialization as $val) {
                 mysql_unbuffered_query($val, $this->link);
             }
