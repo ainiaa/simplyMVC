@@ -115,3 +115,10 @@ class XmlI18N extends I18N
         return self::instance(__CLASS__)->translate($term, $locale, $fileName);
     }
 }
+
+if (!function_exists('LX')) {
+    function LX($key, $lang)
+    {
+        return XmlI18N::t($key, $lang);
+    }
+}

@@ -57,3 +57,10 @@ class JsonI18N extends I18N
         return self::instance(__CLASS__)->translate($term, $locale, $fileName);
     }
 }
+
+if (!function_exists('LJ')) {
+    function LJ($key, $lang = '')
+    {
+        return JsonI18N::t($key, $lang);
+    }
+}

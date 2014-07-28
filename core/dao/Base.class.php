@@ -114,10 +114,8 @@ class BaseDAO extends Object
         // 只在第一次执行记录
         if (empty($this->fields)) {
             // 如果数据表字段没有定义则自动获取
-            !defined('DB_FIELDS_CACHE') && define('DB_FIELDS_CACHE', true);
-            if (DB_FIELDS_CACHE) {
-                !defined('DB_NAME') && define('DB_NAME', '');
-                $db     = $this->dbName ? : DB_NAME;
+            if (C('DB_FIELDS_CACHE')) {
+                $db     = $this->dbName ? : C('DB_NAME');
                 $fields = F('_fields/' . strtolower($db . '.' . $this->name)); //todo 这个需要处理
                 if ($fields) {
                     $this->fields = $fields;
@@ -160,11 +158,9 @@ class BaseDAO extends Object
         $this->fields['_type'] = $type;
 
         // 2008-3-7 增加缓存开关控制
-        !defined('DB_FIELDS_CACHE') && define('DB_FIELDS_CACHE', true);
-        if (DB_FIELDS_CACHE) {
+        if (C('DB_FIELDS_CACHE')) {
             // 永久缓存数据表信息
-            !defined('DB_NAME') && define('DB_NAME', '');
-            $db = $this->dbName ? : DB_NAME;
+            $db = $this->dbName ? : C('DB_NAME');
             F('_fields/' . strtolower($db . '.' . $this->name), $this->fields); //todo 这个需要处理
         }
     }
@@ -255,7 +251,7 @@ class BaseDAO extends Object
         } elseif (isset($this->_scope[$method])) { // 命名范围的单独调用支持
             return $this->scope($method, $args[0]);
         } else {
-            E(__CLASS__ . ':' . $method . L('_METHOD_NOT_EXIST_')); //todo 这个需要处理
+            E(__CLASS__ . ':' . $method . LA('_METHOD_NOT_EXIST_')); //todo 这个需要处理
             return;
         }
     }
@@ -289,8 +285,8 @@ class BaseDAO extends Object
             }
             foreach ($data as $key => $val) {
                 if (!in_array($key, $fields, true)) {
-                    if (APP_DEBUG) {
-                        E(L('_DATA_TYPE_INVALID_') . ':[' . $key . '=>' . $val . ']'); //todo 这个需要处理
+                    if (C('APP_DEBUG')) {
+                        E(LA('_DATA_TYPE_INVALID_') . ':[' . $key . '=>' . $val . ']'); //todo 这个需要处理
                     }
                     unset($data[$key]);
                 } elseif (is_scalar($val)) {
@@ -333,7 +329,7 @@ class BaseDAO extends Object
                 // 重置数据
                 $this->data = array();
             } else {
-                $this->error = L('_DATA_TYPE_INVALID_'); //todo 这个需要处理
+                $this->error = LA('_DATA_TYPE_INVALID_'); //todo 这个需要处理
                 return false;
             }
         }
@@ -376,7 +372,7 @@ class BaseDAO extends Object
     public function addAll($dataList, $options = array(), $replace = false)
     {
         if (empty($dataList)) {
-            $this->error = L('_DATA_TYPE_INVALID_'); //todo 这个需要处理
+            $this->error = LA('_DATA_TYPE_INVALID_'); //todo 这个需要处理
             return false;
         }
         // 分析表达式
@@ -418,7 +414,7 @@ class BaseDAO extends Object
                 )
         ) {
             // 数据库插入操作失败
-            $this->error = L('_OPERATION_WRONG_');
+            $this->error = LA('_OPERATION_WRONG_');
             return false;
         } else {
             // 插入成功
@@ -444,7 +440,7 @@ class BaseDAO extends Object
                 // 重置数据
                 $this->data = array();
             } else {
-                $this->error = L('_DATA_TYPE_INVALID_'); //todo 这个需要处理
+                $this->error = LA('_DATA_TYPE_INVALID_'); //todo 这个需要处理
                 return false;
             }
         }
@@ -452,7 +448,7 @@ class BaseDAO extends Object
         $data = $this->_facade($data);
         if (empty($data)) {
             // 没有数据则不执行
-            $this->error = L('_DATA_TYPE_INVALID_'); //todo 这个需要处理
+            $this->error = LA('_DATA_TYPE_INVALID_'); //todo 这个需要处理
             return false;
         }
         // 分析表达式
@@ -466,7 +462,7 @@ class BaseDAO extends Object
                 unset($data[$pk]);
             } else {
                 // 如果没有任何更新条件则不执行
-                $this->error = L('_OPERATION_WRONG_'); //todo 这个需要处理
+                $this->error = LA('_OPERATION_WRONG_'); //todo 这个需要处理
                 return false;
             }
         }
@@ -610,6 +606,7 @@ class BaseDAO extends Object
         $this->_after_select($resultSet, $options);
         if (isset($options['index'])) { // 对数据集进行索引
             $index = explode(',', $options['index']);
+            $cols = array();
             foreach ($resultSet as $result) {
                 $_key = $result[$index[0]];
                 if (isset($index[1]) && isset($result[$index[1]])) {
@@ -690,8 +687,8 @@ class BaseDAO extends Object
                                 '.'
                         ) && false === strpos($key, '(') && false === strpos($key, '|') && false === strpos($key, '&')
                 ) {
-                    if (APP_DEBUG) {
-                        E(L('_ERROR_QUERY_EXPRESS_') . ':[' . $key . '=>' . $val . ']'); //todo 这个需要处理
+                    if (C('APP_DEBUG')) {
+                        E(LA('_ERROR_QUERY_EXPRESS_') . ':[' . $key . '=>' . $val . ']'); //todo 这个需要处理
                     }
                     unset($options['where'][$key]);
                 }
@@ -1001,7 +998,7 @@ class BaseDAO extends Object
         }
         // 验证数据
         if (empty($data) || !is_array($data)) {
-            $this->error = L('_DATA_TYPE_INVALID_'); //todo 这个需要处理
+            $this->error = LA('_DATA_TYPE_INVALID_'); //todo 这个需要处理
             return false;
         }
 
@@ -1051,7 +1048,7 @@ class BaseDAO extends Object
 
         // 表单令牌验证
         if (!$this->autoCheckToken($data)) {
-            $this->error = L('_TOKEN_ERROR_'); //todo 这个需要处理
+            $this->error = LA('_TOKEN_ERROR_'); //todo 这个需要处理
             return false;
         }
 
@@ -1228,7 +1225,7 @@ class BaseDAO extends Object
                 if (empty($val[5]) || $val[5] == self::MODEL_BOTH || $val[5] == $type) {
                     if (0 == strpos($val[2], '{%') && strpos($val[2], '}')) // 支持提示信息的多语言 使用 {%语言定义} 方式
                     {
-                        $val[2] = L(substr($val[2], 2, -1)); //todo 这个需要处理
+                        $val[2] = LA(substr($val[2], 2, -1)); //todo 这个需要处理
                     }
                     $val[3] = isset($val[3]) ? $val[3] : self::EXISTS_VALIDATE;
                     $val[4] = isset($val[4]) ? $val[4] : 'regex';
@@ -1535,9 +1532,7 @@ class BaseDAO extends Object
     public function getModelName()
     {
         if (empty($this->name)) {
-            !defined('DEFAULT_M_LAYER') && define('DEFAULT_M_LAYER', 'DAO');
-
-            $name = substr(get_class($this), 0, -strlen(DEFAULT_M_LAYER));
+            $name = substr(get_class($this), 0, -strlen(C('DEFAULT_M_LAYER')));
             if ($pos = strrpos($name, '\\')) { //有命名空间
                 $this->name = substr($name, $pos + 1);
             } else {
@@ -1692,7 +1687,7 @@ class BaseDAO extends Object
         } elseif (is_string($data)) {
             parse_str($data, $data);
         } elseif (!is_array($data)) {
-            E(L('_DATA_TYPE_INVALID_')); //todo 这个需要处理
+            E(LA('_DATA_TYPE_INVALID_')); //todo 这个需要处理
         }
         $this->data = $data;
         return $this;
@@ -1738,7 +1733,7 @@ class BaseDAO extends Object
     {
         $prefix = $this->tablePrefix;
         if (is_array($join)) {
-            foreach ($join as $key => &$_join) {
+            foreach ($join as &$_join) {
                 $_join = preg_replace_callback(
                         "/__([A-Z_-]+)__/sU",
                         function ($match) use ($prefix) {
@@ -1784,6 +1779,7 @@ class BaseDAO extends Object
             $union = get_object_vars($union);
         }
         // 转换union表达式
+        $options = '';
         if (is_string($union)) {
             $prefix = $this->tablePrefix;
             //将__TABLE_NAME__字符串替换成带前缀的表名
@@ -1802,7 +1798,7 @@ class BaseDAO extends Object
                 $options = $union;
             }
         } else {
-            E(L('_DATA_TYPE_INVALID_')); //todo 这个需要处理
+            E(LA('_DATA_TYPE_INVALID_')); //todo 这个需要处理
         }
         $this->options['union'][] = $options;
         return $this;

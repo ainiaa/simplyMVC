@@ -61,3 +61,10 @@ class IniI18N extends I18N
         return self::instance(__CLASS__)->translate($term, $locale, $fileName);
     }
 }
+
+if (!function_exists('LI')) {
+    function LI($key, $lang = '')
+    {
+        return IniI18N::t($key, $lang);
+    }
+}
