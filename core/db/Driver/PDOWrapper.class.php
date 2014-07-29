@@ -15,7 +15,7 @@ class PDOWrapper extends DatabaseAbstract implements DatabaseWrapper
     protected function initialization()
     {
         if (!($this->link instanceof PDO)) {
-            $this->link = call_user_func_array(array(new ReflectionClass('PDO'), 'newInstance'), $this->initParams);
+            $this->link = call_user_func_array(array(new ReflectionClass('PDO'), 'newInstance'), $this->initParams);//new PDO($this->initParams[0], $this->initParams[1], $this->initParams[2]);
             foreach ($this->initialization as $val) {
                 $this->link->query($val);
             }
@@ -27,17 +27,15 @@ class PDOWrapper extends DatabaseAbstract implements DatabaseWrapper
 
     public function query()
     {
-        $params = func_get_args();
-        $sql    = array_shift($params);
 
+        $params = func_get_args();
+        $sql = array_shift($params);
         if ($this->getConfig('replaceTableName')) {
             $sql = preg_replace_callback('/{{(\w+)}}/', array($this, 'getTable'), $sql);
         }
-
         Database::$debug && Database::$sql[] = $sql;
 
         $this->initialization();
-
         if (!isset($params[0])) {
             if (!$sth = $this->link->query($sql)) {
                 throw new DatabaseException("Error sql query:$sql");
@@ -90,13 +88,12 @@ class PDOWrapper extends DatabaseAbstract implements DatabaseWrapper
         if ($out = $sth->fetchAll(PDO::FETCH_ASSOC)) {
             return $out;
         }
-
         return array();
     }
 
     /**
-     * @param Statement $sth
-     * @param int       $result_type
+     * @param PDOStatement $sth
+     * @param int          $result_type
      *
      * @return mixed
      */

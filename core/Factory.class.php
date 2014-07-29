@@ -64,7 +64,7 @@ class Factory
 
     static public function getInstanceNow($name, $constructparams = array())
     {
-        if (substr($name, -4) === 'Ctrl') {
+        if (substr($name, -7) === 'Control') {
             if (class_exists($name)) {
                 $action = new $name();
                 foreach ($action as $eachp => $v) {

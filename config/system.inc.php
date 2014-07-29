@@ -8,7 +8,7 @@
  */
 return array(
     'ACTION_SUFFIX' => 'Action',
-    'CONTROLLER_SUFFIX' => 'Ctrl',
+    'CONTROLLER_SUFFIX' => 'Control',
     'MODEL_SUFFIX' => 'Model',
     'SERVICE_SUFFIX' => 'Service',
     'DAO_SUFFIX' => 'DAO',

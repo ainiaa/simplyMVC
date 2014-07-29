@@ -29,6 +29,7 @@ class SmvcTemplate
 
     var $template_out;
     var $_vars;
+    var $skin = '';
 
     var $options = null;
 
@@ -74,7 +75,7 @@ class SmvcTemplate
      * @access  public
      *
      * @param   string $filename
-     * @param   string  $cache_id
+     * @param   string $cache_id
      *
      * @return  void
      */
@@ -250,7 +251,7 @@ class SmvcTemplate
     function make_compiled($filename)
     {
         $source = '';
-        $name = $this->compile_dir;
+        $name   = $this->compile_dir;
 
         $name .= '/' . basename($filename) . '.php';
         $exists = is_file($name);
@@ -329,7 +330,7 @@ class SmvcTemplate
      * @access  public
      *
      * @param   string $filename
-     * @param   string  $cache_id
+     * @param   string $cache_id
      *
      * @return  bool
      */
@@ -525,14 +526,16 @@ class SmvcTemplate
                         $t['_template'] = str_replace("\r", '', $this->fetch_str(base64_decode($_template)));
                     }
 
-//                    $out = "<?php \n" . '$k = ' . preg_replace(
-//                                    "/(\'\\$[^,]+)/e",
-//                                    "stripslashes(trim('\\1','\''));",
-//                                    var_export($t, true)
-//                            ) . ";\n";
+                    //                    $out = "<?php \n" . '$k = ' . preg_replace(
+                    //                                    "/(\'\\$[^,]+)/e",
+                    //                                    "stripslashes(trim('\\1','\''));",
+                    //                                    var_export($t, true)
+                    //                            ) . ";\n";
                     $out = "<?php \n" . '$k = ' . preg_replace_callback(
                                     "/(\'\\$[^,]+)/",
-                                    function ($r) { return stripslashes(trim($r[1],'\''));},
+                                    function ($r) {
+                                        return stripslashes(trim($r[1], '\''));
+                                    },
                                     var_export($t, true)
                             ) . ";\n";
                     $out .= 'echo $this->_echash . $k[\'name\'] . \'|\' . serialize($k) . $this->_echash;' . "\n?>";
@@ -668,8 +671,14 @@ class SmvcTemplate
     function get_val($val)
     {
         if (strrpos($val, '[') !== false) {
-//            $val = preg_replace("/\[([^\[\]]*)\]/eis", "'.'.str_replace('$','\$','\\1')", $val);
-            $val = preg_replace_callback("/\[([^\[\]]*)\]/is", function ($r) { return '.'.str_replace('$','\$',$r[1]);}, $val);
+            //            $val = preg_replace("/\[([^\[\]]*)\]/eis", "'.'.str_replace('$','\$','\\1')", $val);
+            $val = preg_replace_callback(
+                    "/\[([^\[\]]*)\]/is",
+                    function ($r) {
+                        return '.' . str_replace('$', '\$', $r[1]);
+                    },
+                    $val
+            );
         }
 
         if (strrpos($val, '|') !== false) {
@@ -693,7 +702,7 @@ class SmvcTemplate
         }
 
         if (!empty($moddb)) {
-            foreach ($moddb as  $mod) {
+            foreach ($moddb as $mod) {
                 $s = explode(':', $mod);
                 switch ($s[0]) {
                     case 'escape':
@@ -858,7 +867,7 @@ class SmvcTemplate
     function get_para($val, $type = 1) // 处理insert外部函数/需要include运行的函数的调用数据
     {
         $para = array();
-        $pa = $this->str_trim($val);
+        $pa   = $this->str_trim($val);
         foreach ($pa AS $value) {
             if (strrpos($value, '=')) {
                 list($a, $b) = explode('=', str_replace(array(' ', '"', "'", '&quot;'), '', $value));
@@ -996,8 +1005,8 @@ class SmvcTemplate
      */
     function _compile_foreach_start($tag_args)
     {
-        $attrs    = $this->get_para($tag_args, 0);
-        $from     = $attrs['from'];
+        $attrs = $this->get_para($tag_args, 0);
+        $from  = $attrs['from'];
 
         $item = $this->get_val($attrs['item']);
 
@@ -1016,7 +1025,12 @@ class SmvcTemplate
         }
 
         $output = '<?php ';
-        $output .= "\$_from = $from; if (!is_array(\$_from) && !is_object(\$_from)) { settype(\$_from, 'array'); }; \$this->push_vars('$attrs[key]', '$attrs[item]');";
+        if (isset($attrs["key"]) && isset($attrs["item"])) {
+            $output .= "\$_from = {$from}; if (!is_array(\$_from) && !is_object(\$_from)) { settype(\$_from, 'array'); }; \$this->push_vars('{$attrs["key"]}', '{$attrs["item"]}');";
+        } else {
+            $output .= "\$_from = {$from}; if (!is_array(\$_from) && !is_object(\$_from)) { settype(\$_from, 'array'); };";
+        }
+
 
         if (!empty($name)) {
             $foreach_props = "\$this->_foreach['$name']";
@@ -1042,10 +1056,10 @@ class SmvcTemplate
      */
     function push_vars($key, $val)
     {
-        if (!empty($key)) {
+        if (!empty($key) && isset($this->_vars[$key])) {
             array_push($this->_temp_key, "\$this->_vars['$key']='" . $this->_vars[$key] . "';");
         }
-        if (!empty($val)) {
+        if (!empty($val) && isset($this->_vars[$val])) {
             array_push($this->_temp_val, "\$this->_vars['$val']='" . $this->_vars[$val] . "';");
         }
     }
@@ -1077,7 +1091,7 @@ class SmvcTemplate
     function _compile_smarty_ref(&$indexes)
     {
         /* Extract the reference name. */
-        $_ref = $indexes[0];
+        $_ref         = $indexes[0];
         $compiled_ref = '';
 
         switch ($_ref) {
@@ -1174,7 +1188,7 @@ class SmvcTemplate
         $file_name = md5($this->_echash . strtolower(join('', $arr)));
         $file_path = SHARE_TEMP_PATH . "/temp/js/$file_name.js";
 
-        $str = "<script type='text/javascript' src='temp/js/$file_name.js'></script>";
+        $str     = "<script type='text/javascript' src='temp/js/$file_name.js'></script>";
         $changed = false;
 
         if (is_file($file_path)) {
@@ -1278,25 +1292,13 @@ class SmvcTemplate
      **/
     function smarty_prefilter_preCompile($source)
     {
-        $file_type = strtolower(strrchr($this->_current_file, '.'));
-        $tmp_dir   = '';
 
         /* 替换文件编码头部 */
         if (strpos($source, "\xEF\xBB\xBF") !== false) {
             $source = str_replace("\xEF\xBB\xBF", '', $source);
         }
 
-
-        if ($this->store_id > 0) {
-            if (strpos($this->_current_file, '/mall/resource') !== false) {
-                $mall_skin = $this->options['mall_skin'];
-                $tmp_dir   = "themes/mall/skin/$mall_skin/";
-            } else {
-                $tmp_dir = "themes/store/skin/" . $this->skin . '/';
-            }
-        } else {
-            $tmp_dir = "themes/mall/skin/" . $this->skin . '/';
-        }
+        $tmp_dir = "themes/mall/skin/" . $this->skin . '/';
 
         //        $pattern = array(
         //            '/<!--[^>|\n|#]*?({.+?})[^<|{|\n]*?-->/', // 替换smarty注释
@@ -1320,8 +1322,8 @@ class SmvcTemplate
 
         $pattern = array(
                 '/<!--[^>|\n|#]*?({.+?})[^<|{|\n]*?-->/', // 替换smarty注释
-                '/<!--[^<|>|{|\n|#]*?-->/',               // 替换不换行的html注释
-                '/(href=["|\'])\.\.\/(.*?)(["|\'])/i',  // 替换相对链接
+                '/<!--[^<|>|{|\n|#]*?-->/', // 替换不换行的html注释
+                '/(href=["|\'])\.\.\/(.*?)(["|\'])/i', // 替换相对链接
                 '/((?:background|src)\s*=\s*["|\'])(?:\.\/|\.\.\/)?(images\/.*?["|\'])/is', // 在images前加上 $tmp_dir
                 '/((?:background|background-image):\s*?url\()(?:\.\/|\.\.\/)?(images\/)/is', // 在images前加上 $tmp_dir
                 '/{nocache}(.+?){\/nocache}/is', //无缓存模块
@@ -1431,7 +1433,7 @@ class SmvcTemplate
     function _eval($content)
     {
         ob_start();
-//        error_log(var_export($content,1),3, 'd:/smvc.log');
+        //        error_log(var_export($content,1),3, 'd:/smvc.log');
         eval('?' . '>' . trim($content));
 
         $content = ob_get_contents();

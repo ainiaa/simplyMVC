@@ -195,11 +195,11 @@ class Importer
     public static function loadModel($modelName, $groupName = '@', $moduleName = '@')
     {
         if ('@' == $groupName) {
-            $groupName = GROUP_NAME;
+            $groupName = 'frontend';//todo 这个需要根据路由来修改
         }
 
         if ('@' == $moduleName) {
-            $moduleName = MODULE_NAME;
+            $moduleName = 'default';//todo 这个需要根据路由来修改
         }
         //        $base_model_file = APP_PATH . '/' . $group_name . '/' . $group_name . '.model.php';
         //        self::importFileByFullPath($base_model_file);
@@ -210,7 +210,7 @@ class Importer
         $loadResult = self::importFileByFullPath($modelFile);
 
         if (!$loadResult) { //当前group module下加载controller失败
-            $modules = self::getModuleList(GROUP_NAME);
+            $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
                 $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/models/' . $modelFileName;
                 $files    = self::getModelListByGroupAndModule($groupName, $module);
@@ -252,11 +252,11 @@ class Importer
     public static function loadService($service_name, $group_name = '@', $module_name = '@')
     {
         if ('@' == $group_name) {
-            $group_name = GROUP_NAME;
+            $group_name = 'frontend';//todo 这个需要根据路由来修改
         }
 
         if ('@' == $module_name) {
-            $module_name = MODULE_NAME;
+            $module_name = 'default';//todo 这个需要根据路由来修改
         }
 
         $serviceFileName = $service_name . '.service.php';
@@ -266,7 +266,7 @@ class Importer
         //echo $model_file,':',var_export(is_file($model_file));exit;
         $loadResult = self::importFileByFullPath($modelFile);
         if (!$loadResult) { //当前group module下加载controller失败
-            $modules = self::getModuleList(GROUP_NAME);
+            $modules = self::getModuleList($group_name);
             foreach ($modules as $module) {
                 $filePath = APP_PATH . '/' . $group_name . '/' . $module . '/services/' . $serviceFileName;
                 $files    = self::getServiceListByGroupAndModule($group_name, $module);
@@ -309,11 +309,11 @@ class Importer
     public static function loadHelper($helperName, $groupName = '@', $moduleName = '@')
     {
         if ('@' == $groupName) {
-            $groupName = GROUP_NAME;
+            $groupName = 'frontend';//todo 这个需要根据路由来修改
         }
 
         if ('@' == $moduleName) {
-            $moduleName = MODULE_NAME;
+            $moduleName = 'default';//todo 这个需要根据路由来修改
         }
 
         $helperFileName = $helperName . '.helper.php';
@@ -322,7 +322,7 @@ class Importer
         $loadResult = self::importFileByFullPath($helperFile);
 
         if (!$loadResult) { //当前group module下加载controller失败
-            $modules = self::getModuleList(GROUP_NAME);
+            $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
                 $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/helpers/' . $helperFileName;
                 $files    = self::getServiceListByGroupAndModule($groupName, $module);
@@ -364,11 +364,11 @@ class Importer
     public static function loadDAO($daoName, $groupName = '@', $moduleName = '@')
     {
         if ('@' == $groupName) {
-            $groupName = GROUP_NAME;
+            $groupName = 'frontend';//todo 这个需要根据路由来修改
         }
 
         if ('@' == $moduleName) {
-            $moduleName = MODULE_NAME;
+            $moduleName = 'default';//todo 这个需要根据路由来修改
         }
         //        $base_dao_file = APP_PATH . '/' . $group_name . '/' . $group_name . '.dao.php';
         //        self::importFileByFullPath($base_dao_file);
@@ -379,7 +379,7 @@ class Importer
         $loadResult = self::importFileByFullPath($daoFile);
 
         if (!$loadResult) { //当前group module下加载controller失败
-            $modules = self::getModuleList(GROUP_NAME);
+            $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
                 $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/daos/' . $daoFileName;
                 $files    = self::getDAOListByGroupAndModule($groupName, $module);
@@ -689,6 +689,7 @@ class Importer
         Importer::importFile('core.service.Base', 'class.php', ROOT_PATH);
         Importer::importFile('core.view.View', 'class.php', ROOT_PATH);
         Importer::importFile('core.SmvcConf', 'class.php', ROOT_PATH);
+        Importer::importFile('core.Database', 'class.php', ROOT_PATH);
     }
 
 }

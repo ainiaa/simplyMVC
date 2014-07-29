@@ -19,22 +19,20 @@
 4、db的 具体实现
 
    * PS
-        https://github.com/salebab/database pdo  good
-        https://github.com/adriengibrat/Simple-Database-PHP-Class pdo good
+        https://github.com/salebab/database pdo  good  ---  3 files
+        https://github.com/adriengibrat/Simple-Database-PHP-Class  pdo good --- single file
         https://github.com/robmorgan/phinx tools
         https://github.com/khoaofgod/phpfastcache
         https://github.com/stefangabos/Zebra_Database  mysqli good
         https://github.com/joshcam/PHP-MySQLi-Database-Class
-        https://github.com/mikehenrty/thin-pdo-wrapper pdo good
+        https://github.com/mikehenrty/thin-pdo-wrapper pdo good --- single file
         https://github.com/mikecao/sparrow
         https://github.com/ttsuruoka/php-simple-dbi/blob/master/src/SimpleDBI.php
         https://github.com/MyXoToD/PHP-Database-Class mysql
         https://github.com/vrana/notorm
-        https://github.com/jv2222/ezSQL
         https://github.com/Xeoncross/1kb-PHP-MVC-Framework
         https://github.com/sensiolabs/security-advisories ??
         https://github.com/catfan/Medoo
-        https://github.com/jaredtking/php-database
         https://github.com/Molajo/Database  based on joomla
         https://github.com/xuanyan/Database  mulit good
         https://github.com/spadefoot/kohana-orm-leap orm
@@ -57,7 +55,7 @@
         https://github.com/dmitry-vinogradov/PHP-DB
         https://github.com/paulyg/DBALite/tree/master/src
         https://github.com/nmmmnu/pdb good
-        https://github.com/theodorejb/peachy-sql
+        https://github.com/theodorejb/peachy-sql php5.4+
         https://github.com/gimler/MySQLndUhTool tools
         https://github.com/patrichs/BootstrapFull -- admin framework
 

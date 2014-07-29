@@ -1,7 +1,188 @@
 <?php
 
 /**
+ * based on https://github.com/xuanyan/Database
  * Class Database
+ *
+ * equire_once ‘Database.php’;
+ *
+ * // pdo
+ * $db = Database::connect(‘pdo’, ‘mysql:dbname=test;host=localhost’, ‘root’, ‘root’);
+ * $db = new Database(‘pdo’, ‘mysql:dbname=test;host=localhost’, ‘root’, ‘root’);
+ *
+ * $db = Database::connect(array(‘pdo’, ‘mysql:dbname=test;host=localhost’, ‘root’, ‘root’));
+ * $db = new Database(array(‘pdo’, ‘mysql:dbname=test;host=localhost’, ‘root’, ‘root’));
+ *
+ * $link = new PDO;
+ * $db = Database::connect($link);
+ * $db = new Database($link);
+ *
+ * // mysql
+ * $db = Database::connect(‘mysql’, ‘localhost’, ‘root’, ‘root’, ‘test’);
+ * $db = new Database(‘mysql’, ‘localhost’, ‘root’, ‘root’, ‘test’);
+ *
+ * $db = Database::connect(array(‘mysql’, ‘localhost’, ‘root’, ‘root’, ‘test’));
+ * $db = new Database(array(‘mysql’, ‘localhost’, ‘root’, ‘root’, ‘test’));
+ *
+ * $link = mysql_connect(‘localhost’, ‘root’, ‘root’);
+ * mysql_select_db(‘test’, $link);
+ * $db = Database::connect($link);
+ * $db = new Database($link);
+ *
+ * // mysqli
+ * $db = Database::connect(‘mysqli’, ‘localhost’, ‘root’, ‘root’, ‘test’);
+ * $db = new Database(‘mysqli’, ‘localhost’, ‘root’, ‘root’, ‘test’);
+ *
+ * $db = Database::connect(array(‘mysqli’, ‘localhost’, ‘root’, ‘root’, ‘test’));
+ * $db = new Database(array(‘mysqli’, ‘localhost’, ‘root’, ‘root’, ‘test’));
+ *
+ * $link = new mysqli(‘localhost’, ‘root’, ‘root’, ‘test’);
+ * $db = Database::connect($link);
+ * $link = mysqli_init();
+ * $link→real_connect(‘localhost’, ‘root’, ‘root’, ‘test’);
+ * $db = Database::connect($link);
+ * $db = new Database($link);
+ *
+ * // sqlite
+ * $db = Database::connect(‘sqlite’, ‘test.sqlite’);
+ * $db = new Database(‘sqlite’, ‘test.sqlite’);
+ *
+ * $db = Database::connect(array(‘sqlite’, ‘test.sqlite’));
+ * $db = new Database(array(‘sqlite’, ‘test.sqlite’));
+ *
+ * $link = new SQLiteDatabase(‘test.sqlite’);
+ * $db = Database::connect($link);
+ * $db = new Database($link);
+ *
+ * $link = sqlite_open(‘test.sqlite’);
+ * $db = Database::connect($link);
+ * $db = new Database($link);
+ *
+ * // sqlite3
+ * $db = Database::connect(‘sqlite3’, ‘test.sqlite3’);
+ * $db = new Database(‘sqlite3’, ‘test.sqlite3’);
+ *
+ * $db = Database::connect(array(‘sqlite3’, ‘test.sqlite3’));
+ * $db = new Database(array(‘sqlite3’, ‘test.sqlite3’));
+ *
+ * $link = new SQLite3(‘test.sqlite3’);
+ * $db = Database::connect($link);
+ * $db = new Database($link);
+ *
+ * ?>
+ * ```
+ * use the $instance variable
+ *
+ * ```php5
+ * <?php
+ * require_once ‘Database.php’;
+ *
+ * // set the Database::$instance
+ * Database::$instance = Database::connect(‘mysql’, ‘localhost’, ‘root’, ‘root’, ‘test’);
+ *
+ * //in some function, u can use them like this:
+ *
+ * print_r(test());
+ *
+ * function test() {
+ * $sql = “SELECT * FROM test WHERE id = ?”;
+ * $data = Database::$instance→getRow($sql, 1);
+ * return $data;
+ *
+ * }
+ * ?>
+ * ```
+ * demo code:
+ *
+ * ```php5
+ * <?php
+ * // origin sql
+ * $sql = “SELECT * FROM test_table WHERE id = ‘$id’ AND name = ‘$name’”;
+ * $result = $db→getAll($sql);
+ *
+ * // if there are variables in sql, you can do it like this, and don’t need to process the variables. : )
+ * $sql = “SELECT * FROM test_table WHERE id = ? AND name = ?”;
+ * $result = $db→getAll($sql, $id, $name);
+ *
+ * // you can allso use:
+ * $sql = “SELECT * FROM test_table WHERE id = ? AND name = ?”;
+ * $result = $db→getAll($sql, array($id, $name));
+ *
+ * // it allso support:
+ * $sql = “SELECT * FROM test_table WHERE id = :id AND name = :name”;
+ * $result = $db→getAll($sql, array(‘name’=>$name, ‘id’=>$id));
+ * ?>
+ * ```
+ * database methods:
+ *
+ * ```php5
+ * <?php
+ * public function getRow();
+ * // get a row result
+ * public function getCol();
+ * // get a col result
+ * public function getOne();
+ * // get a column value
+ * public function getAll();
+ * // get all results
+ * public function exec();
+ * // execute a sql
+ * public function lastInsertId();
+ * // get the id of the last inserted row or sequence value
+ * public function getDriver();
+ * // get the origin link or object of the database driver
+ * public function query();
+ * // execute a sql and returns a statement object
+ * public function fetch($query);
+ * // fetch a result whith the statement object from query
+ * ?>
+ * ```
+ * the class just do the connecting work at initialization. you can exec ‘the initialization sql’ after connect like this, sure, it is lazy-executing just like the connecting.
+ *
+ * ```php5
+ * <?php
+ * //mysql
+ * $db = Database::connect(‘mysql’, ‘localhost’, ‘root’, ‘root’, ‘test’);
+ * $db→initialization = array(
+ * ‘SET character_set_connection=utf8, character_set_results=utf8, character_set_client=binary’,
+ * “SET sql_mode=’’”
+ * );
+ * // it’s same as above
+ * $db→setConfig(‘initialization’, array(
+ * ‘SET character_set_connection=utf8, character_set_results=utf8, character_set_client=binary’,
+ * “SET sql_mode=’’”
+ * ));
+ * ?>
+ * ```
+ * use table-prefix
+ *
+ * ```php5
+ * <?php
+ * //mysql
+ * $db = Database::connect(‘mysql’, ‘localhost’, ‘root’, ‘root’, ‘test’);
+ *
+ * $db→setConfig(‘tablePreFix’, ‘db_’);
+ * // or set multi table-prefix
+ * $db→setConfig(‘tablePreFix’, array(
+ * ‘db1_’=>array(‘table1’, ‘table2’),
+ * ‘db2_’=> ‘*’ // means the other tables use ‘db2_’ prefix
+ * ));
+ *
+ * // and u can get the table name by getTable function
+ *
+ * $table_name = $db→getTable(‘table1’); // db1_table1
+ *
+ * // and the sql will be auto replaced the table name with ‘tablePreFix’ by dafault if you use ‘{{tablename}}’ in sql
+ *
+ * $sql = “SELECT * FROM {{table1}}”;
+ * // SELECT * FROM db1_table1
+ * $result = $db→getAll($sql);
+ *
+ * // and you can disable the auto-replace by using:
+ *
+ * $db→setConfig(‘replaceTableName’, false);
+ *
+ * ?>
  */
 class Database
 {
@@ -81,7 +262,20 @@ class Database
             throw new DatabaseException("cant auto detect the database driver");
         }
 
-        require_once dirname(__FILE__) . '/Driver/' . $driver . '.php';
+        //todo 这个其实可以使用 autoload 以后在修改吧。
+        Importer::importFileByFullPath(
+                dirname(__FILE__) . '/db/DatabaseAbstract.class.php'
+        );
+        Importer::importFileByFullPath(
+                dirname(__FILE__) . '/db/DatabaseException.class.php'
+        );
+        Importer::importFileByFullPath(
+                dirname(__FILE__) . '/db/DatabaseWrapper.class.php'
+        );
+        Importer::importFileByFullPath(
+                dirname(__FILE__) . '/db/Driver/'.$driver.'Wrapper.class.php'
+        );
+
         $class = $driver . 'Wrapper';
 
         return new $class($params);

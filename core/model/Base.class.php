@@ -6,7 +6,7 @@
  * @author jeff liu
  */
 
-Importer::importFile('core.model.db', 'class.php', ROOT_PATH);
+//Importer::importFile('core.model.db', 'class.php', ROOT_PATH);
 
 class BaseModel extends Object
 {
@@ -35,6 +35,8 @@ class BaseModel extends Object
 
         $this->alias_name = empty($this->alias_name) ? $this->table_name : $this->alias_name;
 
+        $this->initDb();
+
     }
 
     /**
@@ -48,6 +50,7 @@ class BaseModel extends Object
         if (empty($db_type)) {
             $db_type = 'mysql';
         }
+        $this->db = new Database(array('pdo', 'mysql:dbname=test;host=localhost', 'root', ''));
     }
 
     /**
@@ -111,7 +114,7 @@ class BaseModel extends Object
      * @author jeff liu
      * powered by jeff 2011-5-31
      */
-    public function retrieve()
+    public function getOne()
     {
 
     }
@@ -120,7 +123,7 @@ class BaseModel extends Object
      * 获得数据之前的动作
      * @author jeff liu
      */
-    protected function preRetrieve()
+    protected function preGetOne()
     {
 
     }
@@ -129,10 +132,36 @@ class BaseModel extends Object
      * 获得数据之后的动作
      * @author jeff liu
      */
-    protected function postRetrieve()
+    protected function postGetOne()
     {
 
     }
+
+
+    public function getAll()
+    {
+        $sql = 'SELECT * FROM ' . $this->table_name;
+        return $this->db->getAll($sql);
+    }
+
+    /**
+     * 获得数据之前的动作
+     * @author jeff liu
+     */
+    protected function preGetAll()
+    {
+
+    }
+
+    /**
+     * 获得数据之后的动作
+     * @author jeff liu
+     */
+    protected function postGetAll()
+    {
+
+    }
+
 
     /**
      * 删除数据

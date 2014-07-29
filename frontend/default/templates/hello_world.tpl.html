@@ -1,12 +1,17 @@
-$helloWorld: <{$helloWorld}> <br />
-        A
-        SDF
-        AS
-        DF
-        ADSFAS
-        DF
-        SAFdddd <br />
+$helloWorld: <{$helloWorld}> <br/>
+A
+SDF
+AS
+DF
+ADSFAS
+DF
+SAFdddd <br/>
 
-$helloWorld1: <{$helloWorld1}> <br />
-$id: <{$id}> <br />
-$name: <{$name}> <br />
+$helloWorld1: {$helloWorld1} <br/>
+$all:
+{foreach from=$all item=itemList}
+    {foreach from=$itemList item=item key=key}
+        {$key} : {$item}
+    {/foreach}<br/>
+{/foreach}
+<br/>

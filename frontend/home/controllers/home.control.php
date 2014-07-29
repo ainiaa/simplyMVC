@@ -1,6 +1,6 @@
 <?php
 
-class HomeCtrl extends FrontendControl
+class HomeControl extends FrontendControl
 {
 
     function __contruct()

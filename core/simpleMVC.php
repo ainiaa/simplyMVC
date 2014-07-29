@@ -119,6 +119,7 @@ class SimpleMVC
             Importer::importFile('core.service.Base', 'class.php', ROOT_PATH);
             Importer::importFile('core.view.View', 'class.php', ROOT_PATH);
             Importer::importFile('core.SmvcConf', 'class.php', ROOT_PATH);
+            Importer::importFile('core.Database', 'class.php', ROOT_PATH);
         }
 
         /**

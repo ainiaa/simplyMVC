@@ -42,6 +42,20 @@ class defaultControl extends FrontendControl
 
         $this->assign('helloWorld1', 'Hello World gggg !');
 
+        $all = $this->TestService->getAll();
+
+        $this->assign('all', $all);
+
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $all,
+                        'label' => '$all',
+                        'level' => 'error',
+                )
+        );
+
+//        echo '<pre>$all:', var_export($all, 1), '</pre>';
+
         $this->display('hello_world.tpl.html');
     }
 
