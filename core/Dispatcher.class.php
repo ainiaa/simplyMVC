@@ -6,8 +6,6 @@
  */
 class Dispatcher
 {
-    const CONTROLLER_SUFFIX = 'Control';
-    const ACTION_SUFFIX     = 'Action';
 
     /**
      * 任务派遣方法

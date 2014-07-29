@@ -85,7 +85,7 @@ class SimpleMVC
         set_error_handler(array('SimpleMVC', 'appError'));
         set_exception_handler(array('SimpleMVC', 'appException'));
 
-        $isDebugMode = C('APP_DEBUG');
+        $isDebugMode = C('smvcDebug');
         if ($isDebugMode) {
             error_reporting(E_ALL);
             ini_set('display_errors', 'on');
@@ -128,7 +128,7 @@ class SimpleMVC
         SmvcConf::instance()->loadConfigFileList(CONF_PATH, 'inc.php');
 
         //设置加载路径
-        $autoloadPath = C('APP_AUTOLOAD_PATH');
+        $autoloadPath = C('autoLoadPath');
         if ($autoloadPath) {
             $autoloadPath = explode(',', $autoloadPath);
             $autoloadPath = implode(PATH_SEPARATOR, $autoloadPath);

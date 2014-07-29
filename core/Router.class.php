@@ -10,8 +10,13 @@
 class Router
 {
 
-    const CONTROLLER_SUFFIX = 'Control';
-    const ACTION_SUFFIX     = 'Action';
+    public static $group;
+
+    public static $module;
+
+    public static $controller;
+
+    public static $action;
 
     /**
      * 除去魔术
@@ -86,7 +91,14 @@ class Router
      */
     public static function getGroup($info = array())
     {
-        return isset($_REQUEST['group']) ? $_REQUEST['group'] : 'frontend';
+        if ($info) {
+            self::$group = isset($info['group']) ? $info['group'] : C('defaultGroup', 'frontend');
+        } else {
+            if (empty(self::$group)) {
+                self::$group = C('defaultGroup', 'frontend');
+            }
+        }
+        return self::$group;
     }
 
     /**
@@ -99,7 +111,14 @@ class Router
      */
     public static function getModule($info = array())
     {
-        return isset($_REQUEST['module']) ? $_REQUEST['module'] : 'default';
+        if ($info) {
+            self::$module = isset($info['module']) ? $info['module'] : C('defaultModule', 'default');
+        } else {
+            if (empty(self::$module)) {
+                self::$module = C('defaultModule', 'default');
+            }
+        }
+        return self::$module;
     }
 
 
@@ -113,8 +132,14 @@ class Router
      */
     public static function getController($info = array())
     {
-        $controller =  isset($_REQUEST['controller']) ? $_REQUEST['controller'] : 'default' ;
-        return $controller . self::CONTROLLER_SUFFIX;
+        if ($info) {
+            self::$controller = isset($info['controller']) ? $info['controller'] : C('defaultController', 'default');
+        } else {
+            if (empty(self::$controller)) {
+                self::$controller = C('defaultController', 'default');
+            }
+        }
+        return self::$controller . C('controllerSuffix');
     }
 
     /**
@@ -127,13 +152,20 @@ class Router
      */
     public static function getAction($info = array())
     {
-        $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'index';
-        return  $action . self::ACTION_SUFFIX;
+        if ($info) {
+            self::$action = isset($info['action']) ? $info['action'] : C('defaultAction', 'index');
+        } else {
+            if (empty(self::$action)) {
+                self::$action = C('defaultAction', 'index');
+            }
+        }
+        return self::$action . C('actionSuffix');
     }
 
 
     /**
      * TODO
+     *
      * @param $var
      */
     public static function getParams($info = array())

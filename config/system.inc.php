@@ -7,11 +7,10 @@
  * To change this template use File | Settings | File Templates.
  */
 return array(
-    'ACTION_SUFFIX' => 'Action',
-    'CONTROLLER_SUFFIX' => 'Control',
-    'MODEL_SUFFIX' => 'Model',
-    'SERVICE_SUFFIX' => 'Service',
-    'DAO_SUFFIX' => 'DAO',
-    'HELPER_SUFFIX' => 'Helper',
-    'URL_PARAMS_BIND' => true,//@see http://www.thinkphp.cn/update/67.html
+        'actionSuffix'     => 'Action',
+        'controllerSuffix' => 'Control',
+        'modelSuffix'      => 'Model',
+        'serviceSuffix'    => 'Service',
+        'daoSuffix'        => 'DAO',
+        'helperSuffix'     => 'Helper',
 );

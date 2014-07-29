@@ -285,7 +285,7 @@ class BaseDAO extends Object
             }
             foreach ($data as $key => $val) {
                 if (!in_array($key, $fields, true)) {
-                    if (C('APP_DEBUG')) {
+                    if (C('smvcDebug')) {
                         E(LA('_DATA_TYPE_INVALID_') . ':[' . $key . '=>' . $val . ']'); //todo 这个需要处理
                     }
                     unset($data[$key]);
@@ -687,7 +687,7 @@ class BaseDAO extends Object
                                 '.'
                         ) && false === strpos($key, '(') && false === strpos($key, '|') && false === strpos($key, '&')
                 ) {
-                    if (C('APP_DEBUG')) {
+                    if (C('smvcDebug')) {
                         E(LA('_ERROR_QUERY_EXPRESS_') . ':[' . $key . '=>' . $val . ']'); //todo 这个需要处理
                     }
                     unset($options['where'][$key]);

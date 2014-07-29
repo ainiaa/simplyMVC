@@ -28,6 +28,6 @@ return array(
     'DEFAULT_MODULE' => 'default', //默认module
     'DEFAULT_CONTROLLER' => 'default', //默认controller
     'APP_GROUP_MODE' => 1,//启用独立分组
-    'URL_MODEL' => 1, //url model
+    'urlMode' => 1, //1=>兼容性的url mode,2=>path_info的url mode,3=>url rewrite的mode url
 
 );

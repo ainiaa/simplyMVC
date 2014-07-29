@@ -151,7 +151,7 @@ class SmvcConf implements ArrayAccess
      * @param      $key
      * @param bool $default
      *
-     * @return bool
+     * @return mixed
      */
     public function get($key, $default = false)
     {

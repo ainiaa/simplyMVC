@@ -1218,7 +1218,7 @@ class SmvcTemplate
                 $replacement[] = '';
                 $content       = preg_replace($patterns, $replacement, $content);
 
-                if (!defined('DEBUG_MODE') || DEBUG_MODE === 0) {
+                if (C('debugMode') === 0) {
                     $content = str_replace("\r", '', $content);
                     $content = str_replace("\n", '', $content);
                 }
@@ -1246,7 +1246,7 @@ class SmvcTemplate
         $file_name = md5($this->_echash . strtolower(join('', $arr)));
         $file_path = SHARE_TEMP_PATH . "/temp/style/$file_name.css";
 
-        $str = "<link type='text/css' rel='stylesheet' href='temp/style/$file_name.css'></link>";
+        $str = "<link type='text/css' rel='stylesheet' href='temp/style/$file_name.css' />";
         if (is_file($file_path)) {
             $mtime   = filemtime($file_path);
             $changed = false;
@@ -1259,7 +1259,7 @@ class SmvcTemplate
             }
         }
 
-        if (!is_file($file_path) || $changed || DEBUG_MODE > 0) {
+        if (!is_file($file_path) || $changed || C('debugMode') > 0) {
             $js_code = '';
             foreach ($arr AS $file) {
                 $content  = file_get_contents(SHARE_DATA_PATH . '/' . $file);
