@@ -138,11 +138,11 @@ class Importer
     public static function loadController($controllerName, $groupName = '@', $moduleName = '@')
     {
         if ('@' == $groupName) {
-            $groupName = 'frontend';
+            $groupName = Router::getGroup();;
         }
 
         if ('@' == $moduleName) {
-            $moduleName = 'default';
+            $moduleName = Router::getModule();
         }
         $baseControllerFile = APP_PATH . '/' . $groupName . '/' . $groupName . '.control.php';
         self::importFileByFullPath($baseControllerFile);
@@ -153,7 +153,7 @@ class Importer
         $loadResult     = self::importFileByFullPath($controllerFile);
 
         if (!$loadResult) { //当前group module下加载controller失败
-            $modules = self::getModuleList('frontend');
+            $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
                 $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/controllers/' . $controllerFileName;
                 $files    = self::getControllerListByGroupAndModule($groupName, $module);
@@ -195,11 +195,11 @@ class Importer
     public static function loadModel($modelName, $groupName = '@', $moduleName = '@')
     {
         if ('@' == $groupName) {
-            $groupName = 'frontend';//todo 这个需要根据路由来修改
+            $groupName = Router::getGroup();
         }
 
         if ('@' == $moduleName) {
-            $moduleName = 'default';//todo 这个需要根据路由来修改
+            $moduleName = Router::getModule();
         }
         //        $base_model_file = APP_PATH . '/' . $group_name . '/' . $group_name . '.model.php';
         //        self::importFileByFullPath($base_model_file);
@@ -245,31 +245,31 @@ class Importer
      * 加载对应的service文件
      * @todo 需要重新实现
      *
-     * @param string $service_name
-     * @param string $group_name
-     * @param string $module_name
+     * @param string $serviceName
+     * @param string $groupName
+     * @param string $moduleName
      */
-    public static function loadService($service_name, $group_name = '@', $module_name = '@')
+    public static function loadService($serviceName, $groupName = '@', $moduleName = '@')
     {
-        if ('@' == $group_name) {
-            $group_name = 'frontend';//todo 这个需要根据路由来修改
+        if ('@' == $groupName) {
+            $groupName = Router::getGroup();
         }
 
-        if ('@' == $module_name) {
-            $module_name = 'default';//todo 这个需要根据路由来修改
+        if ('@' == $moduleName) {
+            $moduleName = Router::getModule();
         }
 
-        $serviceFileName = $service_name . '.service.php';
+        $serviceFileName = $serviceName . '.service.php';
 
 
-        $modelFile = APP_PATH . $group_name . '/' . $module_name . '/services/' . ucfirst($serviceFileName);
+        $modelFile = APP_PATH . $groupName . '/' . $moduleName . '/services/' . ucfirst($serviceFileName);
         //echo $model_file,':',var_export(is_file($model_file));exit;
         $loadResult = self::importFileByFullPath($modelFile);
         if (!$loadResult) { //当前group module下加载controller失败
-            $modules = self::getModuleList($group_name);
+            $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
-                $filePath = APP_PATH . '/' . $group_name . '/' . $module . '/services/' . $serviceFileName;
-                $files    = self::getServiceListByGroupAndModule($group_name, $module);
+                $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/services/' . $serviceFileName;
+                $files    = self::getServiceListByGroupAndModule($groupName, $module);
                 if (in_array($filePath, $files, true)) {
                     $loadResult = self::importFileByFullPath($modelFile);
                     if ($loadResult) { //加载成功直接break
@@ -309,11 +309,11 @@ class Importer
     public static function loadHelper($helperName, $groupName = '@', $moduleName = '@')
     {
         if ('@' == $groupName) {
-            $groupName = 'frontend';//todo 这个需要根据路由来修改
+            $groupName = Router::getGroup();
         }
 
         if ('@' == $moduleName) {
-            $moduleName = 'default';//todo 这个需要根据路由来修改
+            $moduleName = Router::getModule();
         }
 
         $helperFileName = $helperName . '.helper.php';
@@ -364,14 +364,12 @@ class Importer
     public static function loadDAO($daoName, $groupName = '@', $moduleName = '@')
     {
         if ('@' == $groupName) {
-            $groupName = 'frontend';//todo 这个需要根据路由来修改
+            $groupName = Router::getGroup();
         }
 
         if ('@' == $moduleName) {
-            $moduleName = 'default';//todo 这个需要根据路由来修改
+            $moduleName = Router::getModule();
         }
-        //        $base_dao_file = APP_PATH . '/' . $group_name . '/' . $group_name . '.dao.php';
-        //        self::importFileByFullPath($base_dao_file);
 
         $daoFileName = $daoName . '.dao.php';
 
@@ -414,15 +412,15 @@ class Importer
     /**
      * 根据给定的group和module获得controller列表
      *
-     * @param string $group_name
-     * @param string $module_name
+     * @param string $groupName
+     * @param string $moduleName
      *
      * @return array
      */
-    public static function getControllerListByGroupAndModule($group_name, $module_name)
+    public static function getControllerListByGroupAndModule($groupName, $moduleName)
     {
         $appFileStruct  = self::getAppFileStruct();
-        $files          = isset($appFileStruct[$group_name][$module_name]) ? $appFileStruct[$group_name][$module_name] : array();
+        $files          = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : array();
         $controllerList = isset($files['controllers']) ? $files['controllers'] : array();
 
         return $controllerList;
@@ -431,15 +429,15 @@ class Importer
     /**
      * 根据给定的group和module获得model列表
      *
-     * @param string $group_name
-     * @param string $module_name
+     * @param string $groupName
+     * @param string $moduleName
      *
      * @return array
      */
-    public static function getModelListByGroupAndModule($group_name, $module_name)
+    public static function getModelListByGroupAndModule($groupName, $moduleName)
     {
         $appFileStruct = self::getAppFileStruct();
-        $files         = isset($appFileStruct[$group_name][$module_name]) ? $appFileStruct[$group_name][$module_name] : array();
+        $files         = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : array();
         $modelList     = isset($files['models']) ? $files['models'] : array();
 
         return $modelList;
@@ -448,15 +446,15 @@ class Importer
     /**
      * 根据给定的group和module获得service列表
      *
-     * @param string $group_name
-     * @param string $module_name
+     * @param string $groupName
+     * @param string $moduleName
      *
      * @return array
      */
-    public static function getServiceListByGroupAndModule($group_name, $module_name)
+    public static function getServiceListByGroupAndModule($groupName, $moduleName)
     {
         $appFileStruct = self::getAppFileStruct();
-        $files         = isset($appFileStruct[$group_name][$module_name]) ? $appFileStruct[$group_name][$module_name] : array();
+        $files         = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : array();
         $serviceList   = isset($files['services']) ? $files['services'] : array();
 
         return $serviceList;
@@ -465,15 +463,15 @@ class Importer
     /**
      * 根据给定的group和module获得dao列表
      *
-     * @param string $group_name
-     * @param string $module_name
+     * @param string $groupName
+     * @param string $moduleName
      *
      * @return array
      */
-    public static function getDAOListByGroupAndModule($group_name, $module_name)
+    public static function getDAOListByGroupAndModule($groupName, $moduleName)
     {
         $appFileStruct = self::getAppFileStruct();
-        $files         = isset($appFileStruct[$group_name][$module_name]) ? $appFileStruct[$group_name][$module_name] : array();
+        $files         = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : array();
         $daoList       = isset($files['daos']) ? $files['daos'] : array();
 
         return $daoList;
@@ -490,11 +488,11 @@ class Importer
     {
         $tree = array();
         if ('/' === substr($path, -1)) {
-            $glob_pattern = $path . '*';
+            $globPattern = $path . '*';
         } else {
-            $glob_pattern = $path . '/*';
+            $globPattern = $path . '/*';
         }
-        foreach (glob($glob_pattern) as $single) {
+        foreach (glob($globPattern) as $single) {
             if (is_dir($single)) {
                 $tree = array_merge($tree, self::getFileStructBypath($single));
             } else {
@@ -510,22 +508,18 @@ class Importer
      */
     public static function getGroupList()
     {
-        $group_list = array();
-        !defined('APP_GROUP_LIST') && define('APP_GROUP_LIST', '');
-        if (APP_GROUP_LIST) {
-            $group_list = explode(',', APP_GROUP_LIST);
-        }
-        return $group_list;
+        $groupList = explode(',', C('APP_GROUP_LIST'));
+        return $groupList;
     }
 
     /**
      * 获得module列表
      *
-     * @param string $group_name
+     * @param string $groupName
      *
      * @return array
      */
-    public static function getModuleList($group_name = '')
+    public static function getModuleList($groupName = '')
     {
         $finalData = array();
         $groupList = self::getGroupList();
@@ -539,8 +533,8 @@ class Importer
             }
         }
 
-        if (!empty($group_name) && isset($finalData[$group_name])) {
-            $finalData = $finalData[$group_name];
+        if (!empty($groupName) && isset($finalData[$groupName])) {
+            $finalData = $finalData[$groupName];
         }
 
         return $finalData;
@@ -553,9 +547,8 @@ class Importer
     public static function getAppFileStruct()
     {
         static $finalFileStruct = array();
-        !defined('APP_GROUP_LIST') && define('APP_GROUP_LIST', '');
-        if (APP_GROUP_LIST) {
-            $appGroupList = explode(',', APP_GROUP_LIST);
+        if (C('APP_GROUP_LIST')) {
+            $appGroupList = explode(',', C('APP_GROUP_LIST'));
             foreach ($appGroupList as $groupName) {
                 $groupBasePath                          = APP_PATH . $groupName . '/';
                 $files                                  = glob($groupBasePath . '*');
@@ -587,32 +580,32 @@ class Importer
      * 自动加载
      * @author jeff liu
      *
-     * @param String $class_name 需要加载的类名
+     * @param String $className 需要加载的类名
      */
-    public static function autoLoad($class_name)
+    public static function autoLoad($className)
     {
         SmvcDebugHelper::instance()->debug(
-                array('info' => $class_name, 'label' => '$class_name', 'level' => 'warn')
+                array('info' => $className, 'label' => '$class_name', 'level' => 'warn')
         );
-        if ('Control' == substr($class_name, -7)) { //controller类
-            $controllerName = substr_replace($class_name, '', -7);
+        if ('Control' == substr($className, -7)) { //controller类
+            $controllerName = substr_replace($className, '', -7);
             self::loadController(lcfirst($controllerName));
             return;
-        } elseif ('Model' == substr($class_name, -5)) { //model类 TODO 使用service dao  model 这个还需要吗？？？
-            $modelName = substr_replace($class_name, '', -5);
+        } elseif ('Model' == substr($className, -5)) { //model类 TODO 使用service dao  model 这个还需要吗？？？
+            $modelName = substr_replace($className, '', -5);
             self::loadModel(lcfirst($modelName));
             return;
-        } elseif ('DAO' == substr($class_name, -3)) { //dao类
-            $daoName = substr_replace($class_name, '', -3);
+        } elseif ('DAO' == substr($className, -3)) { //dao类
+            $daoName = substr_replace($className, '', -3);
             self::loadDAO(lcfirst($daoName));
             return;
-        } elseif ('Service' == substr($class_name, -7)) { //service类
-            $serviceName = substr_replace($class_name, '', -7);
+        } elseif ('Service' == substr($className, -7)) { //service类
+            $serviceName = substr_replace($className, '', -7);
             self::loadService(lcfirst($serviceName));
             return;
-        } elseif ('Helper' == substr($class_name, -6)) { //辅助类
+        } elseif ('Helper' == substr($className, -6)) { //辅助类
             //TODO 需要考虑 group moduel 里面的helper？？？  分组下面需要有吗？？？
-            $helperName = substr_replace($class_name, '', -6);
+            $helperName = substr_replace($className, '', -6);
             self::loadHelper(lcfirst($helperName));
             return;
         }
@@ -623,8 +616,8 @@ class Importer
         $fileExtensions = array('.class.php', '.php');
         foreach ($paths as $path) {
             // TODO 如果加载类成功则返回 这个需要完善。。。 文件名后缀需要整理
-            foreach ($fileExtensions as $file_extension) {
-                $fullFilePath = $path . '/' . $class_name . $file_extension;
+            foreach ($fileExtensions as $fileExtension) {
+                $fullFilePath = $path . '/' . $className . $fileExtension;
                 if (self::importFileByFullPath($fullFilePath, false)) {
                     break;
                 }

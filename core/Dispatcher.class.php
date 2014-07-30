@@ -27,7 +27,13 @@ class Dispatcher
         $actionName     = Router::getAction();
         $params         = self::getParams($controller, $actionName);
 
-        self::preDispatch($controller, $actionName, $params);
+        self::preDispatch(
+                array(
+                        'controller' => $controller,
+                        'actionName' => $actionName,
+                        'params'     => $params
+                )
+        );
 
         try {
             //执行当前操作

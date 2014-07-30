@@ -77,8 +77,8 @@ class SmvcDebugHelper implements ArrayAccess
         if (self::$instance == null) {
             $instance = new SmvcDebugHelper();
             $bool     = false;
-            if (defined('SMVC_DEBUG') && SMVC_DEBUG) {
-                include ROOT_PATH . '/include/vendor/FirePHP.class.php'; //FireBug Firephp 调试类
+            if (SMVC_DEBUG) {
+//                include ROOT_PATH . '/include/vendor/FirePHP.class.php'; //FireBug Firephp 调试类
                 $bool = true;
             }
 
