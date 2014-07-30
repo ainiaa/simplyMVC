@@ -314,6 +314,14 @@ class Router
     }
 
 
+    public static function getCookie($key = '', $default = '')
+    {
+        if (func_num_args() === 0) {
+            return $_COOKIE;
+        }
+        return SmvcArrayHelper::get($_COOKIE, $key, $default);
+    }
+
     /**
      * @param $default
      *
