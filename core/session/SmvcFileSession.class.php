@@ -1,4 +1,5 @@
 <?php
+
 class SmvcFileSession extends SmvcBaseSession
 {
 
@@ -6,7 +7,7 @@ class SmvcFileSession extends SmvcBaseSession
      * array of driver config defaults
      */
     protected static $_defaults = array(
-            'cookie_name'    => 'fuelfid', // name of the session cookie for file based sessions
+            'cookie_name'    => 'smvcid', // name of the session cookie for file based sessions
             'path'           => '/tmp', // path where the session files should be stored
             'gc_probability' => 5 // probability % (between 0 and 100) for garbage collection
     );
@@ -20,29 +21,6 @@ class SmvcFileSession extends SmvcBaseSession
 
         $this->config = $this->validateConfig($this->config);
     }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * create a new session
-     *
-     * @access    public
-     * @return    $this
-     */
-    public function create()
-    {
-        // create a new session
-        $this->keys['session_id']  = $this->newSessionId();
-        $this->keys['previous_id'] = $this->keys['session_id']; // prevents errors if previous_id has a unique index
-        $this->keys['ip_hash']     = md5(Input::ip() . Input::real_ip());
-        $this->keys['user_agent']  = Input::user_agent();
-        $this->keys['created']     = $this->time->get_timestamp();
-        $this->keys['updated']     = $this->keys['created'];
-
-        return $this;
-    }
-
-    // --------------------------------------------------------------------
 
     /**
      * read the session
@@ -90,19 +68,23 @@ class SmvcFileSession extends SmvcBaseSession
 
             if (!isset($payload[0]) or !is_array($payload[0])) {
                 // not a valid cookie payload
-            } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= $this->time->get_timestamp()) {
+            } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
-            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Input::ip() . Input::real_ip())) {
+            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::ip() . Router::realIp())) {
                 // IP address doesn't match
-            } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Input::user_agent()) {
+            } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
                 // user agent doesn't match
             } else {
                 // session is valid, retrieve the payload
                 if (isset($payload[0]) and is_array($payload[0])) {
                     $this->keys = $payload[0];
                 }
-                if (isset($payload[1]) and is_array($payload[1])) $this->data = $payload[1];
-                if (isset($payload[2]) and is_array($payload[2])) $this->flash = $payload[2];
+                if (isset($payload[1]) and is_array($payload[1])) {
+                    $this->data = $payload[1];
+                }
+                if (isset($payload[2]) and is_array($payload[2])) {
+                    $this->flash = $payload[2];
+                }
             }
         }
 
@@ -127,7 +109,7 @@ class SmvcFileSession extends SmvcBaseSession
             $this->rotate(false);
 
             // record the last update time of the session
-            $this->keys['updated'] = $this->time->get_timestamp();
+            $this->keys['updated'] = SmvcUtilHelper::getTime();
 
             // session payload
             $payload = $this->serialize(array($this->keys, $this->data, $this->flash));
@@ -148,7 +130,7 @@ class SmvcFileSession extends SmvcBaseSession
             // do some garbage collection
             if (mt_rand(0, 100) < $this->config['gc_probability']) {
                 if ($handle = opendir($this->config['path'])) {
-                    $expire = $this->time->get_timestamp() - $this->config['expiration_time'];
+                    $expire = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
 
                     while (($file = readdir($handle)) !== false) {
                         if (filetype($this->config['path'] . $file) == 'file' and strpos(
@@ -212,7 +194,9 @@ class SmvcFileSession extends SmvcBaseSession
         $handle = fopen($file, 'c');
         if ($handle) {
             // wait for a lock
-            while (!flock($handle, LOCK_EX)) ;
+            while (!flock($handle, LOCK_EX)) {
+                ;
+            }
 
             // erase existing contents
             ftruncate($handle, 0);
@@ -252,7 +236,9 @@ class SmvcFileSession extends SmvcBaseSession
             $handle = fopen($file, 'r');
             if ($handle) {
                 // wait for a lock
-                while (!flock($handle, LOCK_SH)) ;
+                while (!flock($handle, LOCK_SH)) {
+                    ;
+                }
 
                 // read the session data
                 if ($size = filesize($file)) {
@@ -270,12 +256,14 @@ class SmvcFileSession extends SmvcBaseSession
         return $payload;
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * validate a driver config value
      *
-     * @param    array    array with configuration values
+     * @param array $config
+     *
+     * @throws Exception
+     * @internal  param array $array with configuration values
      *
      * @access    public
      * @return  array    validated and consolidated config
@@ -290,7 +278,7 @@ class SmvcFileSession extends SmvcBaseSession
                 switch ($name) {
                     case 'cookie_name':
                         if (empty($item) OR !is_string($item)) {
-                            $item = 'fuelfid';
+                            $item = 'smvcid';
                         }
                         break;
 

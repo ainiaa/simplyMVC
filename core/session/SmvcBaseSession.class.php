@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * based on fueld
+ * Class SmvcBaseSession
+ */
 abstract class SmvcBaseSession implements SmvcSessionInterface
 {
 
@@ -28,17 +32,24 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      */
     protected $time = null;
 
-    // --------------------------------------------------------------------
-    // abstract methods
-    // --------------------------------------------------------------------
-
     /**
      * create a new session
      *
      * @access    public
-     * @return    void
+     * @return $this
      */
-    abstract function create();
+    public function create()
+    {
+        // create a new session
+        $this->keys['session_id']  = $this->newSessionId();
+        $this->keys['previous_id'] = $this->keys['session_id']; // prevents errors if previous_id has a unique index
+        $this->keys['ip_hash']     = md5(Router::ip() . Router::realIp());
+        $this->keys['user_agent']  = Router::getUserAgent();
+        $this->keys['created']     = SmvcUtilHelper::getTime();
+        $this->keys['updated']     = $this->keys['created'];
+
+        return $this;
+    }
 
 
     // --------------------------------------------------------------------
@@ -53,7 +64,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     public function destroy()
     {
         // delete the session cookie
-        Cookie::delete($this->config['cookie_name']);
+        unset($_COOKIE[$this->config['cookie_name']]);
 
         // reset the stored session data
         $this->keys = $this->flash = $this->data = array();
@@ -113,7 +124,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     public function init()
     {
         // get a time object
-        $this->time = Date::time();
+        $this->time = SmvcUtilHelper::getTime();
     }
 
     // --------------------------------------------------------------------
@@ -206,13 +217,13 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         // do we have a session?
         if (!empty($this->keys)) {
             // existing session. need to rotate the session id?
-            if ($force or ($this->config['rotation_time'] and $this->keys['created'] + $this->config['rotation_time'] <= $this->time->get_timestamp(
+            if ($force or ($this->config['rotation_time'] and $this->keys['created'] + $this->config['rotation_time'] <= SmvcUtilHelper::getTime(
                             ))
             ) {
                 // generate a new session id, and update the create timestamp
                 $this->keys['previous_id'] = $this->keys['session_id'];
                 $this->keys['session_id']  = $this->newSessionId();
-                $this->keys['created']     = $this->time->get_timestamp();
+                $this->keys['created']     = SmvcUtilHelper::getTime();
                 $this->keys['updated']     = $this->keys['created'];
             }
         }
@@ -304,7 +315,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
             }
         }
 
-        return ($default instanceof Closure) ? $default() : $default;
+        return SimpleMVC::value($default);
     }
 
     // --------------------------------------------------------------------
@@ -462,7 +473,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      * @param array $payload , cookie payload
      *
      * @throws Exception
-     * @return
+     * @return void
      */
     public function setCookie($payload = array())
     {
@@ -513,21 +524,21 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     public function getCookie()
     {
         // was the cookie value posted?
-        $cookie = Input::post($this->config['post_cookie_name'], false);
+        $cookie = Router::getPost($this->config['post_cookie_name'], false);
 
         // if not found, fetch the regular cookie
         if ($cookie === false) {
-            $cookie = Cookie::get($this->config['cookie_name'], false);
+            $cookie = isset($_COOKIE[$this->config['cookie_name']]) ? $_COOKIE[$this->config['cookie_name']] : false;
         }
 
         // if not found, check the URL for a cookie
         if ($cookie === false) {
-            $cookie = Input::get($this->config['cookie_name'], false);
+            $cookie = Router::getGet($this->config['cookie_name'], false);
         }
 
         // if not found, was a session-id present in the HTTP header?
         if ($cookie === false) {
-            $cookie = Input::headers($this->config['header_header_name'], false);
+            $cookie = Router::getHeader($this->config['header_header_name'], false);
         }
 
         if ($cookie !== false) {
@@ -615,7 +626,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
             }
 
             return $data;
-        } elseif ($data === false) {
+        } else if ($data === false) {
             is_string($input) and $data = array($input);
         }
 

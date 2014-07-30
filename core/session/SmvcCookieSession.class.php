@@ -17,34 +17,11 @@ class SmvcCookieSession extends SmvcBaseSession
         // merge the driver config with the global config
         $this->config = array_merge(
                 $config,
-                (isset($config['cookie']) and is_array($config['cookie'])) ? $config['cookie'] : static::$_defaults
+                (isset($config['cookie']) and is_array($config['cookie'])) ? $config['cookie'] : self::$_defaults
         );
 
         $this->config = $this->validateConfig($this->config);
     }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * create a new session
-     *
-     * @access    public
-     * @return    $this
-     */
-    public function create()
-    {
-        // create a new session
-        $this->keys['session_id'] = $this->newSessionId();
-        $this->keys['ip_hash']    = md5(Input::ip() . Input::real_ip());
-        $this->keys['user_agent'] = Input::user_agent();
-        $this->keys['created']    = $this->time->get_timestamp();
-        $this->keys['updated']    = $this->keys['created'];
-        $this->keys['payload']    = '';
-
-        return $this;
-    }
-
-    // --------------------------------------------------------------------
 
     /**
      * read the session
@@ -58,8 +35,8 @@ class SmvcCookieSession extends SmvcBaseSession
     public function read($force = false)
     {
         // initialize the session
-        $this->data = array();
-        $this->keys = array();
+        $this->data  = array();
+        $this->keys  = array();
         $this->flash = array();
 
         // get the session cookie
@@ -70,19 +47,23 @@ class SmvcCookieSession extends SmvcBaseSession
             // not a valid cookie, or a forced session reset
         } elseif (!isset($payload[0]) or !is_array($payload[0])) {
             // not a valid cookie payload
-        } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= $this->time->get_timestamp()) {
+        } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
             // session has expired
-        } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Input::ip() . Input::real_ip())) {
+        } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::ip() . Router::realIp())) {
             // IP address doesn't match
-        } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Input::user_agent()) {
+        } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
             // user agent doesn't match
         } else {
             // session is valid, retrieve the payload
             if (isset($payload[0]) and is_array($payload[0])) {
                 $this->keys = $payload[0];
             }
-            if (isset($payload[1]) and is_array($payload[1])) $this->data = $payload[1];
-            if (isset($payload[2]) and is_array($payload[2])) $this->flash = $payload[2];
+            if (isset($payload[1]) and is_array($payload[1])) {
+                $this->data = $payload[1];
+            }
+            if (isset($payload[2]) and is_array($payload[2])) {
+                $this->flash = $payload[2];
+            }
         }
 
         return parent::read();
@@ -106,7 +87,7 @@ class SmvcCookieSession extends SmvcBaseSession
             $this->rotate(false);
 
             // record the last update time of the session
-            $this->keys['updated'] = $this->time->get_timestamp();
+            $this->keys['updated'] = SmvcUtilHelper::getTime();
 
             // then update the cookie
             $this->setCookie(array($this->keys, $this->data, $this->flash));

@@ -247,6 +247,14 @@ class SimpleMVC
         }
     }
 
+    public static function value($value)
+    {
+        if ($value instanceof Closure) {
+            return $value();
+        } else {
+            return $value;
+        }
+    }
 
     static public function logo()
     {

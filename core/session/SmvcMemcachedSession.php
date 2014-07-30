@@ -18,14 +18,13 @@ class SmvcMemcachedSession extends SmvcBaseSession
      */
     protected $memcached = false;
 
-    // --------------------------------------------------------------------
 
     public function __construct($config = array())
     {
         // merge the driver config with the global config
         $this->config = array_merge(
                 $config,
-                is_array($config['memcached']) ? $config['memcached'] : static::$_defaults
+                is_array($config['memcached']) ? $config['memcached'] : self::$_defaults
         );
 
         $this->config = $this->validateConfig($this->config);
@@ -40,6 +39,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
      * driver initialisation
      *
      * @access    public
+     * @throws Exception
      * @return    void
      */
     public function init()
@@ -65,29 +65,6 @@ class SmvcMemcachedSession extends SmvcBaseSession
             }
         }
     }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * create a new session
-     *
-     * @access    public
-     * @return    $this
-     */
-    public function create()
-    {
-        // create a new session
-        $this->keys['session_id']  = $this->newSessionId();
-        $this->keys['previous_id'] = $this->keys['session_id']; // prevents errors if previous_id has a unique index
-        $this->keys['ip_hash']     = md5(Input::ip() . Input::real_ip());
-        $this->keys['user_agent']  = Input::user_agent();
-        $this->keys['created']     = $this->time->get_timestamp();
-        $this->keys['updated']     = $this->keys['created'];
-
-        return $this;
-    }
-
-    // --------------------------------------------------------------------
 
     /**
      * read the session
@@ -135,11 +112,11 @@ class SmvcMemcachedSession extends SmvcBaseSession
 
             if (!isset($payload[0]) or !is_array($payload[0])) {
                 // not a valid cookie payload
-            } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= $this->time->get_timestamp()) {
+            } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
-            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Input::ip() . Input::real_ip())) {
+            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::ip() . Router::realIp())) {
                 // IP address doesn't match
-            } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Input::user_agent()) {
+            } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
                 // user agent doesn't match
             } else {
                 // session is valid, retrieve the rest of the payload
@@ -176,7 +153,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
             $this->rotate(false);
 
             // record the last update time of the session
-            $this->keys['updated'] = $this->time->get_timestamp();
+            $this->keys['updated'] = SmvcUtilHelper::getTime();
 
             // session payload
             $payload = $this->serialize(array($this->keys, $this->data, $this->flash));
@@ -266,7 +243,10 @@ class SmvcMemcachedSession extends SmvcBaseSession
     /**
      * validate a driver config value
      *
-     * @param    array    array with configuration values
+     * @param array $config
+     *
+     * @throws Exception
+     * @internal  param array $array with configuration values
      *
      * @access    public
      * @return  array    validated and consolidated config
@@ -339,5 +319,3 @@ class SmvcMemcachedSession extends SmvcBaseSession
     }
 
 }
-
-

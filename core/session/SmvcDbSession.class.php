@@ -14,12 +14,11 @@ class SmvcDbSession extends SmvcBaseSession
      * array of driver config defaults
      */
     protected static $_defaults = array(
-            'cookie_name'    => 'fueldid', // name of the session cookie for database based sessions
+            'cookie_name'    => 'smvcid', // name of the session cookie for database based sessions
             'table'          => 'sessions', // name of the sessions table
             'gc_probability' => 5 // probability % (between 0 and 100) for garbage collection
     );
 
-    // --------------------------------------------------------------------
 
     public function __construct($config = array())
     {
@@ -28,32 +27,6 @@ class SmvcDbSession extends SmvcBaseSession
 
         $this->config = $this->validateConfig($this->config);
     }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * create a new session
-     *
-     * @access    public
-     * @return    $this
-     */
-    public function create($payload = '')
-    {
-        // create a new session
-        $this->keys['session_id']  = $this->newSessionId();
-        $this->keys['previous_id'] = $this->keys['session_id']; // prevents errors if previous_id has a unique index
-        $this->keys['ip_hash']     = md5(Input::ip() . Input::real_ip());
-        $this->keys['user_agent']  = Input::user_agent();
-        $this->keys['created']     = $this->time->get_timestamp();
-        $this->keys['updated']     = $this->keys['created'];
-
-        // add the payload
-        $this->keys['payload'] = $payload;
-
-        return $this;
-    }
-
-    // --------------------------------------------------------------------
 
     /**
      * read the session
@@ -80,7 +53,8 @@ class SmvcDbSession extends SmvcBaseSession
             // read the session record
             $this->record = DB::select()->where('session_id', '=', $cookie[0])->from($this->config['table'])->execute(
                     $this->config['database']
-            );//todo 这个需要修改
+            );
+            //todo 这个需要修改
 
             // record found?
             if ($this->record->count()) {
@@ -102,11 +76,11 @@ class SmvcDbSession extends SmvcBaseSession
 
             if (!isset($payload[0]) or !is_array($payload[0])) {
                 // not a valid cookie payload
-            } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= $this->time->get_timestamp()) {
+            } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
-            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Input::ip() . Input::real_ip())) {
+            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::ip() . Router::realIp())) {
                 // IP address doesn't match
-            } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Input::user_agent()) {
+            } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
                 // user agent doesn't match
             } else {
                 // session is valid, retrieve the payload
@@ -143,7 +117,7 @@ class SmvcDbSession extends SmvcBaseSession
             $this->rotate(false);
 
             // record the last update time of the session
-            $this->keys['updated'] = $this->time->get_timestamp();
+            $this->keys['updated'] = SmvcUtilHelper::getTime();
 
             // create the session record, and add the session payload
             $session            = $this->keys;
@@ -169,12 +143,12 @@ class SmvcDbSession extends SmvcBaseSession
                 // then update the cookie
                 $this->setCookie(array($this->keys['session_id']));
             } else {
-//                logger(\Fuel::L_ERROR, 'Session update failed, session record could not be found. Concurrency issue?');//todo logger
+                //                logger(\Fuel::L_ERROR, 'Session update failed, session record could not be found. Concurrency issue?');//todo logger
             }
 
             // do some garbage collection
             if (mt_rand(0, 100) < $this->config['gc_probability']) {
-                $expired = $this->time->get_timestamp() - $this->config['expiration_time'];
+                $expired = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
                 $result  = DB::delete($this->config['table'])->where('updated', '<', $expired)->execute(
                         $this->config['database']
                 );
@@ -233,7 +207,7 @@ class SmvcDbSession extends SmvcBaseSession
                 switch ($name) {
                     case 'cookie_name':
                         if (empty($item) or !is_string($item)) {
-                            $item = 'fueldid';
+                            $item = 'smvcid';
                         }
                         break;
 
