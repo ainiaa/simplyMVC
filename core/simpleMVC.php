@@ -39,7 +39,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH);
 include CORE_PATH . '/Importer.class.php';
 
 Importer::importFileByFullPath(ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php');
-
+//Importer::importFileByFullPath(VENDOR_PATH . '/FirePHP.class.php'); //
 /**
  * 实现自动加载功能
  */
@@ -79,7 +79,6 @@ class SimpleMVC
         set_exception_handler(array('SimpleMVC', 'appException'));
 
         $isDebugMode = C('smvcDebug');
-        define('SMVC_DEBUG', $isDebugMode); //debug
         if ($isDebugMode) {
             error_reporting(E_ALL);
             ini_set('display_errors', 'on');
@@ -91,34 +90,73 @@ class SimpleMVC
         Dispatcher::dispatch();
     }
 
+    public static function getBaseFileList()
+    {
+        return array(
+                CORE_PATH . '/Router.class.php',
+                CORE_PATH . '/Factory.class.php',
+                CORE_PATH . '/Dispatcher.class.php',
+                CORE_PATH . '/Object.class.php',
+                CORE_PATH . '/control/Base.class.php',
+                CORE_PATH . '/model/Base.class.php',
+                CORE_PATH . '/dao/Base.class.php',
+                CORE_PATH . '/service/Base.class.php',
+                CORE_PATH . '/view/View.class.php',
+                CORE_PATH . '/SmvcConf.class.php',
+                CORE_PATH . '/Database.class.php',
+                CORE_PATH . '/functions.class.php',
+                VENDOR_PATH . '/FirePHP.class.php',
+        );
+    }
+
+    public static function createBaseFileCache()
+    {
+        $content      = '<?php ';
+        $baseFileList = self::getBaseFileList();
+        foreach ($baseFileList as $file) {
+            $currentContent = php_strip_whitespace($file);
+            $currentContent = trim(substr($currentContent, 5)); //去掉<?php
+            if ('?>' == substr($currentContent, -2)) {
+                $currentContent = substr($currentContent, 0, -2);
+            }
+            $content .= $currentContent;
+        }
+        file_put_contents(ROOT_PATH . '/public/tmp/~~core.php', $content);
+    }
+
     /**
      * 初始化系统
      * @author jeff liu
      */
     private static function init()
     {
-        //TODO 这块可以优化 直接第一次运行的时候 写入到一个文件里面 然后一次性加载完全，
-        if (method_exists('Importer', 'importBaseFiles')) {
+        if (file_exists(ROOT_PATH . '/public/tmp/~~core.php')) {
+            Importer::importFileByFullPath(ROOT_PATH . '/public/tmp/~~core.php');
+        } else if (method_exists('Importer', 'importBaseFiles')) {
             Importer::importBaseFiles();
+            self::createBaseFileCache();
         } else {
-            Importer::importFile('core.Router', 'class.php', ROOT_PATH);
-            Importer::importFile('core.Router', 'class.php', ROOT_PATH);
-            Importer::importFile('core.Factory', 'class.php', ROOT_PATH);
-            Importer::importFile('core.Dispatcher', 'class.php', ROOT_PATH);
-            Importer::importFile('core.Object', 'class.php', ROOT_PATH);
-            Importer::importFile('core.control.Base', 'class.php', ROOT_PATH);
-            Importer::importFile('core.model.Base', 'class.php', ROOT_PATH);
-            Importer::importFile('core.dao.Base', 'class.php', ROOT_PATH);
-            Importer::importFile('core.service.Base', 'class.php', ROOT_PATH);
-            Importer::importFile('core.view.View', 'class.php', ROOT_PATH);
-            Importer::importFile('core.SmvcConf', 'class.php', ROOT_PATH);
-            Importer::importFile('core.Database', 'class.php', ROOT_PATH);
+            self::createBaseFileCache();
+            $baseFileList = self::getBaseFileList();
+            if (is_array($baseFileList)) {
+                foreach ($baseFileList as $file) {
+                    Importer::importFileByFullPath($file);
+                }
+            }
         }
 
         /**
          * 加载所有的配置文件
          */
         SmvcConf::instance()->loadConfigFileList(CONF_PATH, 'inc.php');
+
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => C(),
+                        'label' => 'C()' . __METHOD__,
+                        'level' => 'warn',
+                )
+        );
 
         //设置加载路径
         $autoloadPath = C('autoLoadPath');

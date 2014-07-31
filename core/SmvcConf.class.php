@@ -153,9 +153,11 @@ class SmvcConf implements ArrayAccess
      *
      * @return mixed
      */
-    public function get($key, $default = false)
+    public function get($key = null, $default = false)
     {
-        if (isset($this->configData[$key])) {
+        if ($key == '*' || $key == null) {
+            return $this->configData;
+        } else if (isset($this->configData[$key])) {
             return $this->configData[$key];
         } else {
             return $default;
@@ -163,16 +165,16 @@ class SmvcConf implements ArrayAccess
     }
 }
 
-if (!function_exists('C')) {
-    function C($key, $default = false)
-    {
-        return SmvcConf::instance()->get($key, $default);
-    }
-}
-
-if (!function_exists('LCL')) {
-    function LCL($configFilePath, $configFileExt = 'inc.php')
-    {
-        SmvcConf::instance()->loadConfigFileList($configFilePath, $configFileExt);
-    }
-}
+//if (!function_exists('C')) {
+//    function C($key = null, $default = false)
+//    {
+//        return SmvcConf::instance()->get($key, $default);
+//    }
+//}
+//
+//if (!function_exists('LCL')) {
+//    function LCL($configFilePath, $configFileExt = 'inc.php')
+//    {
+//        SmvcConf::instance()->loadConfigFileList($configFilePath, $configFileExt);
+//    }
+//}

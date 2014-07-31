@@ -584,45 +584,48 @@ class Importer
      */
     public static function autoLoad($className)
     {
-        SmvcDebugHelper::instance()->debug(
-                array('info' => $className, 'label' => '$class_name', 'level' => 'warn')
-        );
+//        echo '$className:', $className, '<br />';
         if ('Control' == substr($className, -7)) { //controller类
             $controllerName = substr_replace($className, '', -7);
             self::loadController(lcfirst($controllerName));
-            return;
-        } elseif ('Model' == substr($className, -5)) { //model类 TODO 使用service dao  model 这个还需要吗？？？
+        } else if ('Model' == substr($className, -5)) { //model类 TODO 使用service dao  model 这个还需要吗？？？
             $modelName = substr_replace($className, '', -5);
             self::loadModel(lcfirst($modelName));
-            return;
-        } elseif ('DAO' == substr($className, -3)) { //dao类
+        } else if ('DAO' == substr($className, -3)) { //dao类
             $daoName = substr_replace($className, '', -3);
             self::loadDAO(lcfirst($daoName));
-            return;
-        } elseif ('Service' == substr($className, -7)) { //service类
+        } else if ('Service' == substr($className, -7)) { //service类
             $serviceName = substr_replace($className, '', -7);
             self::loadService(lcfirst($serviceName));
-            return;
-        } elseif ('Helper' == substr($className, -6)) { //辅助类
+        } else if ('Helper' == substr($className, -6)) { //辅助类
             //TODO 需要考虑 group moduel 里面的helper？？？  分组下面需要有吗？？？
             $helperName = substr_replace($className, '', -6);
             self::loadHelper(lcfirst($helperName));
-            return;
-        }
-
-        // 根据自动加载路径设置进行尝试搜索
-        $includePath    = get_include_path();
-        $paths          = explode(PATH_SEPARATOR, $includePath);
-        $fileExtensions = array('.class.php', '.php');
-        foreach ($paths as $path) {
-            // TODO 如果加载类成功则返回 这个需要完善。。。 文件名后缀需要整理
-            foreach ($fileExtensions as $fileExtension) {
-                $fullFilePath = $path . '/' . $className . $fileExtension;
-                if (self::importFileByFullPath($fullFilePath, false)) {
-                    break;
+        } else {
+            // 根据自动加载路径设置进行尝试搜索
+            $includePath    = get_include_path();
+            $paths          = explode(PATH_SEPARATOR, $includePath);
+            $fileExtensions = array('.class.php', '.php');
+            foreach ($paths as $path) {
+                // TODO 如果加载类成功则返回 这个需要完善。。。 文件名后缀需要整理
+                foreach ($fileExtensions as $fileExtension) {
+                    $fullFilePath = $path . '/' . $className . $fileExtension;
+                    SmvcDebugHelper::instance()->debug(
+                            array(
+                                    'info'  => array('className' => $className, 'path' => $fullFilePath),
+                                    'label' => '$class_name',
+                                    'level' => 'warn'
+                            )
+                    );
+                    if (self::importFileByFullPath($fullFilePath, false)) {
+                        break;
+                    }
                 }
             }
         }
+        SmvcDebugHelper::instance()->debug(
+                array('info' => $className, 'label' => '$class_name', 'level' => 'warn')
+        );
     }
 
     /**
@@ -672,17 +675,24 @@ class Importer
      */
     public static function importBaseFiles()
     {
-        Importer::importFile('core.Router', 'class.php', ROOT_PATH);
-        Importer::importFile('core.Factory', 'class.php', ROOT_PATH);
-        Importer::importFile('core.Dispatcher', 'class.php', ROOT_PATH);
-        Importer::importFile('core.Object', 'class.php', ROOT_PATH);
-        Importer::importFile('core.control.Base', 'class.php', ROOT_PATH);
-        Importer::importFile('core.model.Base', 'class.php', ROOT_PATH);
-        Importer::importFile('core.dao.Base', 'class.php', ROOT_PATH);
-        Importer::importFile('core.service.Base', 'class.php', ROOT_PATH);
-        Importer::importFile('core.view.View', 'class.php', ROOT_PATH);
-        Importer::importFile('core.SmvcConf', 'class.php', ROOT_PATH);
-        Importer::importFile('core.Database', 'class.php', ROOT_PATH);
+        $baseFileList = SimpleMVC::getBaseFileList();
+        if (is_array($baseFileList)) {
+            foreach ($baseFileList as $file) {
+                Importer::importFileByFullPath($file);
+            }
+        }
+        //        Importer::importFileByFullPath(ROOT_PATH . '/core/functions.class.php');
+        //        Importer::importFile('core.Router', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.Factory', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.Dispatcher', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.Object', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.control.Base', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.model.Base', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.dao.Base', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.service.Base', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.view.View', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.SmvcConf', 'class.php', ROOT_PATH);
+        //        Importer::importFile('core.Database', 'class.php', ROOT_PATH);
     }
 
 }

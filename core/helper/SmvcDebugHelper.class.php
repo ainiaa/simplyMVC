@@ -70,19 +70,23 @@ class SmvcDebugHelper implements ArrayAccess
 
     /**
      * @static
-     * @return object
+     * @return SmvcDebugHelper
      */
     public static function instance()
     {
         if (self::$instance == null) {
             $instance = new SmvcDebugHelper();
             $bool     = false;
-            if (SMVC_DEBUG) {
-//                include ROOT_PATH . '/include/vendor/FirePHP.class.php'; //FireBug Firephp 调试类
+            if (C('smvcDebug')) {
+                //                include ROOT_PATH . '/include/vendor/FirePHP.class.php'; //FireBug Firephp 调试类
+                //                echo 'get_include_path:', var_export(get_include_path(), 1), '   -- --- -- ', __METHOD__, '<br />';
                 $bool = true;
             }
 
+            echo '$bool:', var_export($bool, 1), '   -- --- -- ', __METHOD__, '<br />';
+
             $instance->_isdebug = $bool;
+
             if ($instance->_isdebug) {
                 $instance->debugInstance = FirePHP::getInstance(true);
                 $instance->debugInstance->setEnabled($bool);
@@ -97,7 +101,7 @@ class SmvcDebugHelper implements ArrayAccess
      *
      * @return bool
      */
-    public function debug($param = array())
+    public function debug($param = array( /*'info' => '', 'label' => '', 'level' => '', 'options' => ''*/))
     {
         $info       = isset($param['info']) ? $param['info'] : ''; //这个可以为数组 也可以为字符串
         $label      = isset($param['label']) ? $param['label'] : '';

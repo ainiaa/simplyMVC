@@ -262,20 +262,6 @@ class Database
             throw new DatabaseException("cant auto detect the database driver");
         }
 
-        //todo 这个其实可以使用 autoload 以后在修改吧。
-        Importer::importFileByFullPath(
-                dirname(__FILE__) . '/db/DatabaseAbstract.class.php'
-        );
-        Importer::importFileByFullPath(
-                dirname(__FILE__) . '/db/DatabaseException.class.php'
-        );
-        Importer::importFileByFullPath(
-                dirname(__FILE__) . '/db/DatabaseWrapper.class.php'
-        );
-        Importer::importFileByFullPath(
-                dirname(__FILE__) . '/db/Driver/'.$driver.'Wrapper.class.php'
-        );
-
         $class = $driver . 'Wrapper';
 
         return new $class($params);

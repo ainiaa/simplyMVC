@@ -1,16 +1,17 @@
 <?php
 
 return array(
-        'extName'        => 'php',
-        'pathMode'       => '',
-        'appGroupPath'   => '',
-        'defaultGroup'   => 'frontend',
-        'defaultModule'  => 'default',
-        'defaultController'  => 'default',
-        'defaultAction'  => 'index',
-        'viewEngine'     => 'Smarty', //视图engine
-        'viewEnginePath' => ROOT_PATH . '/include/vendor/Smarty/Smarty.class.php', //视图engine 所在位置
-        'viewEngineConf' => array( //视图engine相关配置
+        'extName'           => 'php',
+        'pathMode'          => '',
+        'appGroupPath'      => '',
+        'defaultGroup'      => 'frontend',
+        'defaultModule'     => 'default',
+        'defaultController' => 'default',
+        'defaultAction'     => 'index',
+        'viewEngine'        => 'SmvcTemplate', //'Smarty', //视图engine
+    //        'viewEnginePath'    => ROOT_PATH . '/include/vendor/Smarty/Smarty.class.php', //视图engine 所在位置
+        'viewEnginePath'    => CORE_PATH . '/view/SmvcTemplate.class.php', //视图engine 所在位置
+        'viewEngineConf'    => array( //视图engine相关配置
                 'caching'         => false, //是否使用缓存，项目在调试期间，不建议启用缓存
                 'template_dir'    => '@/templates', //设置模板目录
                 'compile_dir'     => '@/templates_c', //设置编译目录

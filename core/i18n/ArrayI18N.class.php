@@ -28,7 +28,6 @@ class ArrayI18N extends I18N
                 )
         );
         if (empty($this->directory)) {
-            !defined('ROOT_PATH') && define('ROOT_PATH', __DIR__);
             self::setDirectory(ROOT_PATH . '/i18n/');
         }
 
