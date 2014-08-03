@@ -75,8 +75,7 @@ abstract class I18N
      */
     protected function setLocale($locale = null)
     {
-        !defined('DEFAULT_LOCALE') && define('DEFAULT_LOCALE', 'en_us');
-        $locale       = is_null($locale) ? DEFAULT_LOCALE : $locale;
+        $locale       = is_null($locale) ? C('defaultLocal') : $locale;
         $this->locale = $locale;
     }
 

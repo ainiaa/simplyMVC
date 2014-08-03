@@ -18,4 +18,5 @@ return array(
     //自动开启session
         'SESSION_AUTO_START'       => true,
         'SESSION_TYPE'             => 'db', //存储 session 的driver
+        'defaultLocal'             => 'en_us',//默认语言
 );

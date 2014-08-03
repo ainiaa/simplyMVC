@@ -1,7 +1,7 @@
 <?php
 define('ROOT_PATH', dirname(__FILE__));
 
-defined('APP_PATH') or define('APP_PATH', dirname($_SERVER['SCRIPT_FILENAME']) . '/');
+!defined('APP_PATH') or define('APP_PATH', dirname($_SERVER['SCRIPT_FILENAME']) . '/');
 
 define('CONF_PATH', ROOT_PATH . '/config'); //config路径
 define('CORE_PATH', ROOT_PATH . '/core'); //core路径

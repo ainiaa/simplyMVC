@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by JetBrains PhpStorm.
- * User: Administrator
- * Date: 13-2-24
- * Time: 下午7:59
- * To change this template use File | Settings | File Templates.
- */
 class BaseService extends Object
 {
     public $BaseDAO;
