@@ -1,5 +1,5 @@
 <?php
-
+//https://github.com/kahwee/php-db-session-handler/blob/master/DbSessionHandler.php
 // --------------------------------------------------------------------
 
 class SmvcDbSession extends SmvcBaseSession
@@ -29,15 +29,18 @@ class SmvcDbSession extends SmvcBaseSession
     }
 
     /**
+     * todo
      * read the session
      *
      * @access    public
      *
-     * @param    boolean , set to true if we want to force a new session to be created
+     * @param string $id
+     *
+     * @internal  param $boolean , set to true if we want to force a new session to be created
      *
      * @return    $this
      */
-    public function read($force = false)
+    public function read($id = '')
     {
         // initialize the session
         $this->data   = array();
@@ -49,7 +52,7 @@ class SmvcDbSession extends SmvcBaseSession
         $cookie = $this->getCookie();
 
         // if a cookie was present, find the session record
-        if ($cookie and !$force and isset($cookie[0])) {
+        if ($cookie && isset($cookie[0])) {
             // read the session record
             $this->record = DB::select()->where('session_id', '=', $cookie[0])->from($this->config['table'])->execute(
                     $this->config['database']
@@ -96,7 +99,7 @@ class SmvcDbSession extends SmvcBaseSession
             }
         }
 
-        return parent::read();
+        return parent::read($id);
     }
 
     // --------------------------------------------------------------------
@@ -105,13 +108,16 @@ class SmvcDbSession extends SmvcBaseSession
      * write the current session
      *
      * @access    public
+     *
+     * @param string $id
+     *
      * @return    $this
      */
-    public function write()
+    public function write($id)
     {
         // do we have something to write?
         if (!empty($this->keys) or !empty($this->data) or !empty($this->flash)) {
-            parent::write();
+            parent::write($id);
 
             // rotate the session id if needed
             $this->rotate(false);
@@ -166,7 +172,7 @@ class SmvcDbSession extends SmvcBaseSession
      * @access    public
      * @return    $this
      */
-    public function destroy()
+    public function destroy($id)
     {
         // do we have something to destroy?
         if (!empty($this->keys) and !empty($this->record)) {
@@ -250,4 +256,15 @@ class SmvcDbSession extends SmvcBaseSession
         return parent::validateConfig($validated);
     }
 
+    /**
+     * Garbage collection. Remove all expired entries atomically.
+     *
+     * @param int $maxLifeTime
+     *
+     * @return boolean
+     */
+    public function gc($maxLifeTime)
+    {
+        // TODO: Implement gc() method.
+    }
 }

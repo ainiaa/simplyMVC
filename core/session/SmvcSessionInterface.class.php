@@ -12,6 +12,16 @@ interface SmvcSessionInterface
     public function create();
 
 
+    /**
+     * Garbage collection. Remove all expired entries atomically.
+     *
+     * @param int $maxLifeTime Sessions that have not updated for the last maxlifetime seconds will be removed
+     *
+     * @return boolean
+     */
+    public function gc($maxLifeTime);
+
+
     // --------------------------------------------------------------------
     // generic driver methods
     // --------------------------------------------------------------------
@@ -19,17 +29,22 @@ interface SmvcSessionInterface
     /**
      * destroy the current session
      *
+     * @param string $id session id
+     *
      * @access    public
      */
-    public function destroy();
+    public function destroy($id = '');
 
     /**
      * read the session
      *
      * @access    public
-     * @return    SessionDriver
+     *
+     * @param string $id session id
+     *
+     * @return    SmvcSessionInterface
      */
-    public function read();
+    public function read($id);
 
     // --------------------------------------------------------------------
 
@@ -37,9 +52,12 @@ interface SmvcSessionInterface
      * write the session
      *
      * @access    public
-     * @return    SessionDriver
+     *
+     * @param string $id session id
+     *
+     * @return    SmvcSessionInterface
      */
-    public function write();
+    public function write($id);
 
     // --------------------------------------------------------------------
 
@@ -205,7 +223,7 @@ interface SmvcSessionInterface
      * @param null      $value
      *
      * @access    public
-     * @return  SessionDriver
+     * @return  SmvcSessionInterface
      */
     public function setConfig($name, $value = null);
 

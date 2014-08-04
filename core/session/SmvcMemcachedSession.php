@@ -71,11 +71,13 @@ class SmvcMemcachedSession extends SmvcBaseSession
      *
      * @access    public
      *
-     * @param    boolean , set to true if we want to force a new session to be created
+     * @param string $id
+     *
+     * @internal  param $boolean , set to true if we want to force a new session to be created
      *
      * @return    $this
      */
-    public function read($force = false)
+    public function read($id = '')
     {
         // initialize the session
         $this->data  = array();
@@ -86,7 +88,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
         $cookie = $this->getCookie();
 
         // if a cookie was present, find the session record
-        if ($cookie and !$force and isset($cookie[0])) {
+        if ($cookie && isset($cookie[0])) {
             // read the session file
             $payload = $this->readMemcached($cookie[0]);
 
@@ -132,7 +134,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
             }
         }
 
-        return parent::read();
+        return parent::read($id);
     }
 
     // --------------------------------------------------------------------
@@ -141,13 +143,16 @@ class SmvcMemcachedSession extends SmvcBaseSession
      * write the session
      *
      * @access    public
+     *
+     * @param string $id
+     *
      * @return    $this
      */
-    public function write()
+    public function write($id)
     {
         // do we have something to write?
         if (!empty($this->keys) or !empty($this->data) or !empty($this->flash)) {
-            parent::write();
+            parent::write($id);
 
             // rotate the session id if needed
             $this->rotate(false);
@@ -180,10 +185,13 @@ class SmvcMemcachedSession extends SmvcBaseSession
      * destroy the current session
      *
      * @access    public
+     *
+     * @param string $id
+     *
      * @throws Exception
      * @return    $this
      */
-    public function destroy()
+    public function destroy($id = '')
     {
         // do we have something to destroy?
         if (!empty($this->keys)) {
@@ -318,4 +326,15 @@ class SmvcMemcachedSession extends SmvcBaseSession
         return parent::validateConfig($validated);
     }
 
+    /**
+     * Garbage collection. Remove all expired entries atomically.
+     *
+     * @param int $maxLifeTime
+     *
+     * @return boolean
+     */
+    public function gc($maxLifeTime)
+    {
+        // TODO: Implement gc() method.
+    }
 }

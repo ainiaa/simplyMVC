@@ -14,6 +14,8 @@ class SmvcCookieSession extends SmvcBaseSession
 
     public function __construct($config = array())
     {
+
+        parent::__construct($config);
         // merge the driver config with the global config
         $this->config = array_merge(
                 $config,
@@ -24,15 +26,18 @@ class SmvcCookieSession extends SmvcBaseSession
     }
 
     /**
+     * todo
      * read the session
      *
      * @access    public
      *
-     * @param    boolean , set to true if we want to force a new session to be created
+     * @param string $id
+     *
+     * @internal  param $boolean , set to true if we want to force a new session to be created
      *
      * @return    $this
      */
-    public function read($force = false)
+    public function read($id)
     {
         // initialize the session
         $this->data  = array();
@@ -43,7 +48,7 @@ class SmvcCookieSession extends SmvcBaseSession
         $payload = $this->getCookie();
 
         // validate it
-        if ($payload === false or $force) {
+        if ($payload === false) {
             // not a valid cookie, or a forced session reset
         } elseif (!isset($payload[0]) or !is_array($payload[0])) {
             // not a valid cookie payload
@@ -66,7 +71,7 @@ class SmvcCookieSession extends SmvcBaseSession
             }
         }
 
-        return parent::read();
+        return parent::read($id);
     }
 
     // --------------------------------------------------------------------
@@ -132,6 +137,15 @@ class SmvcCookieSession extends SmvcBaseSession
 
         // validate all global settings as well
         return parent::validateConfig($validated);
+    }
+
+    /**
+     * Garbage collection. Remove all expired entries atomically.
+     * @return boolean
+     */
+    public function gc()
+    {
+        // TODO: Implement gc() method.
     }
 }
 

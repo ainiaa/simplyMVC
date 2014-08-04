@@ -32,6 +32,19 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      */
     protected $time = null;
 
+
+    public function __construct($config = array())
+    {
+        session_set_save_handler(
+                array($this, 'create'),
+                array($this, 'destroy'),
+                array($this, 'read'),
+                array($this, 'write'),
+                array($this, 'destroy'),
+                array($this, 'gc')
+        );
+    }
+
     /**
      * create a new session
      *
@@ -61,7 +74,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      *
      * @access    public
      */
-    public function destroy()
+    public function destroy($id = '')
     {
         // delete the session cookie
         unset($_COOKIE[$this->config['cookie_name']]);
@@ -76,9 +89,12 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      * read the session
      *
      * @access    public
-     * @return    SessionDriver
+     *
+     * @param string $id
+     *
+     * @return    SmvcSessionInterface
      */
-    public function read()
+    public function read($id)
     {
         // do we need to create a new session?
         empty($this->keys) and $this->create();
@@ -101,9 +117,12 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      * write the session
      *
      * @access    public
-     * @return    SessionDriver
+     *
+     * @param string $id
+     *
+     * @return    SmvcSessionInterface
      */
-    public function write()
+    public function write($id)
     {
         // create the session if it doesn't exist
         empty($this->keys) and $this->create();
@@ -473,7 +492,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      * @param array $payload , cookie payload
      *
      * @throws Exception
-     * @return void
+     * @return boolean
      */
     public function setCookie($payload = array())
     {
@@ -511,6 +530,8 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
                 );
             }
         }
+
+        return false;
     }
 
     // --------------------------------------------------------------------
@@ -519,7 +540,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      * read a cookie
      *
      * @access    public
-     * @return
+     * @return bool|string
      */
     public function getCookie()
     {
@@ -713,7 +734,6 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
 
         return $validated;
     }
-
 }
 
 
