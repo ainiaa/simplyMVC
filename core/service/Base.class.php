@@ -30,20 +30,27 @@ class BaseService extends Object
      * 初始化数据库
      * @author jeff liu
      *
-     * @param string $db_type
      */
-    private function initDb($db_type = null)
+    private function initDb()
     {
-        if (empty($db_type)) {
-            $db_type = 'mysql';
-        }
-        $this->db = new Database(array('pdo', 'mysql:dbname=test;host=localhost', 'root', ''));
+        $this->db = Database::instance(
+                array(
+                        C('DB_TYPE'),
+                        sprintf('mysql:dbname=%s;host=%s', C('DB_NAME'), C('DB_HOST')),
+                        C('DB_USER'),
+                        C('DB_PASS'),
+                )
+        );
     }
 
     public function getAll()
     {
-        $sql = 'SELECT * FROM smvc_test';
-        return $this->db->getAll($sql);
+        $sql  = 'SELECT *,"1233333" FROM smvc_test';
+        $data = $this->db->getAll($sql);
+        SmvcDebugHelper::instance()->debug(
+                array('info' => $data, 'label' => '$data ' . __METHOD__, 'level' => 'error')
+        );
+        return $data;
     }
 
 }

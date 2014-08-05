@@ -109,6 +109,9 @@ class SimpleMVC
         );
     }
 
+    /**
+     * 将core文件写入到一个文件里面 这样纸需要加载一次就行了。
+     */
     public static function createBaseFileCache()
     {
         $content      = '<?php ';
@@ -126,7 +129,7 @@ class SimpleMVC
 
     /**
      * 初始化系统
-     * @author jeff liu
+     * @author Jeff Liu
      */
     private static function init()
     {

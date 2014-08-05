@@ -4,10 +4,10 @@
  */
 return array(
         'DB_HOST'   => 'localhost', //数据库HOST
-        'DB_NAME'   => 'smpmvc', //数据库名
+        'DB_NAME'   => 'test', //数据库名
         'DB_PORT'   => '3306', //数据库端口
         'DB_PREFIX' => 'smv_',
-        'DB_TYPE'   => 'mysqli',
+        'DB_TYPE'   => 'pdo',
         'DB_USER'   => 'root',
-        'DB_PASS'   => 'root',
+        'DB_PASS'   => '',
 );

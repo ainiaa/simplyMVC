@@ -5,6 +5,9 @@
 class SmvcDbSession extends SmvcBaseSession
 {
 
+
+    public static $db;
+
     /*
      * @var	session database result object
      */
@@ -26,6 +29,8 @@ class SmvcDbSession extends SmvcBaseSession
         $this->config = array_merge($config, is_array($config['db']) ? $config['db'] : self::$_defaults);
 
         $this->config = $this->validateConfig($this->config);
+
+        self::getDbInstance();
     }
 
     /**
@@ -54,9 +59,9 @@ class SmvcDbSession extends SmvcBaseSession
         // if a cookie was present, find the session record
         if ($cookie && isset($cookie[0])) {
             // read the session record
-            $this->record = DB::select()->where('session_id', '=', $cookie[0])->from($this->config['table'])->execute(
-                    $this->config['database']
-            );
+            $this->record = self::$db->getOne();// DB::select()->where('session_id', '=', $cookie[0])->from($this->config['table'])->execute(
+//                    $this->config['database']
+            //            );
             //todo 这个需要修改
 
             // record found?
@@ -170,9 +175,12 @@ class SmvcDbSession extends SmvcBaseSession
      * destroy the current session
      *
      * @access    public
+     *
+     * @param string $id
+     *
      * @return    $this
      */
-    public function destroy($id)
+    public function destroy($id = '')
     {
         // do we have something to destroy?
         if (!empty($this->keys) and !empty($this->record)) {
@@ -266,5 +274,21 @@ class SmvcDbSession extends SmvcBaseSession
     public function gc($maxLifeTime)
     {
         // TODO: Implement gc() method.
+    }
+
+    public static function getDbInstance()
+    {
+        if (empty(self::$db)) {
+            self::$db = Database::instance(
+                    array(
+                            C('DB_TYPE'),
+                            sprintf('mysql:dbname=%s;host=%s', C('DB_NAME'), C('DB_HOST')),
+                            C('DB_USER'),
+                            C('DB_PASS'),
+                    )
+            );
+        }
+
+        return self::$db;
     }
 }

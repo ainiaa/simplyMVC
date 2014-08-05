@@ -226,6 +226,23 @@ class Database
         $this->driver = self::getDriver($params, $sp);
     }
 
+    public static function instance()
+    {
+        $params = func_get_args();
+
+        if (count($params) == 1) {
+            $params = $params[0];
+        }
+
+        list($key, $sp) = self::getParamHash($params);
+
+        if (!isset(self::$connections[$key])) {
+            self::$connections[$key] = self::getDriver($params, $sp);
+        }
+
+        return self::$connections[$key];
+    }
+
     private static function getDriver($params, $sp)
     {
         if (is_array($params)) {
@@ -277,22 +294,5 @@ class Database
         // $key = md5(serialize($params));
 
         return array($key, $sp);
-    }
-
-    public static function connect()
-    {
-        $params = func_get_args();
-
-        if (count($params) == 1) {
-            $params = $params[0];
-        }
-
-        list($key, $sp) = self::getParamHash($params);
-
-        if (!isset(self::$connections[$key])) {
-            self::$connections[$key] = self::getDriver($params, $sp);
-        }
-
-        return self::$connections[$key];
     }
 }
