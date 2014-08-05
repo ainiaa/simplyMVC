@@ -6,8 +6,6 @@
  * @author jeff liu
  */
 
-//Importer::importFile('core.model.db', 'class.php', ROOT_PATH);
-
 class BaseModel extends Object
 {
     protected $table_name = ''; //表名

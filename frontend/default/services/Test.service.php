@@ -8,5 +8,13 @@
  */
 class TestService extends BaseService
 {
+    /**
+     * @var TestDAO
+     */
     public $TestDAO;
+
+    public function getAll()
+    {
+        return $this->TestDAO->getAll('*');
+    }
 }
