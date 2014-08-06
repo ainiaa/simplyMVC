@@ -15,6 +15,9 @@ class TestService extends BaseService
 
     public function getAll()
     {
-        return $this->TestDAO->getAll('*');
+        $where = array(
+                "id[<]" => 3
+        );
+        return $this->TestDAO->getAll('*', $where);
     }
 }

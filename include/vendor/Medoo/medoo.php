@@ -618,7 +618,8 @@ class medoo
 			$column = $this->column_push($columns);
 		}
 
-		return 'SELECT ' . $column . ' FROM ' . $table . $this->where_clause($where);
+		$return = 'SELECT ' . $column . ' FROM ' . $table . $this->where_clause($where);
+        return $return;
 	}
 
 	public function select($table, $join, $columns = null, $where = null)

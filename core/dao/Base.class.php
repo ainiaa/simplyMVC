@@ -148,7 +148,8 @@ class BaseDAO extends Object
      */
     public function getOne($columns, $where = array())
     {
-        return $this->db->get($this->tableName, $columns, $where);
+        $return = $this->db->get($this->tableName, $columns, $where);
+        return $return;
     }
 
     /**
@@ -175,9 +176,13 @@ class BaseDAO extends Object
      *
      * @return array
      */
-    public function getAll($columns, $where = array())
+    public function getAll($columns = '*', $where = array())
     {
-        return $this->db->select($this->tableName, $columns, $where);
+        $return = $this->db->select($this->tableName, $columns, $where);
+
+        echo '<br >last sql:',$this->db->last_query(),'<br >';
+
+        return $return;
     }
 
     /**

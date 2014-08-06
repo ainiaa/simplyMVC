@@ -6,7 +6,10 @@ class SmvcDbSession extends SmvcBaseSession
 {
 
 
-    public static $db;
+    /**
+     * @var medoo
+     */
+    public $db;
 
     /*
      * @var	session database result object
@@ -18,19 +21,20 @@ class SmvcDbSession extends SmvcBaseSession
      */
     protected static $_defaults = array(
             'cookie_name'    => 'smvcid', // name of the session cookie for database based sessions
-            'table'          => 'sessions', // name of the sessions table
+            'table'          => 'smvc_sessions', // name of the sessions table
             'gc_probability' => 5 // probability % (between 0 and 100) for garbage collection
     );
 
 
     public function __construct($config = array())
     {
+        parent::__construct($config);
         // merge the driver config with the global config
         $this->config = array_merge($config, is_array($config['db']) ? $config['db'] : self::$_defaults);
 
         $this->config = $this->validateConfig($this->config);
 
-        self::getDbInstance();
+        $this->getDbInstance();
     }
 
     /**
@@ -59,8 +63,12 @@ class SmvcDbSession extends SmvcBaseSession
         // if a cookie was present, find the session record
         if ($cookie && isset($cookie[0])) {
             // read the session record
-            $this->record = self::$db->getOne();// DB::select()->where('session_id', '=', $cookie[0])->from($this->config['table'])->execute(
-//                    $this->config['database']
+            $this->record = $this->db->get(
+                    $this->config['table'],
+                    '*',
+                    array('session_id' => $cookie[0])
+            ); // DB::select()->where('session_id', '=', $cookie[0])->from($this->config['table'])->execute(
+            //                    $this->config['database']
             //            );
             //todo 这个需要修改
 
@@ -137,16 +145,20 @@ class SmvcDbSession extends SmvcBaseSession
             // do we need to create a new session?
             if (is_null($this->record)) {
                 // create the new session record
-                $result = DB::insert($this->config['table'], array_keys($session))->values($session)->execute(
-                        $this->config['database']
-                );
+                //                $result = DB::insert($this->config['table'], array_keys($session))->values($session)->execute(
+                //                        $this->config['database']
+                //                );
+                $result = $this->db->insert($this->config['table'], $session);
+
             } else {
                 // update the database
-                $result = DB::update($this->config['table'])->set($session)->where(
-                        'session_id',
-                        '=',
-                        $this->record->get('session_id')
-                )->execute($this->config['database']);
+                $session_id = ''; //todo 需要处理
+                $result     = $this->db->update($this->config['table'], array(), array('session_id' => $session_id));
+                //                $result = DB::update($this->config['table'])->set($session)->where(
+                //                        'session_id',
+                //                        '=',
+                //                        $this->record->get('session_id')
+                //                )->execute($this->config['database']);
             }
 
             // update went well?
@@ -160,9 +172,11 @@ class SmvcDbSession extends SmvcBaseSession
             // do some garbage collection
             if (mt_rand(0, 100) < $this->config['gc_probability']) {
                 $expired = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
-                $result  = DB::delete($this->config['table'])->where('updated', '<', $expired)->execute(
-                        $this->config['database']
-                );
+                $result  = $this->db->delete($this->config['table'], array('updated[<]' => $expired));
+
+                //                $result  = DB::delete($this->config['table'])->where('updated', '<', $expired)->execute(
+                //                        $this->config['database']
+                //                );
             }
         }
 
@@ -185,9 +199,10 @@ class SmvcDbSession extends SmvcBaseSession
         // do we have something to destroy?
         if (!empty($this->keys) and !empty($this->record)) {
             // delete the session record
-            $result = DB::delete($this->config['table'])->where('session_id', '=', $this->keys['session_id'])->execute(
-                    $this->config['database']
-            );
+            $result = $this->db->delete($this->config['table'], array('session_id[<]' => $this->keys['session_id']));
+            //            $result = DB::delete($this->config['table'])->where('session_id', '=', $this->keys['session_id'])->execute(
+            //                    $this->config['database']
+            //            );
         }
 
         // reset the stored session data
@@ -276,10 +291,10 @@ class SmvcDbSession extends SmvcBaseSession
         // TODO: Implement gc() method.
     }
 
-    public static function getDbInstance()
+    public function getDbInstance()
     {
-        if (empty(self::$db)) {
-            self::$db = Database::instance(
+        if (empty($this->db)) {
+            $this->db = Database::instance(
                     array(
                             C('DB_TYPE'),
                             sprintf('mysql:dbname=%s;host=%s', C('DB_NAME'), C('DB_HOST')),
@@ -289,6 +304,6 @@ class SmvcDbSession extends SmvcBaseSession
             );
         }
 
-        return self::$db;
+        return $this->$db;
     }
 }

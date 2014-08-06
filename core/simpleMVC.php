@@ -106,6 +106,7 @@ class SimpleMVC
                 CORE_PATH . '/Database.class.php',
                 CORE_PATH . '/functions.class.php',
                 VENDOR_PATH . '/FirePHP.class.php',
+                VENDOR_PATH . '/Medoo/medoo.php',
         );
     }
 
@@ -114,6 +115,7 @@ class SimpleMVC
      */
     public static function createBaseFileCache()
     {
+        return false; //todo 暂时屏蔽
         $content      = '<?php ';
         $baseFileList = self::getBaseFileList();
         foreach ($baseFileList as $file) {
@@ -196,7 +198,9 @@ class SimpleMVC
      */
     static public function initSession()
     {
-        session_start();
+        self::$sessionHandler = new SmvcDbSession();
+        self::$sessionHandler->create();
+//        session_start();
     }
 
     /**
