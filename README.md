@@ -24,7 +24,7 @@
 5、session 的具体实现   `pending` -- optional
 
    * cookie   `doing` 依赖于 cookie实例获取需要处理
-   * db   `doing`  依赖于 db实例获取需要处理
+   * db   `doing`    <font color="green">`done`</font>
    * file   `doing`
    * memcache   `doing`  依赖于 memcache实例获取需要处理
    * redis   `doing`  依赖于redis实例获取需要处理   https://github.com/salimane/rediscluster-php/blob/master/src/RedisCluster/RedisCluster.php
