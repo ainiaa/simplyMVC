@@ -30,7 +30,10 @@ class SmvcDbSession extends SmvcBaseSession
     {
         parent::__construct($config);
         // merge the driver config with the global config
-        $this->config = array_merge($config, is_array($config['db']) ? $config['db'] : self::$_defaults);
+        $dbConfig     = isset($config['database']) && is_array(
+                $config['database']
+        ) ? $config['database'] : self::$_defaults;
+        $this->config = array_merge($config, $dbConfig);
 
         $this->config = $this->validateConfig($this->config);
 
@@ -59,6 +62,13 @@ class SmvcDbSession extends SmvcBaseSession
 
         // get the session cookie
         $cookie = $this->getCookie();
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $cookie,
+                        'label' => '$cookie ' . __METHOD__,
+                        'level' => 'info',
+                )
+        );
 
         // if a cookie was present, find the session record
         if ($cookie && isset($cookie[0])) {
@@ -67,23 +77,39 @@ class SmvcDbSession extends SmvcBaseSession
                     $this->config['table'],
                     '*',
                     array('session_id' => $cookie[0])
+
             ); // DB::select()->where('session_id', '=', $cookie[0])->from($this->config['table'])->execute(
             //                    $this->config['database']
             //            );
             //todo 这个需要修改
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => $this->record,
+                            'label' => '$this->record ' . __METHOD__,
+                            'level' => 'info',
+                    )
+            );
 
             // record found?
-            if ($this->record->count()) {
-                $payload = $this->unserialize($this->record->get('payload'));
+            if (is_array($this->record) && count($this->record) > 0) {
+                $payload = isset($this->record['payload']) ? $this->record['payload'] : '';
+                $payload = $this->unserialize($payload);
             } else {
                 // try to find the session on previous id
-                $this->record = DB::select()->where('previous_id', '=', $cookie[0])->from(
-                        $this->config['table']
-                )->execute($this->config['database']);
+                $this->record = $this->db->get(
+                        $this->config['table'],
+                        '*',
+                        array('previous_id' => $cookie[0])
+
+                );
+                //                DB::select()->where('previous_id', '=', $cookie[0])->from(
+                //                        $this->config['table']
+                //                )->execute($this->config['database']);
 
                 // record found?
-                if ($this->record->count()) {
-                    $payload = $this->unserialize($this->record->get('payload'));
+                if (is_array($this->record) && count($this->record) > 0) {
+                    $payload = isset($this->record['payload']) ? $this->record['payload'] : '';
+                    $payload = $this->unserialize($payload);
                 } else {
                     // cookie present, but session record missing. force creation of a new session
                     return $this->read(true);
@@ -111,6 +137,15 @@ class SmvcDbSession extends SmvcBaseSession
                 }
             }
         }
+
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $this,
+                        'lable' => '$this ' . __METHOD__,
+                        'level' => 'info',
+                )
+        );
+
 
         return parent::read($id);
     }
@@ -294,16 +329,15 @@ class SmvcDbSession extends SmvcBaseSession
     public function getDbInstance()
     {
         if (empty($this->db)) {
-            $this->db = Database::instance(
-                    array(
-                            C('DB_TYPE'),
-                            sprintf('mysql:dbname=%s;host=%s', C('DB_NAME'), C('DB_HOST')),
-                            C('DB_USER'),
-                            C('DB_PASS'),
-                    )
-            );
+            $this->db = new medoo(array(
+                    'database_type' => C('DB_TYPE', 'mysql'),
+                    'database_name' => C('DB_NAME', 'test'),
+                    'server'        => C('DB_HOST', 'localhost'),
+                    'username'      => C('DB_USER', 'root'),
+                    'password'      => C('DB_PASS', ''),
+            ));
         }
 
-        return $this->$db;
+        return $this->db;
     }
 }

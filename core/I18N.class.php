@@ -93,25 +93,11 @@ abstract class I18N
     public function _translate($term)
     {
         $parsedData = $this->_getData();
-        SmvcDebugHelper::instance()->debug(
-                array(
-                        'info'  => $parsedData,
-                        'label' => '$parsedData ',
-                        'level' => 'info',
-                )
-        );
         return $this->find($term, $parsedData);
     }
 
     public function _getData()
     {
-        SmvcDebugHelper::instance()->debug(
-                array(
-                        'info'  => $this->locale,
-                        'label' => '$locale  xx ',
-                        'level' => 'info',
-                )
-        );
         return array();
     }
 
@@ -131,25 +117,11 @@ abstract class I18N
         $keyStr = '';
         foreach ($terms as $keyword) {
             $keyStr .= '.' . $keyword;
-            SmvcDebugHelper::instance()->debug(
-                    array(
-                            'info'  => $keyword,
-                            'label' => '$keyword',
-                            'level' => 'info',
-                    )
-            );
             if (empty($parsedData[$keyword])) {
                 return "Translation missing for #{$keyStr}";
             } else {
                 $parsedData = $parsedData[$keyword];
             }
-            SmvcDebugHelper::instance()->debug(
-                    array(
-                            'info'  => $parsedData,
-                            'label' => '$parsedData',
-                            'level' => 'info',
-                    )
-            );
         }
         return $parsedData;
 
@@ -196,13 +168,6 @@ abstract class I18N
     public static function instance($className)
     {
         if (empty(self::$instance[$className])) {
-            SmvcDebugHelper::instance()->debug(
-                    array(
-                            'info'  => $className,
-                            'label' => '$className ',
-                            'level' => 'info',
-                    )
-            );
             self::$instance[$className] = new $className();
         }
 

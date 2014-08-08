@@ -14,7 +14,7 @@ return array(
     //COOKIE 域名
         'cookieDomain'             => '',
     //类自动加载目录 多个目录之间使用逗号分割
-        'autoLoadPath'             => CORE_PATH . ',' . CORE_PATH . '/cache/' . ',' . CORE_PATH . '/i18n/' . ',' . CORE_PATH . '/helper/' . ',' . CORE_PATH . '/db/' . ',' . CORE_PATH . '/db/Driver/',
+        'autoLoadPath'             => CORE_PATH . ',' . CORE_PATH . '/cache/' . ',' . CORE_PATH . '/i18n/' . ',' . CORE_PATH . '/helper/' . ',' . CORE_PATH . '/session/',
     //自动开启session
         'SESSION_AUTO_START'       => true,
         'SESSION_TYPE'             => 'db', //存储 session 的driver

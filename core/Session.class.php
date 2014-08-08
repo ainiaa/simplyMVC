@@ -1,11 +1,11 @@
 <?php
 
-class Sessionx
+class Session
 {
     /**
      * loaded session driver instance
      */
-    protected static $_instance = null;
+    protected static $_proxy = null;
 
     /**
      * array of loaded instances
@@ -41,6 +41,10 @@ class Sessionx
      * Produces fully configured session driver instances
      *
      * @param    array|string full driver config or just driver type
+     *
+     * @throws SessionException
+     * @throws Exception
+     * @return
      */
     public static function forge($custom = array())
     {
@@ -51,40 +55,62 @@ class Sessionx
             $custom = array('driver' => $custom);
         }
 
-        $config = array_merge(static::$_defaults, $config, $custom);
+        $config = array_merge(self::$_defaults, $config, $custom);
 
         if (empty($config['driver'])) {
             throw new SessionException('No session driver given or no default session driver set.');
         }
 
         // determine the driver to load
-        $class = 'Session' . ucfirst($config['driver']);
+        $class = 'Smvc' . ucfirst($config['driver']) . 'Session';
+
+        /**  @var SmvcBaseSession */
+        $driver = null;
 
         $driver = new $class($config);
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $driver,
+                        'label' => '$driver ' . __METHOD__,
+                        'level' => 'error',
+                )
+        );
 
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $config,
+                        'label' => '$config ' . __METHOD__,
+                        'level' => 'error',
+                )
+        );
         // get the driver's cookie name
-        $cookie = $driver->get_config('cookie_name');
-
+        $cookieName = isset($config['cookie_name']) ? $config['cookie_name'] : 'smvcid';
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $cookieName,
+                        'label' => '$cookieName ' . __METHOD__,
+                        'level' => 'error',
+                )
+        );
         // do we already have a driver instance for this cookie?
-        if (isset(static::$_instances[$cookie])) {
+        if (isset(self::$_instances[$cookieName])) {
             // if so, they must be using the same driver class!
-            $class_instance = 'Fuel\\Core\\' . $class;
-            if (static::$_instances[$cookie] instanceof $class_instance) {
-                throw new Exception('You can not instantiate two different sessions using the same cookie name "' . $cookie . '"');
+            if (self::$_instances[$cookieName] instanceof $class) {
+                throw new Exception('You can not instantiate two different sessions using the same cookie name "' . $cookieName . '"');
             }
         } else {
             // register a shutdown event to update the session
-            \Event::register('fuel-shutdown', array($driver, 'write'));
-
             // init the session
             $driver->init();
             $driver->read();
 
+            register_shutdown_function(array(&$driver, "write"), array(''));
+
             // store this instance
-            static::$_instances[$cookie] =& $driver;
+            self::$_instances[$cookieName] =& $driver;
         }
 
-        return static::$_instances[$cookie];
+        return self::$_instances[$cookieName];
     }
 
     // --------------------------------------------------------------------
@@ -95,7 +121,7 @@ class Sessionx
      * @internal  param $void
      *
      * @access    private
-     * @return \Session
+     * @return Session
      */
     final private function __construct()
     {
@@ -109,23 +135,16 @@ class Sessionx
      * @param    void
      *
      * @access    public
-     * @return    SessionDriver object
+     * @return    SmvcBaseSession object
      */
     public static function instance($instance = null)
     {
-        if ($instance !== null) {
-            if (isset(static::$_instances[$instance])) {
-                return static::$_instances[$instance];
-            } else {
-                return false;
-            }
+        if (isset(self::$_proxy[$instance]) && self::$_proxy[$instance]) {
+            return self::$_proxy[$instance];
+        } else {
+            self::$_proxy[$instance] = self::forge($instance);
         }
-
-        if (static::$_instance === null) {
-            static::$_instance = static::forge();
-        }
-
-        return static::$_instance;
+        return static::$_proxy[$instance];
     }
 
     // --------------------------------------------------------------------
@@ -133,15 +152,15 @@ class Sessionx
     /**
      * set session variables
      *
-     * @param    string|array name             of the variable to set or array of values, array(name => value)
-     * @param                 mixed            value
+     * @param    string|array       name of the variable to set or array of values, array(name => value)
+     * @param                 mixed $value
      *
      * @access    public
-     * @return    void
+     * @return $this
      */
     public static function set($name, $value = null)
     {
-        return static::instance()->set($name, $value);
+        return self::instance()->set($name, $value);
     }
 
     // --------------------------------------------------------------------
@@ -151,14 +170,14 @@ class Sessionx
      *
      * @access    public
      *
-     * @param    string    name of the variable to get
-     * @param    mixed     default value to return if the variable does not exist
+     * @param    string $name    of the variable to get
+     * @param    mixed  $default value to return if the variable does not exist
      *
      * @return    mixed
      */
     public static function get($name = null, $default = null)
     {
-        return static::instance()->get($name, $default);
+        return self::instance()->get($name, $default);
     }
 
     // --------------------------------------------------------------------
@@ -166,15 +185,14 @@ class Sessionx
     /**
      * delete a session variable
      *
-     * @param    string    name of the variable to delete
-     * @param    mixed     value
+     * @param    string $name of the variable to delete
      *
      * @access    public
-     * @return    void
+     * @return $this
      */
     public static function delete($name)
     {
-        return static::instance()->delete($name);
+        return self::instance()->delete($name);
     }
 
     // --------------------------------------------------------------------
@@ -184,13 +202,13 @@ class Sessionx
      *
      * @access    public
      *
-     * @param    string    name of the variable to get, default is 'session_id'
+     * @param    string $name of the variable to get, default is 'session_id'
      *
      * @return    mixed
      */
     public static function key($name = 'session_id')
     {
-        return static::instance()->key($name);
+        return self::instance()->key($name);
     }
 
     // --------------------------------------------------------------------
@@ -198,15 +216,15 @@ class Sessionx
     /**
      * set session flash variables
      *
-     * @param    string    name of the variable to set
-     * @param    mixed     value
+     * @param    string $name of the variable to set
+     * @param    mixed  $value
      *
      * @access    public
-     * @return    void
+     * @return $this
      */
-    public static function set_flash($name, $value = null)
+    public static function setFlash($name, $value = null)
     {
-        return static::instance()->set_flash($name, $value);
+        return self::instance()->setFlash($name, $value);
     }
 
     // --------------------------------------------------------------------
@@ -216,15 +234,15 @@ class Sessionx
      *
      * @access    public
      *
-     * @param    string    name of the variable to get
-     * @param    mixed     default value to return if the variable does not exist
-     * @param    bool      true if the flash variable needs to expire immediately
+     * @param    string $name     of the variable to get
+     * @param    mixed  $default  value to return if the variable does not exist
+     * @param           bool      true if the flash variable needs to expire immediately
      *
      * @return    mixed
      */
-    public static function get_flash($name = null, $default = null, $expire = null)
+    public static function getFlash($name = null, $default = null, $expire = null)
     {
-        return static::instance()->get_flash($name, $default, $expire);
+        return self::instance()->getFlash($name, $default, $expire);
     }
 
     // --------------------------------------------------------------------
@@ -234,13 +252,13 @@ class Sessionx
      *
      * @access    public
      *
-     * @param    string    name of the variable to keep
+     * @param    string $name of the variable to keep
      *
-     * @return    void
+     * @return $this
      */
-    public static function keep_flash($name = null)
+    public static function keepFlash($name = null)
     {
-        return static::instance()->keep_flash($name);
+        return self::instance()->keepFlash($name);
     }
 
     // --------------------------------------------------------------------
@@ -248,15 +266,14 @@ class Sessionx
     /**
      * delete session flash variables
      *
-     * @param    string    name of the variable to delete
-     * @param    mixed     value
+     * @param    string $name of the variable to delete
      *
      * @access    public
-     * @return    void
+     * @return $this
      */
-    public static function delete_flash($name = null)
+    public static function deleteFlash($name = null)
     {
-        return static::instance()->delete_flash($name);
+        return self::instance()->deleteFlash($name);
     }
 
     // --------------------------------------------------------------------
@@ -265,11 +282,11 @@ class Sessionx
      * create a new session
      *
      * @access    public
-     * @return    void
+     * @return $this
      */
     public static function create()
     {
-        return static::instance()->create();
+        return self::instance()->create();
     }
 
     // --------------------------------------------------------------------
@@ -278,11 +295,14 @@ class Sessionx
      * read the session
      *
      * @access    public
-     * @return    void
+     *
+     * @param $id
+     *
+     * @return SmvcSessionInterface
      */
-    public static function read()
+    public static function read($id)
     {
-        return static::instance()->read();
+        return self::instance()->read($id);
     }
 
     // --------------------------------------------------------------------
@@ -291,11 +311,14 @@ class Sessionx
      * write the session
      *
      * @access    public
-     * @return    void
+     *
+     * @param $id
+     *
+     * @return SmvcSessionInterface
      */
-    public static function write()
+    public static function write($id)
     {
-        return static::instance()->write();
+        return self::instance()->write($id);
     }
 
     // --------------------------------------------------------------------
@@ -304,11 +327,11 @@ class Sessionx
      * rotate the session id
      *
      * @access    public
-     * @return    void
+     * @return $this
      */
     public static function rotate()
     {
-        return static::instance()->rotate();
+        return self::instance()->rotate();
     }
 
     // --------------------------------------------------------------------
@@ -317,69 +340,72 @@ class Sessionx
      * destroy the current session
      *
      * @access    public
-     * @return    void
+     *
+     * @param string $id
+     *
+     * @return $this
      */
-    public static function destroy()
+    public static function destroy($id = '')
     {
-        return static::instance()->destroy();
+        return self::instance()->destroy($id);
     }
 }
 
 
 
-class Session
-{
-    private $driver;
-
-    public function __construct($config, $specifiedDriver = false)
-    {
-        if ($specifiedDriver) {
-            $config['driver'] = $specifiedDriver;
-        } else {
-            $config['driver'] = '';
-        }
-        $driver = ucwords($config['driver']);
-
-        $this->driver = new $driver($config);
-    }
-
-    /**
-     * Use magic method 'call' to pass user method
-     * into driver method
-     *
-     * @param string @name
-     * @param array  @arguments
-     *
-     * @return mixed
-     */
-    public function __call($name, $arguments)
-    {
-        return call_user_func_array(array($this->driver, $name), $arguments);
-    }
-
-    /**
-     * PHP Magic method for calling a class property dinamicly
-     *
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        return $this->driver->$name;
-    }
-
-    /**
-     * PHP Magic method for set a class property dinamicly
-     *
-     * @param string $name
-     * @param mixed  $value
-     *
-     * @return void
-     */
-    public function __set($name, $value)
-    {
-        $this->driver->$name = $value;
-    }
-
-}
+//class Session
+//{
+//    private $driver;
+//
+//    public function __construct($config, $specifiedDriver = false)
+//    {
+//        if ($specifiedDriver) {
+//            $config['driver'] = $specifiedDriver;
+//        } else {
+//            $config['driver'] = '';
+//        }
+//        $driver = ucwords($config['driver']);
+//
+//        $this->driver = new $driver($config);
+//    }
+//
+//    /**
+//     * Use magic method 'call' to pass user method
+//     * into driver method
+//     *
+//     * @param string @name
+//     * @param array  @arguments
+//     *
+//     * @return mixed
+//     */
+//    public function __call($name, $arguments)
+//    {
+//        return call_user_func_array(array($this->driver, $name), $arguments);
+//    }
+//
+//    /**
+//     * PHP Magic method for calling a class property dinamicly
+//     *
+//     * @param string $name
+//     *
+//     * @return mixed
+//     */
+//    public function __get($name)
+//    {
+//        return $this->driver->$name;
+//    }
+//
+//    /**
+//     * PHP Magic method for set a class property dinamicly
+//     *
+//     * @param string $name
+//     * @param mixed  $value
+//     *
+//     * @return void
+//     */
+//    public function __set($name, $value)
+//    {
+//        $this->driver->$name = $value;
+//    }
+//
+//}

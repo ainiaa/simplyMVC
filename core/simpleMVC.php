@@ -55,6 +55,7 @@ if (function_exists('spl_autoload_register')) {
 
 class SimpleMVC
 {
+    public static $sessionHandler;
 
     public function __construct()
     {
@@ -103,7 +104,6 @@ class SimpleMVC
                 CORE_PATH . '/service/Base.class.php',
                 CORE_PATH . '/view/View.class.php',
                 CORE_PATH . '/SmvcConf.class.php',
-                CORE_PATH . '/Database.class.php',
                 CORE_PATH . '/functions.class.php',
                 VENDOR_PATH . '/FirePHP.class.php',
                 VENDOR_PATH . '/Medoo/medoo.php',
@@ -155,13 +155,13 @@ class SimpleMVC
          */
         SmvcConf::instance()->loadConfigFileList(CONF_PATH, 'inc.php');
 
-        SmvcDebugHelper::instance()->debug(
-                array(
-                        'info'  => C(),
-                        'label' => 'C()' . __METHOD__,
-                        'level' => 'warn',
-                )
-        );
+//        SmvcDebugHelper::instance()->debug(
+//                array(
+//                        'info'  => C(),
+//                        'label' => 'C()' . __METHOD__,
+//                        'level' => 'warn',
+//                )
+//        );
 
         //设置加载路径
         $autoloadPath = C('autoLoadPath');
@@ -171,13 +171,13 @@ class SimpleMVC
             Importer::setIncludePath($autoloadPath);
         }
 
-        SmvcDebugHelper::instance()->debug(
-                array(
-                        'info'  => get_include_path(),
-                        'label' => 'get_include_path ',
-                        'level' => 'info',
-                )
-        );
+//        SmvcDebugHelper::instance()->debug(
+//                array(
+//                        'info'  => get_include_path(),
+//                        'label' => 'get_include_path ',
+//                        'level' => 'info',
+//                )
+//        );
 
         // 定义当前请求的系统常量
         define('NOW_TIME', $_SERVER['REQUEST_TIME']);
@@ -198,9 +198,10 @@ class SimpleMVC
      */
     static public function initSession()
     {
-        self::$sessionHandler = new SmvcDbSession();
-        self::$sessionHandler->create();
-//        session_start();
+//        self::$sessionHandler = new SmvcDbSession();
+//        self::$sessionHandler->create();
+        Session::instance('db');
+        //        session_start();
     }
 
     /**

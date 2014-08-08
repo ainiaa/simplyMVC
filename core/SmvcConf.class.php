@@ -163,18 +163,16 @@ class SmvcConf implements ArrayAccess
             return $default;
         }
     }
-}
 
-//if (!function_exists('C')) {
-//    function C($key = null, $default = false)
-//    {
-//        return SmvcConf::instance()->get($key, $default);
-//    }
-//}
-//
-//if (!function_exists('LCL')) {
-//    function LCL($configFilePath, $configFileExt = 'inc.php')
-//    {
-//        SmvcConf::instance()->loadConfigFileList($configFilePath, $configFileExt);
-//    }
-//}
+    /**
+     * @param null   $key
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function set($key = null, $value = '')
+    {
+        $this->configData[$key] = $value;
+        return true;
+    }
+}

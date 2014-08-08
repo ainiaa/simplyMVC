@@ -316,41 +316,62 @@ class Importer
             $moduleName = Router::getModule();
         }
 
-        $helperFileName = $helperName . '.helper.php';
+        $helperFileName = $helperName . '.class.php';
 
-        $helperFile = APP_PATH . '/' . $groupName . '/' . $moduleName . '/helpers/' . $helperFileName;
-        $loadResult = self::importFileByFullPath($helperFile);
+        //首先加载core目录下的helper
+        $helperFile = CORE_PATH . '/helper/' . $helperFileName;
+        $loadResult = self::importFileByFullPath($helperFile, false);
+//        SmvcDebugHelper::instance()->debug(
+//                array(
+//                        'info'  => $helperFile,
+//                        'label' => '$helperFile ' . __METHOD__,
+//                        'level' => 'info'
+//                )
+//        );
 
-        if (!$loadResult) { //当前group module下加载controller失败
-            $modules = self::getModuleList($groupName);
-            foreach ($modules as $module) {
-                $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/helpers/' . $helperFileName;
-                $files    = self::getServiceListByGroupAndModule($groupName, $module);
-                if (in_array($filePath, $files, true)) {
-                    $loadResult = self::importFileByFullPath($helperFile);
-                    if ($loadResult) { //加载成功直接break
-                        break;
+        if (!$loadResult) {
+            $helperFile = APP_PATH . '/' . $groupName . '/' . $moduleName . '/helper/' . $helperFileName;
+            $loadResult = self::importFileByFullPath($helperFile, false);
+
+            if (!$loadResult) { //当前group module下加载controller失败
+                $modules = self::getModuleList($groupName);
+                foreach ($modules as $module) {
+                    $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/helper/' . $helperFileName;
+                    $files    = self::getServiceListByGroupAndModule($groupName, $module);
+                    if (in_array($filePath, $files, true)) {
+                        $loadResult = self::importFileByFullPath($helperFile);
+                        if ($loadResult) { //加载成功直接break
+                            break;
+                        }
                     }
                 }
-            }
-            //当前group加载失败 获取所有的加载其他group下的controll 直到第一个加载成功为止
-            if (!$loadResult) {
-                $groupList = self::getGroupList();
-                foreach ((array)$groupList as $group) {
-                    $groupModules = self::getModuleList($group);
-                    foreach ($groupModules as $groupModule) {
-                        $filePath = APP_PATH . '/' . $group . '/' . $groupModule . '/helpers/' . $helperFileName;
-                        $files    = self::getDAOListByGroupAndModule($group, $groupModule);
-                        if (in_array($filePath, $files, true)) {
-                            $loadResult = self::importFileByFullPath($helperFile);
-                            if ($loadResult) { //加载成功直接break
-                                break;
+                //当前group加载失败 获取所有的加载其他group下的controll 直到第一个加载成功为止
+                if (!$loadResult) {
+                    $groupList = self::getGroupList();
+                    foreach ((array)$groupList as $group) {
+                        $groupModules = self::getModuleList($group);
+//                        SmvcDebugHelper::instance()->debug(
+//                                array(
+//                                        'info'  => $groupModules,
+//                                        'label' => '$groupModules ' . __METHOD__,
+//                                        'level' => 'info'
+//                                )
+//                        );
+                        foreach ($groupModules as $groupModule) {
+                            $filePath = APP_PATH . '/' . $group . '/' . $groupModule . '/helpers/' . $helperFileName;
+                            $files    = self::getDAOListByGroupAndModule($group, $groupModule);
+                            if (in_array($filePath, $files, true)) {
+                                $loadResult = self::importFileByFullPath($helperFile);
+                                if ($loadResult) { //加载成功直接break
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
     }
 
     /**
@@ -584,7 +605,7 @@ class Importer
      */
     public static function autoLoad($className)
     {
-//        echo '$className:', $className, '<br />';
+        //        echo '$className:', $className, '<br />';
         if ('Control' == substr($className, -7)) { //controller类
             $controllerName = substr_replace($className, '', -7);
             self::loadController(lcfirst($controllerName));
@@ -599,33 +620,39 @@ class Importer
             self::loadService(lcfirst($serviceName));
         } else if ('Helper' == substr($className, -6)) { //辅助类
             //TODO 需要考虑 group moduel 里面的helper？？？  分组下面需要有吗？？？
-            $helperName = substr_replace($className, '', -6);
-            self::loadHelper(lcfirst($helperName));
+            //            $helperName = substr_replace($className, '', -6);
+            self::loadHelper(lcfirst($className));
         } else {
-            // 根据自动加载路径设置进行尝试搜索
-            $includePath    = get_include_path();
-            $paths          = explode(PATH_SEPARATOR, $includePath);
-            $fileExtensions = array('.class.php', '.php');
-            foreach ($paths as $path) {
-                // TODO 如果加载类成功则返回 这个需要完善。。。 文件名后缀需要整理
-                foreach ($fileExtensions as $fileExtension) {
-                    $fullFilePath = $path . '/' . $className . $fileExtension;
-                    SmvcDebugHelper::instance()->debug(
-                            array(
-                                    'info'  => array('className' => $className, 'path' => $fullFilePath),
-                                    'label' => '$class_name',
-                                    'level' => 'warn'
-                            )
-                    );
-                    if (self::importFileByFullPath($fullFilePath, false)) {
-                        break;
+
+            //尝试获取fileMapping
+            $loadResult = self::loadMappingFile($className);
+            if (!$loadResult) {
+                // 根据自动加载路径设置进行尝试搜索
+                $includePath    = get_include_path();
+                $paths          = explode(PATH_SEPARATOR, $includePath);
+                $fileExtensions = array('.class.php', '.php');
+                foreach ($paths as $path) {
+                    // TODO 如果加载类成功则返回 这个需要完善。。。 文件名后缀需要整理
+                    foreach ($fileExtensions as $fileExtension) {
+                        $fullFilePath = $path . '/' . $className . $fileExtension;
+//                        SmvcDebugHelper::instance()->debug(
+//                                array(
+//                                        'info'  => array('className' => $className, 'path' => $fullFilePath),
+//                                        'label' => '$class_name',
+//                                        'level' => 'warn'
+//                                )
+//                        );
+                        if (self::importFileByFullPath($fullFilePath, false)) {
+                            break;
+                        }
                     }
                 }
             }
         }
-        SmvcDebugHelper::instance()->debug(
-                array('info' => $className, 'label' => '$class_name', 'level' => 'warn')
-        );
+
+//        SmvcDebugHelper::instance()->debug(
+//                array('info' => $className, 'label' => '$class_name', 'level' => 'warn')
+//        );
     }
 
     /**
@@ -681,18 +708,49 @@ class Importer
                 Importer::importFileByFullPath($file);
             }
         }
-        //        Importer::importFileByFullPath(ROOT_PATH . '/core/functions.class.php');
-        //        Importer::importFile('core.Router', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.Factory', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.Dispatcher', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.Object', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.control.Base', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.model.Base', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.dao.Base', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.service.Base', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.view.View', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.SmvcConf', 'class.php', ROOT_PATH);
-        //        Importer::importFile('core.Database', 'class.php', ROOT_PATH);
+    }
+
+    public static function fileMapping()
+    {
+        return array(
+            // phpseclib /Crypt
+                'Crypt_AES'                 => VENDOR_PATH . 'phpseclib/Crypt/AES.php',
+                'Crypt_Base'                => VENDOR_PATH . 'phpseclib/Crypt/Base.php',
+                'Crypt_Blowfish'            => VENDOR_PATH . 'phpseclib/Crypt/Blowfish.php',
+                'Crypt_DES'                 => VENDOR_PATH . 'phpseclib/Crypt/DES.php',
+                'Crypt_Hash'                => VENDOR_PATH . 'phpseclib/Crypt/Hash.php',
+                'Crypt_RC2'                 => VENDOR_PATH . 'phpseclib/Crypt/RC2.php',
+                'Crypt_RC4'                 => VENDOR_PATH . 'phpseclib/Crypt/RC4.php',
+                'Crypt_Rijndael'            => VENDOR_PATH . 'phpseclib/Crypt/Rijndael.php',
+                'Crypt_RSA'                 => VENDOR_PATH . 'phpseclib/Crypt/RSA.php',
+                'Crypt_TripleDES'           => VENDOR_PATH . 'phpseclib/Crypt/TripleDES.php',
+                'Crypt_Twofish'             => VENDOR_PATH . 'phpseclib/Crypt/Twofish.php',
+            // phpseclib /File
+                'File_ANSI'                 => VENDOR_PATH . 'phpseclib/File/ANSI.php',
+                'File_ANSI1'                => VENDOR_PATH . 'phpseclib/File/ASN1.php',
+                'File_X509'                 => VENDOR_PATH . 'phpseclib/File/X509.php',
+            //phpseclib /Math
+                'Math_BigInteger'           => VENDOR_PATH . 'phpseclib/Math/BigInteger.php',
+            //phpseclib /Net
+                'Net_SCP'                   => VENDOR_PATH . 'phpseclib/Net/SCP.php',
+                'Net_SFTP'                  => VENDOR_PATH . 'phpseclib/Net/SFTP.php',
+                'Net_SSH1'                  => VENDOR_PATH . 'phpseclib/Net/SSH1.php',
+                'Net_SSH2'                  => VENDOR_PATH . 'phpseclib/Net/SSH2.php',
+            //phpseclib /Net/SFTP
+                'Net_SFTP_Stream'           => VENDOR_PATH . 'phpseclib/Net/SFTP/Stream.php',
+            //phpseclib /System
+                'System_SSH_Agent_Identity' => VENDOR_PATH . 'phpseclib/System/SSH/Agent.php',
+        );
+    }
+
+    public static function loadMappingFile($className)
+    {
+        $loadResult  = false;
+        $fileMapping = self::fileMapping();
+        if (isset($fileMapping[$className])) {
+            $loadResult = self::importFileByFullPath($fileMapping[$className], false);
+        }
+        return $loadResult;
     }
 
 }

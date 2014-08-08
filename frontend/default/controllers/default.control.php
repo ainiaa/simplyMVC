@@ -11,13 +11,13 @@ class defaultControl extends FrontendControl
     public function preIndexAction()
     {
         //        trace('本调试信息仅页面Trace中可见');
-        SmvcDebugHelper::instance()->debug(
-                array(
-                        'info'  => $_REQUEST,
-                        'label' => '$_REQUEST ',
-                        'level' => 'info',
-                )
-        );
+//        SmvcDebugHelper::instance()->debug(
+//                array(
+//                        'info'  => $_REQUEST,
+//                        'label' => '$_REQUEST ',
+//                        'level' => 'info',
+//                )
+//        );
         echo __METHOD__, ' 在index之前执行 ... <br />';
         echo IniI18N::t('first.hello', 'en_us'), IniI18N::t('first.world', 'en_us'), '<br />';
         echo IniI18N::t('second.hello', 'en_us', 'other'), IniI18N::t('second.world', 'en_us', 'other'), '<br />';

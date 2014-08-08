@@ -6,6 +6,14 @@ if (!function_exists('C')) {
     }
 }
 
+if (!function_exists('SC')) {
+    function SC($key = null, $value = false)
+    {
+        return SmvcConf::instance()->set($key, $value);
+    }
+}
+
+
 if (!function_exists('LCL')) {
     function LCL($configFilePath, $configFileExt = 'inc.php')
     {

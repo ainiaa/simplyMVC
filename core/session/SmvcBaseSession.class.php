@@ -77,7 +77,8 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     public function destroy($id = '')
     {
         // delete the session cookie
-        unset($_COOKIE[$this->config['cookie_name']]);
+        Cookie::delete($this->config['cookie_name']);
+        //        unset($_COOKIE[$this->config['cookie_name']]);
 
         // reset the stored session data
         $this->keys = $this->flash = $this->data = array();
@@ -496,11 +497,34 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      */
     public function setCookie($payload = array())
     {
-        if ($this->config['enable_cookie']) {
+        $enable_cookie = isset($this->config['enable_cookie']) ? $this->config['enable_cookie'] : true;
+        if ($enable_cookie) {
             $payload = $this->serialize($payload);
 
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => $payload,
+                            'label' => '$payload ori ' . __METHOD__,
+                            'level' => 'error',
+                    )
+            );
             // encrypt the payload if needed
             $this->config['encrypt_cookie'] and $payload = Crypt::encode($payload);
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => $payload,
+                            'label' => '$payload encode' . __METHOD__,
+                            'level' => 'error',
+                    )
+            );
+
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => Crypt::decode($payload),
+                            'label' => '$payload decode' . __METHOD__,
+                            'level' => 'error',
+                    )
+            );
 
             // make sure it doesn't exceed the cookie size specification
             if (strlen($payload) > 4000) {
@@ -547,9 +571,36 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         // was the cookie value posted?
         $cookie = Router::getPost($this->config['post_cookie_name'], false);
 
+        SmvcDebugHelper::instance()->debug(array(
+                        'info' => $cookie,
+                        'label' => '$cookie ' . __METHOD__,
+                        'level' => 'warn',
+                ));
+        SmvcDebugHelper::instance()->debug(array(
+                        'info' => $_COOKIE,
+                        'label' => '$_COOKIE ' . __METHOD__,
+                        'level' => 'warn',
+                ));
         // if not found, fetch the regular cookie
         if ($cookie === false) {
-            $cookie = isset($_COOKIE[$this->config['cookie_name']]) ? $_COOKIE[$this->config['cookie_name']] : false;
+            $cookie_name = isset($this->config['cookie_name']) ? $this->config['cookie_name'] : 'smvcid';
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => $this->config,
+                            'label' => '$this->config ' . __METHOD__,
+                            'level' => 'info',
+                    )
+            );
+            $cookie = Cookie::get(
+                    $cookie_name
+            ); //isset($_COOKIE[$this->config['cookie_name']]) ? $_COOKIE[$this->config['cookie_name']] : false;
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => $cookie,
+                            'label' => '$cookie ' . __METHOD__,
+                            'level' => 'error',
+                    )
+            );
         }
 
         // if not found, check the URL for a cookie
@@ -559,12 +610,20 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
 
         // if not found, was a session-id present in the HTTP header?
         if ($cookie === false) {
-            $cookie = Router::getHeader($this->config['header_header_name'], false);
+            $header_header_name = isset($this->config['header_header_name']) ? $this->config['header_header_name'] : '';
+            $cookie             = Router::getHeader($header_header_name, false);
         }
 
         if ($cookie !== false) {
             // fetch the payload
             $this->config['encrypt_cookie'] and $cookie = Crypt::decode($cookie);
+            SmvcDebugHelper::instance()->debug(
+                    array(
+                            'info'  => $cookie,
+                            'label' => '$cookie ' . __METHOD__,
+                            'level' => 'error',
+                    )
+            );
             $cookie = $this->unserialize($cookie);
 
             // validate the cookie format: must be an array

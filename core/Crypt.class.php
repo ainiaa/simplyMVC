@@ -24,40 +24,53 @@ class Crypt
      */
     private static $config = array();
 
+    private static $inited = false;
+
     /*
      * initialisation and auto configuration
      */
     public static function _init()
     {
-        self::$crypter = new Crypt_AES();
-        self::$hasher  = new Crypt_Hash('sha256');
+        if (empty(self::$inited)) {
+            self::$crypter = new Crypt_AES();
+            self::$hasher  = new Crypt_Hash('sha256');
 
-        self::$config = C('crypt', array());
+            self::$config = C('crypt', array());
 
-        // generate random crypto keys if we don't have them or they are incorrect length
-        $update = false;
-        foreach (array('crypto_key', 'crypto_iv', 'crypto_hmac') as $key) {
-            if (empty(self::$config[$key]) or (strlen(self::$config[$key]) % 4) != 0) {
-                $crypto = '';
-                for ($i = 0; $i < 8; $i++) {
-                    $crypto .= self::safe_b64encode(pack('n', mt_rand(0, 0xFFFF)));
+            // generate random crypto keys if we don't have them or they are incorrect length
+            $update = false;
+            foreach (array('crypto_key', 'crypto_iv', 'crypto_hmac') as $key) {
+                if (empty(self::$config[$key]) or (strlen(self::$config[$key]) % 4) != 0) {
+                    $crypto = '';
+                    for ($i = 0; $i < 8; $i++) {
+                        $crypto .= self::safe_b64encode(pack('n', mt_rand(0, 0xFFFF)));
+                    }
+                    self::$config[$key] = $crypto;
+                    $update             = true;
                 }
-                self::$config[$key] = $crypto;
-                $update             = true;
             }
+
+            // update the config if needed
+            if ($update === true) {
+                try {
+                    SC('crypt', self::$config);
+//                    SmvcDebugHelper::instance()->debug(
+//                            array(
+//                                    'info'  => var_export(self::$config,1),
+//                                    'label' => 'self::$config ' . __METHOD__,
+//                                    'level' => 'error',
+//                            )
+//                    );
+                } catch (Exception $e) {
+                }
+            }
+
+            self::$crypter->enableContinuousBuffer();
+
+            self::$hasher->setKey(self::safe_b64decode(self::$config['crypto_hmac']));
+            self::$inited = true;
         }
 
-        // update the config if needed
-        if ($update === true) {
-            try {
-                \Config::save('crypt', self::$config); //todo 需要处理
-            } catch (Exception $e) {
-            }
-        }
-
-        self::$crypter->enableContinuousBuffer();
-
-        self::$hasher->setKey(self::safe_b64decode(self::$config['crypto_hmac']));
     }
 
     // --------------------------------------------------------------------
@@ -72,6 +85,9 @@ class Crypt
      */
     public static function encode($value, $key = false)
     {
+//        return $value;
+        self::_init();
+
         $key ? self::$crypter->setKey($key) : self::$crypter->setKey(
                 self::safe_b64decode(self::$config['crypto_key'])
         );
@@ -94,12 +110,28 @@ class Crypt
      */
     public static function decode($value, $key = false)
     {
+//        return $value;
+        self::_init();
         $key ? self::$crypter->setKey($key) : self::$crypter->setKey(
                 self::safe_b64decode(self::$config['crypto_key'])
         );
         self::$crypter->setIV(self::safe_b64decode(self::$config['crypto_iv']));
 
         $value = self::safe_b64decode($value);
+//        SmvcDebugHelper::instance()->debug(
+//                array(
+//                        'info'  => $value,
+//                        'label' => '$value ' . __METHOD__,
+//                        'level' => 'error',
+//                )
+//        );
+//        SmvcDebugHelper::instance()->debug(
+//                array(
+//                        'info'  => self::$crypter->decrypt($value),
+//                        'label' => 'self::$crypter->decrypt($value) ' . __METHOD__,
+//                        'level' => 'error',
+//                )
+//        );
         if ($value = self::validate_hmac($value)) {
             return self::$crypter->decrypt($value);
         } else {
@@ -137,6 +169,7 @@ class Crypt
 
     private static function validate_hmac($value)
     {
+        self::_init();
         // strip the hmac-sha256 hash from the value
         $hmac = substr($value, strlen($value) - 43);
 

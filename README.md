@@ -32,7 +32,6 @@
                                                  https://github.com/s1lent1um/phpredis-proxy/blob/master/RedisProxy.php
 
 
-                                                 http://www.cnblogs.com/leonkao/p/laravel-composer.html  composer 介绍
 
 6、db的 具体实现   `pending` -- optional
 

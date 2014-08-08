@@ -20,25 +20,11 @@ class JsonI18N extends I18N
 
     public function _getData()
     {
-        SmvcDebugHelper::instance()->debug(
-                array(
-                        'info'  => $this->locale,
-                        'label' => '$locale ',
-                        'level' => 'info',
-                )
-        );
         if (empty($this->directory)) {
             self::setDirectory(ROOT_PATH . '/i18n/');
         }
 
         $filename = sprintf("%s/%s/%s.json", $this->getDirectory(), $this->locale, $this->fileName);
-        SmvcDebugHelper::instance()->debug(
-                array(
-                        'info'  => $filename,
-                        'label' => '$filename ',
-                        'level' => 'info',
-                )
-        );
 
         if (file_exists($filename)) {
             $jsonString = file_get_contents($filename);
