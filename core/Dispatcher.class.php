@@ -20,8 +20,6 @@ class Dispatcher
          */
         Router::parseUrl();
 
-        //在Importer里面加入一个loadController的方法 专门用来加载load
-        //autoload也需要修改 需要优先加载当前group下的model 然后再加载公共model 最后是其他group下的model
         $controllerName = Router::getController();
         $controller     = self::getController($controllerName);
         $actionName     = Router::getAction();

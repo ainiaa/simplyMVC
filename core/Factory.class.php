@@ -8,61 +8,57 @@
  */
 class Factory
 {
-    static $instanceStorages = array();
+    public static $instances = array();
 
     //$QuoteObj = array(  引用的obj，obj的变量，引用参数  )
 
     /**
      * @static
      *
-     * @param null       $instanceName    实例名
-     * @param array      $QuoteObj        相关引用的信息
-     * @param array|null $constructparams 初始化参数
-     * @param bool       $getinstancenow  是否立即获取单例化
+     * @param null       $instanceName 实例名
+     * @param array      $quoteObj     相关引用的信息
+     * @param array|null $params       初始化参数
+     * @param bool       $getNow       是否立即获取单例化
      *
      * @throws Exception
      * @return $instanceName
      *
      * return XXXService , XXXDAODb ..
      */
-    static public function getInstance(
-            $instanceName = null,
-            $QuoteObj = array(),
-            $constructparams = array(),
-            $getinstancenow = false
-    ) {
+    public static function getInstance($instanceName = null, $quoteObj = array(), $params = array(), $getNow = false)
+    {
         if (!is_string($instanceName) || $instanceName == '') {
             throw new Exception('$instanceName must be string!!!');
         }
-        $constructparams = $constructparams ? : array();
-        $instanceid      = $instanceName . '_' . hash('crc32', serialize($constructparams));
-        if (!isset(self::$instanceStorages[$instanceid])) {
-            if ($getinstancenow) {
-                self::$instanceStorages[$instanceid] = self::getInstanceNow($instanceName, $constructparams);
+        $params     = $params ? : array();
+        $instanceid = $instanceName . '_' . hash('crc32', serialize($params));
+        if (!isset(self::$instances[$instanceid])) {
+            if ($getNow) {
+                self::$instances[$instanceid] = self::getInstanceNow($instanceName, $params);
             } else {
-                $tmp                  = new FactoryProxy();
-                $tmp->class           = $instanceName;
-                $tmp->constructparams = $constructparams;
-                if (!empty($QuoteObj) && is_array($QuoteObj)) {
-                    if (!is_object($QuoteObj[0])) {
+                $tmp         = new FactoryProxy();
+                $tmp->class  = $instanceName;
+                $tmp->params = $params;
+                if (!empty($quoteObj) && is_array($quoteObj)) {
+                    if (!is_object($quoteObj[0])) {
                         throw new Exception('$p must be object!!!');
                     }
-                    if (isset($QuoteObj[1])) {
-                        if (!is_string($QuoteObj[1]) || $QuoteObj[1] == '') {
+                    if (isset($quoteObj[1])) {
+                        if (!is_string($quoteObj[1]) || $quoteObj[1] == '') {
                             throw new Exception('$pp must be string!!!');
                         }
                     } else {
-                        $QuoteObj[1] = $instanceName;
+                        $quoteObj[1] = $instanceName;
                     }
-                    $tmp->myQuote = $QuoteObj;
+                    $tmp->myQuote = $quoteObj;
                 }
-                self::$instanceStorages[$instanceid] = $tmp;
+                self::$instances[$instanceid] = $tmp;
             }
         }
-        return self::$instanceStorages[$instanceid];
+        return self::$instances[$instanceid];
     }
 
-    static public function getInstanceNow($name, $constructparams = array())
+    public static function getInstanceNow($name, $constructparams = array())
     {
         if (substr($name, -7) === 'Control') {
             if (class_exists($name)) {
@@ -116,10 +112,8 @@ class Factory
             } else {
                 return $classRef->newInstance();
             }
-            //var_dump($classRef);
         } else {
             $object = new $class();
-            //var_dump($object);exit;
             return $object;
         }
     }
@@ -130,33 +124,32 @@ class Factory
 class FactoryProxy
 {
     public $class = null;
-    public $constructparams = null;
+    public $params = null;
     public $myQuote = null;
 
     public function __call($name, $args)
     {
         $instanceid = $this->class;
-        if (!is_null($this->constructparams)) {
-            $instanceid = $this->class . '_' . hash('crc32', serialize($this->constructparams));
+        if (!is_null($this->params)) {
+            $instanceid = $this->class . '_' . hash('crc32', serialize($this->params));
         }
-        if (!isset(Factory::$instanceStorages[$instanceid]) || get_class(
-                        Factory::$instanceStorages[$instanceid]
+        if (!isset(Factory::$instances[$instanceid]) || get_class(
+                        Factory::$instances[$instanceid]
                 ) == 'FactoryProxy'
         ) {
-            Factory::$instanceStorages[$instanceid] = null;
-            Factory::$instanceStorages[$instanceid] = Factory::getInstance(
+            Factory::$instances[$instanceid] = null;
+            Factory::$instances[$instanceid] = Factory::getInstance(
                     $this->class,
                     array(),
-                    $this->constructparams,
+                    $this->params,
                     true
             );
         }
         if (!is_null($this->myQuote)) {
             $qclass        = $this->myQuote[0];
             $qpro          = $this->myQuote[1];
-            $qclass->$qpro = Factory::$instanceStorages[$instanceid];
+            $qclass->$qpro = Factory::$instances[$instanceid];
         }
-        //var_dump(Factory::$instanceStorages[$instanceid]);exit;
-        return call_user_func_array(array(Factory::$instanceStorages[$instanceid], $name), $args);
+        return call_user_func_array(array(Factory::$instances[$instanceid], $name), $args);
     }
 }
