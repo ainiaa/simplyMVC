@@ -1,27 +1,33 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 13-11-7
- * Time: 下午5:29
- */
-
 return array(
-    'session' => array(
-        'auto_initialize'        => true,//获取方式  C('session.auto_initialize')
-        'driver'                 => 'cookie',
-        'match_ip'               => false,
-        'match_ua'               => true,
-        'cookie_domain'          => '',
-        'cookie_path'            => '/',
-        'cookie_http_only'       => null,
-        'encrypt_cookie'         => true,
-        'expire_on_close'        => false,
-        'expiration_time'        => 7200,
-        'rotation_time'          => 300,
-        'flash_id'               => 'flash',
-        'flash_auto_expire'      => true,
-        'flash_expire_after_get' => true,
-        'post_cookie_name'       => '',
-    ),
+        'session' => array(
+                'auto_initialize'        => true, //获取方式  C('session.auto_initialize')
+                'driver'                 => 'cookie', //cookie database redis memcache
+                'match_ip'               => false,
+                'match_ua'               => true,
+                'cookie_domain'          => '',
+                'cookie_path'            => '/',
+                'cookie_http_only'       => null,
+                'encrypt_cookie'         => true,
+                'expire_on_close'        => false,
+                'expiration_time'        => 7200,
+                'rotation_time'          => 300,
+                'flash_id'               => 'flash',
+                'flash_auto_expire'      => true,
+                'flash_expire_after_get' => true,
+                'post_cookie_name'       => '',
+                'redis'                  => array(
+                        'host'     => '127.0.0.1',
+                        'port'     => '3306',
+                        'pconnect' => false,
+                ),
+                'database'               => array(
+                        'database_type' => 'mysql',
+                        'server'        => 'localhost',
+                        'database_name' => 'test',
+                        'db_port'       => '3306',
+                        'username'      => 'root',
+                        'password'      => '',
+                ),
+        ),
 );

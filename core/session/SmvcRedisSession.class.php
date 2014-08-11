@@ -3,11 +3,22 @@
 class SmvcRedisSession extends SmvcBaseSession
 {
 
+
+    /**
+     * @var Redis
+     */
+    public $storager;
+
+    /*
+     * @var	session database result object
+     */
+    protected $record = null;
+
     /**
      * array of driver config defaults
      */
     protected static $_defaults = array(
-            'cookie_name' => 'fuelrid', // name of the session cookie for redis based sessions
+            'cookie_name' => 'smvcid', // name of the session cookie for redis based sessions
             'database'    => 'default' // name of the redis database to use (as configured in config/db.php)
     );
 
@@ -16,33 +27,19 @@ class SmvcRedisSession extends SmvcBaseSession
      */
     protected $redis = false;
 
-    // --------------------------------------------------------------------
 
     public function __construct($config = array())
     {
+        parent::__construct($config);
         // merge the driver config with the global config
-        $this->config = array_merge($config, is_array($config['redis']) ? $config['redis'] : static::$_defaults);
+        $redisConf    = isset($config['redis']) && is_array(
+                $config['redis']
+        ) ? $config['redis'] : self::$_defaults;
+        $this->config = array_merge($config, $redisConf);
 
         $this->config = $this->validateConfig($this->config);
-    }
 
-    // --------------------------------------------------------------------
-
-    /**
-     * driver initialisation
-     *
-     * @access    public
-     * @return    void
-     */
-    public function init()
-    {
-        // generic driver initialisation
-        parent::init();
-
-        if ($this->redis === false) {
-            // get the redis database instance
-            $this->redis = Redis_Db::instance($this->config['database']);
-        }
+        $this->getStorageInstance();
     }
 
     /**
@@ -59,15 +56,16 @@ class SmvcRedisSession extends SmvcBaseSession
     public function read($id = '')
     {
         // initialize the session
-        $this->data  = array();
-        $this->keys  = array();
-        $this->flash = array();
+        $this->data   = array();
+        $this->keys   = array();
+        $this->flash  = array();
+        $this->record = null;
 
         // get the session cookie
         $cookie = $this->getCookie();
 
         // if a cookie was present, find the session record
-        if ($cookie  && isset($cookie[0])) {
+        if ($cookie && isset($cookie[0])) {
             // read the session file
             $payload = $this->readRedis($cookie[0]);
 
@@ -116,7 +114,6 @@ class SmvcRedisSession extends SmvcBaseSession
         return parent::read($id);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * write the session
@@ -158,7 +155,6 @@ class SmvcRedisSession extends SmvcBaseSession
         return $this;
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * destroy the current session
@@ -174,7 +170,7 @@ class SmvcRedisSession extends SmvcBaseSession
         // do we have something to destroy?
         if (!empty($this->keys)) {
             // delete the key from the redis server
-            $this->redis->del($this->keys['session_id']);
+            $this->storager->del($this->keys['session_id']);
         }
 
         parent::destroy();
@@ -182,36 +178,40 @@ class SmvcRedisSession extends SmvcBaseSession
         return $this;
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * Writes the redis entry
      *
      * @access    private
+     *
+     * @param $session_id
+     * @param $payload
+     *
      * @return  boolean, true if it was an existing session, false if not
      */
     protected function _write_redis($session_id, $payload)
     {
         // write it to the redis server
-        $this->redis->set($session_id, $payload);
-        $this->redis->expire($session_id, $this->config['expiration_time']);
+        $this->storager->set($session_id, $payload);
+        $this->storager->expire($session_id, $this->config['expiration_time']);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * Reads the redis entry
      *
      * @access    private
+     *
+     * @param $session_id
+     *
      * @return  mixed, the payload if the file exists, or false if not
      */
     protected function readRedis($session_id)
     {
         // fetch the session data from the redis server
-        return $this->redis->get($session_id);
+        return $this->storager->get($session_id);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * validate a driver config value
@@ -228,10 +228,10 @@ class SmvcRedisSession extends SmvcBaseSession
         foreach ($config as $name => $item) {
             // filter out any driver config
             if (!is_array($item)) {
-                switch ($item) {
+                switch ($name) {
                     case 'cookie_name':
                         if (empty($item) or !is_string($item)) {
-                            $item = 'fuelrid';
+                            $item = 'smvcid';
                         }
                         break;
 
@@ -241,7 +241,7 @@ class SmvcRedisSession extends SmvcBaseSession
                             $item = 'default';
                         }
                         break;
-
+                    
                     default:
                         break;
                 }
@@ -266,6 +266,26 @@ class SmvcRedisSession extends SmvcBaseSession
     {
         // TODO: Implement gc() method.
     }
+
+    public function getStorageInstance()
+    {
+        if (empty($this->storager)) {
+            $redisConf = C('session.redis', array());
+            if (empty($redisConf)) {
+                $redisConf = array(
+                        'host'     => '127.0.0.1',
+                        'port'     => '3306',
+                        'pconnect' => false,
+                );
+            }
+            $this->storager = new Redis();
+            if (isset($redisConf['pconnect']) && $redisConf['pconnect']) {
+                $this->storager->pconnect($redisConf['host'], $redisConf['port']);
+            } else {
+                $this->storager->connect($redisConf['host'], $redisConf['port']);
+            }
+        }
+
+        return $this->storager;
+    }
 }
-
-

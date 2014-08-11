@@ -39,7 +39,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH);
 include CORE_PATH . '/Importer.class.php';
 
 Importer::importFileByFullPath(ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php');
-//Importer::importFileByFullPath(VENDOR_PATH . '/FirePHP.class.php'); //
+
 /**
  * 实现自动加载功能
  */
@@ -55,7 +55,6 @@ if (function_exists('spl_autoload_register')) {
 
 class SimpleMVC
 {
-    public static $sessionHandler;
 
     public function __construct()
     {
@@ -155,13 +154,13 @@ class SimpleMVC
          */
         SmvcConf::instance()->loadConfigFileList(CONF_PATH, 'inc.php');
 
-//        SmvcDebugHelper::instance()->debug(
-//                array(
-//                        'info'  => C(),
-//                        'label' => 'C()' . __METHOD__,
-//                        'level' => 'warn',
-//                )
-//        );
+        //        SmvcDebugHelper::instance()->debug(
+        //                array(
+        //                        'info'  => C(),
+        //                        'label' => 'C()' . __METHOD__,
+        //                        'level' => 'warn',
+        //                )
+        //        );
 
         //设置加载路径
         $autoloadPath = C('autoLoadPath');
@@ -171,13 +170,13 @@ class SimpleMVC
             Importer::setIncludePath($autoloadPath);
         }
 
-//        SmvcDebugHelper::instance()->debug(
-//                array(
-//                        'info'  => get_include_path(),
-//                        'label' => 'get_include_path ',
-//                        'level' => 'info',
-//                )
-//        );
+        //        SmvcDebugHelper::instance()->debug(
+        //                array(
+        //                        'info'  => get_include_path(),
+        //                        'label' => 'get_include_path ',
+        //                        'level' => 'info',
+        //                )
+        //        );
 
         // 定义当前请求的系统常量
         define('NOW_TIME', $_SERVER['REQUEST_TIME']);
@@ -192,16 +191,13 @@ class SimpleMVC
     }
 
     /**
-     * todo 需要重新实现
+     * 需要重新实现
      * 初始化session
      * @author Jeff Liu
      */
     static public function initSession()
     {
-//        self::$sessionHandler = new SmvcDbSession();
-//        self::$sessionHandler->create();
         Session::instance('db');
-        //        session_start();
     }
 
     /**

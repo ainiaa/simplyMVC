@@ -1,6 +1,4 @@
 <?php
-//https://github.com/kahwee/php-db-session-handler/blob/master/DbSessionHandler.php
-// --------------------------------------------------------------------
 
 class SmvcDbSession extends SmvcBaseSession
 {
@@ -9,7 +7,7 @@ class SmvcDbSession extends SmvcBaseSession
     /**
      * @var medoo
      */
-    public $db;
+    public $storager;
 
     /*
      * @var	session database result object
@@ -30,18 +28,17 @@ class SmvcDbSession extends SmvcBaseSession
     {
         parent::__construct($config);
         // merge the driver config with the global config
-        $dbConfig     = isset($config['database']) && is_array(
+        $dbConf       = isset($config['database']) && is_array(
                 $config['database']
         ) ? $config['database'] : self::$_defaults;
-        $this->config = array_merge($config, $dbConfig);
+        $this->config = array_merge($config, $dbConf);
 
         $this->config = $this->validateConfig($this->config);
 
-        $this->getDbInstance();
+        $this->getStorageInstance();
     }
 
     /**
-     * todo
      * read the session
      *
      * @access    public
@@ -62,33 +59,30 @@ class SmvcDbSession extends SmvcBaseSession
 
         // get the session cookie
         $cookie = $this->getCookie();
-        SmvcDebugHelper::instance()->debug(
-                array(
-                        'info'  => $cookie,
-                        'label' => '$cookie ' . __METHOD__,
-                        'level' => 'info',
-                )
-        );
+        //        SmvcDebugHelper::instance()->debug(
+        //                array(
+        //                        'info'  => $cookie,
+        //                        'label' => '$cookie ' . __METHOD__,
+        //                        'level' => 'info',
+        //                )
+        //        );
 
         // if a cookie was present, find the session record
         if ($cookie && isset($cookie[0])) {
             // read the session record
-            $this->record = $this->db->get(
+            $this->record = $this->storager->get(
                     $this->config['table'],
                     '*',
                     array('session_id' => $cookie[0])
 
-            ); // DB::select()->where('session_id', '=', $cookie[0])->from($this->config['table'])->execute(
-            //                    $this->config['database']
-            //            );
-            //todo 这个需要修改
-            SmvcDebugHelper::instance()->debug(
-                    array(
-                            'info'  => $this->record,
-                            'label' => '$this->record ' . __METHOD__,
-                            'level' => 'info',
-                    )
             );
+            //            SmvcDebugHelper::instance()->debug(
+            //                    array(
+            //                            'info'  => $this->record,
+            //                            'label' => '$this->record ' . __METHOD__,
+            //                            'level' => 'info',
+            //                    )
+            //            );
 
             // record found?
             if (is_array($this->record) && count($this->record) > 0) {
@@ -96,15 +90,12 @@ class SmvcDbSession extends SmvcBaseSession
                 $payload = $this->unserialize($payload);
             } else {
                 // try to find the session on previous id
-                $this->record = $this->db->get(
+                $this->record = $this->storager->get(
                         $this->config['table'],
                         '*',
                         array('previous_id' => $cookie[0])
 
                 );
-                //                DB::select()->where('previous_id', '=', $cookie[0])->from(
-                //                        $this->config['table']
-                //                )->execute($this->config['database']);
 
                 // record found?
                 if (is_array($this->record) && count($this->record) > 0) {
@@ -138,19 +129,18 @@ class SmvcDbSession extends SmvcBaseSession
             }
         }
 
-        SmvcDebugHelper::instance()->debug(
-                array(
-                        'info'  => $this,
-                        'lable' => '$this ' . __METHOD__,
-                        'level' => 'info',
-                )
-        );
+        //        SmvcDebugHelper::instance()->debug(
+        //                array(
+        //                        'info'  => $this,
+        //                        'lable' => '$this ' . __METHOD__,
+        //                        'level' => 'info',
+        //                )
+        //        );
 
 
         return parent::read($id);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * write the current session
@@ -179,21 +169,16 @@ class SmvcDbSession extends SmvcBaseSession
 
             // do we need to create a new session?
             if (is_null($this->record)) {
-                // create the new session record
-                //                $result = DB::insert($this->config['table'], array_keys($session))->values($session)->execute(
-                //                        $this->config['database']
-                //                );
-                $result = $this->db->insert($this->config['table'], $session);
+                $result = $this->storager->insert($this->config['table'], $session);
 
             } else {
                 // update the database
                 $session_id = ''; //todo 需要处理
-                $result     = $this->db->update($this->config['table'], array(), array('session_id' => $session_id));
-                //                $result = DB::update($this->config['table'])->set($session)->where(
-                //                        'session_id',
-                //                        '=',
-                //                        $this->record->get('session_id')
-                //                )->execute($this->config['database']);
+                $result     = $this->storager->update(
+                        $this->config['table'],
+                        array(),
+                        array('session_id' => $session_id)
+                );
             }
 
             // update went well?
@@ -207,18 +192,14 @@ class SmvcDbSession extends SmvcBaseSession
             // do some garbage collection
             if (mt_rand(0, 100) < $this->config['gc_probability']) {
                 $expired = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
-                $result  = $this->db->delete($this->config['table'], array('updated[<]' => $expired));
+                $result  = $this->storager->delete($this->config['table'], array('updated[<]' => $expired));
 
-                //                $result  = DB::delete($this->config['table'])->where('updated', '<', $expired)->execute(
-                //                        $this->config['database']
-                //                );
             }
         }
 
         return $this;
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * destroy the current session
@@ -234,10 +215,10 @@ class SmvcDbSession extends SmvcBaseSession
         // do we have something to destroy?
         if (!empty($this->keys) and !empty($this->record)) {
             // delete the session record
-            $result = $this->db->delete($this->config['table'], array('session_id[<]' => $this->keys['session_id']));
-            //            $result = DB::delete($this->config['table'])->where('session_id', '=', $this->keys['session_id'])->execute(
-            //                    $this->config['database']
-            //            );
+            $result = $this->storager->delete(
+                    $this->config['table'],
+                    array('session_id[<]' => $this->keys['session_id'])
+            );
         }
 
         // reset the stored session data
@@ -248,7 +229,6 @@ class SmvcDbSession extends SmvcBaseSession
         return $this;
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * validate a driver config value
@@ -276,14 +256,6 @@ class SmvcDbSession extends SmvcBaseSession
                         break;
 
                     case 'database':
-                        // do we have a database?
-                        if (empty($item) or !is_string($item)) {
-                            Config::load('db', true);
-                            $item = Config::get('db.active', false);
-                        }
-                        if ($item === false) {
-                            throw new Exception('You have specify a database to use database backed sessions.');
-                        }
                         break;
 
                     case 'table':
@@ -326,18 +298,22 @@ class SmvcDbSession extends SmvcBaseSession
         // TODO: Implement gc() method.
     }
 
-    public function getDbInstance()
+    public function getStorageInstance()
     {
-        if (empty($this->db)) {
-            $this->db = new medoo(array(
-                    'database_type' => C('DB_TYPE', 'mysql'),
-                    'database_name' => C('DB_NAME', 'test'),
-                    'server'        => C('DB_HOST', 'localhost'),
-                    'username'      => C('DB_USER', 'root'),
-                    'password'      => C('DB_PASS', ''),
-            ));
+        if (empty($this->storager)) {
+            $dbConf = C('session.database', array());
+            if (empty($dbConf)) {
+                $dbConf = array(
+                        'database_type' => C('DB_TYPE', 'mysql'),
+                        'database_name' => C('DB_NAME', 'test'),
+                        'server'        => C('DB_HOST', 'localhost'),
+                        'username'      => C('DB_USER', 'root'),
+                        'password'      => C('DB_PASS', ''),
+                );
+            }
+            $this->storager = new medoo($dbConf);
         }
 
-        return $this->db;
+        return $this->storager;
     }
 }

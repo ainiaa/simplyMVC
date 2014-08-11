@@ -11,7 +11,6 @@
 3、session 的具体实现   `pending` -- optional
 
    * cookie   `doing` 依赖于 cookie实例获取需要处理
-   * file   `doing`
    * memcache   `doing`  依赖于 memcache实例获取需要处理
    * redis   `doing`  依赖于redis实例获取需要处理
 

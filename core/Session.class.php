@@ -33,7 +33,6 @@ class Session
     );
 
 
-    // --------------------------------------------------------------------
 
     /**
      * Factory
@@ -49,6 +48,14 @@ class Session
     public static function forge($custom = array())
     {
         $config = C('session');
+
+        SmvcDebugHelper::instance()->debug(
+                array(
+                        'info'  => $config,
+                        'label' => '$config ' . __METHOD__,
+                        'level' => 'error',
+                )
+        );
 
         // When a string was passed it's just the driver type
         if ($custom && !is_array($custom)) {
@@ -113,7 +120,6 @@ class Session
         return self::$_instances[$cookieName];
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * class constructor
@@ -127,7 +133,6 @@ class Session
     {
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * create or return the driver instance
@@ -147,7 +152,6 @@ class Session
         return static::$_proxy[$instance];
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * set session variables
@@ -163,7 +167,6 @@ class Session
         return self::instance()->set($name, $value);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * get session variables
@@ -180,7 +183,6 @@ class Session
         return self::instance()->get($name, $default);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * delete a session variable
@@ -195,7 +197,6 @@ class Session
         return self::instance()->delete($name);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * get session key variables
@@ -211,7 +212,6 @@ class Session
         return self::instance()->key($name);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * set session flash variables
@@ -227,7 +227,6 @@ class Session
         return self::instance()->setFlash($name, $value);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * get session flash variables
@@ -245,7 +244,6 @@ class Session
         return self::instance()->getFlash($name, $default, $expire);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * keep session flash variables
@@ -261,7 +259,6 @@ class Session
         return self::instance()->keepFlash($name);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * delete session flash variables
@@ -276,7 +273,6 @@ class Session
         return self::instance()->deleteFlash($name);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * create a new session
@@ -289,7 +285,6 @@ class Session
         return self::instance()->create();
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * read the session
@@ -305,7 +300,6 @@ class Session
         return self::instance()->read($id);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * write the session
@@ -321,7 +315,6 @@ class Session
         return self::instance()->write($id);
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * rotate the session id
@@ -334,7 +327,6 @@ class Session
         return self::instance()->rotate();
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * destroy the current session
@@ -350,62 +342,3 @@ class Session
         return self::instance()->destroy($id);
     }
 }
-
-
-
-//class Session
-//{
-//    private $driver;
-//
-//    public function __construct($config, $specifiedDriver = false)
-//    {
-//        if ($specifiedDriver) {
-//            $config['driver'] = $specifiedDriver;
-//        } else {
-//            $config['driver'] = '';
-//        }
-//        $driver = ucwords($config['driver']);
-//
-//        $this->driver = new $driver($config);
-//    }
-//
-//    /**
-//     * Use magic method 'call' to pass user method
-//     * into driver method
-//     *
-//     * @param string @name
-//     * @param array  @arguments
-//     *
-//     * @return mixed
-//     */
-//    public function __call($name, $arguments)
-//    {
-//        return call_user_func_array(array($this->driver, $name), $arguments);
-//    }
-//
-//    /**
-//     * PHP Magic method for calling a class property dinamicly
-//     *
-//     * @param string $name
-//     *
-//     * @return mixed
-//     */
-//    public function __get($name)
-//    {
-//        return $this->driver->$name;
-//    }
-//
-//    /**
-//     * PHP Magic method for set a class property dinamicly
-//     *
-//     * @param string $name
-//     * @param mixed  $value
-//     *
-//     * @return void
-//     */
-//    public function __set($name, $value)
-//    {
-//        $this->driver->$name = $value;
-//    }
-//
-//}
