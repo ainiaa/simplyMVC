@@ -17,6 +17,18 @@ class SmvcUtilHelper
         }
     }
 
+    public static function defArray($info)
+    {
+        if (is_array($info)) {
+            foreach ($info as $name => $value) {
+                if (!defined($name)) {
+                    define($name, $value);
+                }
+            }
+        }
+    }
+
+
     /**
      * @param bool $useRequestTime
      *
@@ -33,8 +45,9 @@ class SmvcUtilHelper
 
 
     /**
-     * @see php manual gettype
+     * @see    php manual gettype
      * @author Jeff Liu
+     *
      * @param $value
      *
      * @return string

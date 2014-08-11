@@ -2,7 +2,7 @@
 /***
  * 框架入口文件
  * @date   2013-01-30
- * @author jeff liu
+ * @author Jeff Liu
  * 设置编码为UTF-8 防止因为编码问题导致显示界面错乱
  */
 header('Content-Type:text/html;charset=utf-8');
@@ -73,19 +73,7 @@ class SimpleMVC
 
         self::init();
 
-        // 设定错误和异常处理
-        register_shutdown_function(array('SimpleMVC', 'fatalError'));
-        set_error_handler(array('SimpleMVC', 'appError'));
-        set_exception_handler(array('SimpleMVC', 'appException'));
 
-        $isDebugMode = C('smvcDebug');
-        if ($isDebugMode) {
-            error_reporting(E_ALL);
-            ini_set('display_errors', 'on');
-        } else {
-            error_reporting(0);
-            ini_set('display_errors', 'off');
-        }
 
         Dispatcher::dispatch();
     }
@@ -149,18 +137,25 @@ class SimpleMVC
             }
         }
 
-        /**
-         * 加载所有的配置文件
-         */
+        $isDebugMode = C('smvcDebug');
+        if ($isDebugMode) {
+            error_reporting(E_ALL);
+            ini_set('display_errors', 'on');
+        } else {
+            error_reporting(0);
+            ini_set('display_errors', 'off');
+        }
+
+
+        // 设定错误和异常处理
+        register_shutdown_function(array('SimpleMVC', 'fatalError'));
+        set_error_handler(array('SimpleMVC', 'appError'));
+        set_exception_handler(array('SimpleMVC', 'appException'));
+
+
+        //加载所有的配置文件
         SmvcConf::instance()->loadConfigFileList(CONF_PATH, 'inc.php');
 
-        //        SmvcDebugHelper::instance()->debug(
-        //                array(
-        //                        'info'  => C(),
-        //                        'label' => 'C()' . __METHOD__,
-        //                        'level' => 'warn',
-        //                )
-        //        );
 
         //设置加载路径
         $autoloadPath = C('autoLoadPath');
@@ -263,7 +258,7 @@ class SimpleMVC
                 if (defined('LOG_RECORD') && LOG_RECORD) {
                     //                Log::write("[$errno] " . $errorStr, Log::ERR);
                 }
-                function_exists('halt') ? halt($errorStr) : exit('ERROR:' . $errorStr);
+                function_exists('halt') ? halt($errorStr) : exit('ERROR:' . $errorStr); //todo halt方法不存在
                 break;
             case E_STRICT:
             case E_USER_WARNING:

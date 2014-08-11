@@ -5,10 +5,10 @@
 
    * 使用 原生态的PHP 作为模板语言  `pending`
    * 使用 smarty (太庞大了)  `pending`
-   * 使用 twing  `pending` -- optional
-   * 使用 bootstrap  `pending` -- optional
+   * 使用 Twig  `pending`
+   * 使用 bootstrap  `pending`
 
-3、session 的具体实现   `pending` -- optional
+3、session 的具体实现   `pending`
 
    * cookie   `doing` 依赖于 cookie实例获取需要处理
    * memcache   `doing`  依赖于 memcache实例获取需要处理
