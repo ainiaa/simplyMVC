@@ -1,6 +1,6 @@
 <?php
 
-class FrontendControl extends BaseControl
+class FrontendController extends BaseController
 {
 
     function __construct()

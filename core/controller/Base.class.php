@@ -4,7 +4,7 @@
  * @author jeff liu
  * 控制器基类 定义了 控制器的基本方法
  */
-class BaseControl extends Object
+class BaseController extends Object
 {
     protected $view = null; //视图对象
     protected $visitor = null; //访问者对象

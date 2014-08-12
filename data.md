@@ -39,3 +39,10 @@
     https://github.com/gimler/MySQLndUhTool tools
     https://github.com/patrichs/BootstrapFull -- admin framework
 2、http://www.cnblogs.com/leonkao/p/laravel-composer.html  composer 介绍
+
+3、template 可以支持
+
+   * 使用 原生态的PHP 作为模板语言  `pending`
+   * 使用 smarty (太庞大了)  `pending`
+   * 使用 Twig  `pending`
+   * 使用 bootstrap  `pending`

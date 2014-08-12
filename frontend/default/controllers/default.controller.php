@@ -1,6 +1,6 @@
 <?php
 
-class defaultControl extends FrontendControl
+class defaultController extends FrontendController
 {
 
     /**

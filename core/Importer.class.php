@@ -144,10 +144,10 @@ class Importer
         if ('@' == $moduleName) {
             $moduleName = Router::getModule();
         }
-        $baseControllerFile = APP_PATH . '/' . $groupName . '/' . $groupName . '.control.php';
+        $baseControllerFile = APP_PATH . '/' . $groupName . '/' . $groupName . '.controller.php';
         self::importFileByFullPath($baseControllerFile);
 
-        $controllerFileName = $controllerName . '.control.php';
+        $controllerFileName = $controllerName . '.controller.php';
 
         $controllerFile = APP_PATH . '/' . $groupName . '/' . $moduleName . '/controllers/' . $controllerFileName;
         $loadResult     = self::importFileByFullPath($controllerFile);
@@ -184,66 +184,9 @@ class Importer
         }
     }
 
-    /**
-     * 加载model文件
-     * @todo 需要重新实现
-     *
-     * @param string $modelName
-     * @param string $groupName
-     * @param string $moduleName
-     */
-    public static function loadModel($modelName, $groupName = '@', $moduleName = '@')
-    {
-        if ('@' == $groupName) {
-            $groupName = Router::getGroup();
-        }
-
-        if ('@' == $moduleName) {
-            $moduleName = Router::getModule();
-        }
-        //        $base_model_file = APP_PATH . '/' . $group_name . '/' . $group_name . '.model.php';
-        //        self::importFileByFullPath($base_model_file);
-
-        $modelFileName = $modelName . '.model.php';
-
-        $modelFile  = APP_PATH . '/' . $groupName . '/' . $moduleName . '/models/' . $modelFileName;
-        $loadResult = self::importFileByFullPath($modelFile);
-
-        if (!$loadResult) { //当前group module下加载controller失败
-            $modules = self::getModuleList($groupName);
-            foreach ($modules as $module) {
-                $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/models/' . $modelFileName;
-                $files    = self::getModelListByGroupAndModule($groupName, $module);
-                if (in_array($filePath, $files, true)) {
-                    $loadResult = self::importFileByFullPath($modelFile);
-                    if ($loadResult) { //加载成功直接break
-                        break;
-                    }
-                }
-            }
-            //当前group加载失败 获取所有的加载其他group下的controll 直到第一个加载成功为止
-            if (!$loadResult) {
-                $groupList = self::getGroupList();
-                foreach ((array)$groupList as $group) {
-                    $groupModules = self::getModuleList($group);
-                    foreach ($groupModules as $groupModule) {
-                        $filePath = APP_PATH . '/' . $group . '/' . $groupModule . '/models/' . $modelFileName;
-                        $files    = self::getModelListByGroupAndModule($group, $groupModule);
-                        if (in_array($filePath, $files, true)) {
-                            $loadResult = self::importFileByFullPath($modelFile);
-                            if ($loadResult) { //加载成功直接break
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * 加载对应的service文件
-     * @todo 需要重新实现
      *
      * @param string $serviceName
      * @param string $groupName
@@ -262,16 +205,16 @@ class Importer
         $serviceFileName = $serviceName . '.service.php';
 
 
-        $modelFile = APP_PATH . $groupName . '/' . $moduleName . '/services/' . ucfirst($serviceFileName);
+        $serviceFile = APP_PATH . $groupName . '/' . $moduleName . '/services/' . ucfirst($serviceFileName);
         //echo $model_file,':',var_export(is_file($model_file));exit;
-        $loadResult = self::importFileByFullPath($modelFile);
+        $loadResult = self::importFileByFullPath($serviceFile);
         if (!$loadResult) { //当前group module下加载controller失败
             $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
                 $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/services/' . $serviceFileName;
                 $files    = self::getServiceListByGroupAndModule($groupName, $module);
                 if (in_array($filePath, $files, true)) {
-                    $loadResult = self::importFileByFullPath($modelFile);
+                    $loadResult = self::importFileByFullPath($serviceFile);
                     if ($loadResult) { //加载成功直接break
                         break;
                     }
@@ -286,7 +229,7 @@ class Importer
                         $filePath = APP_PATH . '/' . $group . '/' . $groupModule . '/services/' . $serviceFileName;
                         $files    = self::getDAOListByGroupAndModule($group, $groupModule);
                         if (in_array($filePath, $files, true)) {
-                            $loadResult = self::importFileByFullPath($modelFile);
+                            $loadResult = self::importFileByFullPath($serviceFile);
                             if ($loadResult) { //加载成功直接break
                                 break;
                             }
@@ -300,7 +243,6 @@ class Importer
 
     /**
      * 加载对应的helper文件
-     * @todo 需要重新实现
      *
      * @param string $helperName
      * @param string $groupName
@@ -321,13 +263,13 @@ class Importer
         //首先加载core目录下的helper
         $helperFile = CORE_PATH . '/helper/' . $helperFileName;
         $loadResult = self::importFileByFullPath($helperFile, false);
-//        SmvcDebugHelper::instance()->debug(
-//                array(
-//                        'info'  => $helperFile,
-//                        'label' => '$helperFile ' . __METHOD__,
-//                        'level' => 'info'
-//                )
-//        );
+        //        SmvcDebugHelper::instance()->debug(
+        //                array(
+        //                        'info'  => $helperFile,
+        //                        'label' => '$helperFile ' . __METHOD__,
+        //                        'level' => 'info'
+        //                )
+        //        );
 
         if (!$loadResult) {
             $helperFile = APP_PATH . '/' . $groupName . '/' . $moduleName . '/helper/' . $helperFileName;
@@ -350,13 +292,13 @@ class Importer
                     $groupList = self::getGroupList();
                     foreach ((array)$groupList as $group) {
                         $groupModules = self::getModuleList($group);
-//                        SmvcDebugHelper::instance()->debug(
-//                                array(
-//                                        'info'  => $groupModules,
-//                                        'label' => '$groupModules ' . __METHOD__,
-//                                        'level' => 'info'
-//                                )
-//                        );
+                        //                        SmvcDebugHelper::instance()->debug(
+                        //                                array(
+                        //                                        'info'  => $groupModules,
+                        //                                        'label' => '$groupModules ' . __METHOD__,
+                        //                                        'level' => 'info'
+                        //                                )
+                        //                        );
                         foreach ($groupModules as $groupModule) {
                             $filePath = APP_PATH . '/' . $group . '/' . $groupModule . '/helpers/' . $helperFileName;
                             $files    = self::getDAOListByGroupAndModule($group, $groupModule);
@@ -376,7 +318,6 @@ class Importer
 
     /**
      * 加载对应的dao文件
-     * @todo 需要重新实现
      *
      * @param string $daoName
      * @param string $groupName
@@ -445,23 +386,6 @@ class Importer
         $controllerList = isset($files['controllers']) ? $files['controllers'] : array();
 
         return $controllerList;
-    }
-
-    /**
-     * 根据给定的group和module获得model列表
-     *
-     * @param string $groupName
-     * @param string $moduleName
-     *
-     * @return array
-     */
-    public static function getModelListByGroupAndModule($groupName, $moduleName)
-    {
-        $appFileStruct = self::getAppFileStruct();
-        $files         = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : array();
-        $modelList     = isset($files['models']) ? $files['models'] : array();
-
-        return $modelList;
     }
 
     /**
@@ -606,12 +530,9 @@ class Importer
     public static function autoLoad($className)
     {
         //        echo '$className:', $className, '<br />';
-        if ('Control' == substr($className, -7)) { //controller类
-            $controllerName = substr_replace($className, '', -7);
+        if ('Controller' == substr($className, -10)) { //controller类
+            $controllerName = substr_replace($className, '', -10);
             self::loadController(lcfirst($controllerName));
-        } else if ('Model' == substr($className, -5)) { //model类 TODO 使用service dao  model 这个还需要吗？？？
-            $modelName = substr_replace($className, '', -5);
-            self::loadModel(lcfirst($modelName));
         } else if ('DAO' == substr($className, -3)) { //dao类
             $daoName = substr_replace($className, '', -3);
             self::loadDAO(lcfirst($daoName));
@@ -635,13 +556,13 @@ class Importer
                     // TODO 如果加载类成功则返回 这个需要完善。。。 文件名后缀需要整理
                     foreach ($fileExtensions as $fileExtension) {
                         $fullFilePath = $path . '/' . $className . $fileExtension;
-//                        SmvcDebugHelper::instance()->debug(
-//                                array(
-//                                        'info'  => array('className' => $className, 'path' => $fullFilePath),
-//                                        'label' => '$class_name',
-//                                        'level' => 'warn'
-//                                )
-//                        );
+                        //                        SmvcDebugHelper::instance()->debug(
+                        //                                array(
+                        //                                        'info'  => array('className' => $className, 'path' => $fullFilePath),
+                        //                                        'label' => '$class_name',
+                        //                                        'level' => 'warn'
+                        //                                )
+                        //                        );
                         if (self::importFileByFullPath($fullFilePath, false)) {
                             break;
                         }
@@ -650,9 +571,9 @@ class Importer
             }
         }
 
-//        SmvcDebugHelper::instance()->debug(
-//                array('info' => $className, 'label' => '$class_name', 'level' => 'warn')
-//        );
+        //        SmvcDebugHelper::instance()->debug(
+        //                array('info' => $className, 'label' => '$class_name', 'level' => 'warn')
+        //        );
     }
 
     /**

@@ -8,8 +8,7 @@
  */
 return array(
         'actionSuffix'     => 'Action',
-        'controllerSuffix' => 'Control',
-        'modelSuffix'      => 'Model',
+        'controllerSuffix' => 'Controller',
         'serviceSuffix'    => 'Service',
         'daoSuffix'        => 'DAO',
         'helperSuffix'     => 'Helper',

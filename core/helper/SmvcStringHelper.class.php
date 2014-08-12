@@ -145,7 +145,7 @@ class SmvcStringHelper
     {
         $s = self::normalizeNewLines($s);
 
-        // remove control characters; leave \t + \n
+        // remove controller characters; leave \t + \n
         $s = preg_replace('#[\x00-\x08\x0B-\x1F\x7F]+#', '', $s);
 
         // right trim

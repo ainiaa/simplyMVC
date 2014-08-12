@@ -70,10 +70,7 @@ class SimpleMVC
      */
     public static function startup()
     {
-
         self::init();
-
-
 
         Dispatcher::dispatch();
     }
@@ -85,8 +82,7 @@ class SimpleMVC
                 CORE_PATH . '/Factory.class.php',
                 CORE_PATH . '/Dispatcher.class.php',
                 CORE_PATH . '/Object.class.php',
-                CORE_PATH . '/control/Base.class.php',
-                CORE_PATH . '/model/Base.class.php',
+                CORE_PATH . '/controller/Base.class.php',
                 CORE_PATH . '/dao/Base.class.php',
                 CORE_PATH . '/service/Base.class.php',
                 CORE_PATH . '/view/View.class.php',
@@ -190,7 +186,7 @@ class SimpleMVC
      * 初始化session
      * @author Jeff Liu
      */
-    static public function initSession()
+    public static function initSession()
     {
         Session::instance('db');
     }
@@ -199,7 +195,7 @@ class SimpleMVC
      * @access public
      * @author Jeff Liu
      */
-    static public function isAjax()
+    public static function isAjax()
     {
         $is_ajax = false;
         !defined('VAR_AJAX_SUBMIT') && define('VAR_AJAX_SUBMIT', 'isAjax');
@@ -222,7 +218,7 @@ class SimpleMVC
      *
      * @param mixed $e 异常对象
      */
-    static public function appException($e)
+    public static function appException($e)
     {
         echo $e->__toString();
     }
@@ -238,7 +234,7 @@ class SimpleMVC
      *
      * @return void
      */
-    static public function appError($errno, $errstr, $errfile, $errline)
+    public static function appError($errno, $errstr, $errfile, $errline)
     {
         switch ($errno) {
             case E_ERROR:
@@ -271,7 +267,7 @@ class SimpleMVC
     }
 
     // 致命错误捕获
-    static public function fatalError()
+    public static function fatalError()
     {
         if ($e = error_get_last()) {
             self::appError($e['type'], $e['message'], $e['file'], $e['line']);
@@ -287,6 +283,5 @@ class SimpleMVC
         }
     }
 }
-
 
 SimpleMVC::startup();

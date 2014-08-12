@@ -1,6 +1,6 @@
 <?php
 
-require_once ROOT_PATH . '/core/controllers/base.control.php';
+require_once ROOT_PATH . '/core/controllers/base.controller.php';
 class BackendControl extends BaseControl
 {
 

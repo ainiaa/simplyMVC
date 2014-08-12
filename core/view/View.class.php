@@ -48,7 +48,6 @@ class View
 
     /**
      *
-     * TODO
      * 初始化视图
      */
     public function  init()
