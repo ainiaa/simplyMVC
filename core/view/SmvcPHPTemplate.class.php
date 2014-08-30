@@ -1,24 +1,14 @@
 <?php
 
 /**
- * 直接使用php 作为模板
+ * 直接使用 PHP 作为模板
  * Class SmvcPHPTemplate
  */
 class SmvcPHPTemplate
 {
-    public $tpl_vars = array();
+    public $tplVars = array();
 
-    private $template_dir; //设置模板目录
-
-    private $caching; //是否使用缓存，项目在调试期间，不建议启用缓存
-
-    private $cache_dir; //缓存文件夹
-
-    private $cache_lifetime; // 缓存更新时间, 默认 3600 秒
-
-    private $force_compile; //是否需要强制编译
-
-
+    private $templateDir; //设置模板目录
 
     function __construct()
     {
@@ -31,10 +21,10 @@ class SmvcPHPTemplate
     public function assign($key, $value)
     {
         if (is_scalar($key)) {
-            $this->tpl_vars[$key] = $value;
+            $this->tplVars[$key] = $value;
         } else if (is_array($key)) {
             foreach ($key as $k => $v) {
-                $this->tpl_vars[$k] = $v;
+                $this->tplVars[$k] = $v;
             }
         }
     }
@@ -43,12 +33,14 @@ class SmvcPHPTemplate
      * todo
      *
      * @param $file
+     *
+     * @return string
      */
     public function fetch($file)
     {
-        extract($this->tpl_vars);
+        extract($this->tplVars);
         ob_start();
-        include $this->template_dir . $file;
+        include $this->templateDir . $file;
         $contents = ob_get_contents();
         ob_end_clean();
         return $contents;
@@ -61,8 +53,8 @@ class SmvcPHPTemplate
      */
     public function get($key = null)
     {
-        if (isset($this->tpl_vars[$key])) {
-            return $this->tpl_vars[$key];
+        if (isset($this->tplVars[$key])) {
+            return $this->tplVars[$key];
         } else {
             return null;
         }

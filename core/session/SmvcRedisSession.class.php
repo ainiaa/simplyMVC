@@ -140,13 +140,13 @@ class SmvcRedisSession extends SmvcBaseSession
             $payload = $this->serialize(array($this->keys, $this->data, $this->flash));
 
             // create the session file
-            $this->_write_redis($this->keys['session_id'], $payload);
+            $this->writeRedis($this->keys['session_id'], $payload);
 
             // was the session id rotated?
             if (isset($this->keys['previous_id']) and $this->keys['previous_id'] != $this->keys['session_id']) {
                 // point the old session file to the new one, we don't want to lose the session
                 $payload = $this->serialize(array('rotated_session_id' => $this->keys['session_id']));
-                $this->_write_redis($this->keys['previous_id'], $payload);
+                $this->writeRedis($this->keys['previous_id'], $payload);
             }
 
             $this->setCookie(array($this->keys['session_id']));
@@ -189,7 +189,7 @@ class SmvcRedisSession extends SmvcBaseSession
      *
      * @return  boolean, true if it was an existing session, false if not
      */
-    protected function _write_redis($session_id, $payload)
+    protected function writeRedis($session_id, $payload)
     {
         // write it to the redis server
         $this->storager->set($session_id, $payload);

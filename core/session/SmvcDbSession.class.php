@@ -310,6 +310,22 @@ class SmvcDbSession extends SmvcBaseSession
                         'username'      => C('DB_USER', 'root'),
                         'password'      => C('DB_PASS', ''),
                 );
+            } else {
+                if (!isset($dbConf['database_type'])) {
+                    $dbConf['database_type'] = C('DB_TYPE', 'mysql');
+                }
+                if (!isset($dbConf['database_name'])) {
+                    $dbConf['database_name'] = C('DB_NAME', 'test');
+                }
+                if (!isset($dbConf['server'])) {
+                    $dbConf['server'] = C('DB_HOST', 'localhost');
+                }
+                if (!isset($dbConf['username'])) {
+                    $dbConf['username'] = C('DB_USER', 'root');
+                }
+                if (!isset($dbConf['password'])) {
+                    $dbConf['password'] = C('DB_PASS', '');
+                }
             }
             $this->storager = new medoo($dbConf);
         }

@@ -3,6 +3,18 @@
 class SmvcMemcachedSession extends SmvcBaseSession
 {
 
+
+
+    /*
+     * @var	storage for the memcached object
+     */
+    protected $memcached = false;
+
+    /**
+     * @var memcached
+     */
+    public $storager;
+
     /**
      * array of driver config defaults
      */
@@ -13,21 +25,20 @@ class SmvcMemcachedSession extends SmvcBaseSession
             )
     );
 
-    /*
-     * @var	storage for the memcached object
-     */
-    protected $memcached = false;
-
 
     public function __construct($config = array())
     {
+        parent::__construct($config);
         // merge the driver config with the global config
-        $this->config = array_merge(
-                $config,
-                is_array($config['memcached']) ? $config['memcached'] : self::$_defaults
-        );
+        $memcacheConf = isset($config['memcached']) && is_array(
+                $config['memcached']
+        ) ? $config['memcached'] : self::$_defaults;
+        $this->config = array_merge($config, $memcacheConf);
 
         $this->config = $this->validateConfig($this->config);
+
+
+        $this->getStorageInstance();
 
         // adjust the expiration time to the maximum possible for memcached
         $this->config['expiration_time'] = min($this->config['expiration_time'], 2592000);
@@ -137,10 +148,9 @@ class SmvcMemcachedSession extends SmvcBaseSession
         return parent::read($id);
     }
 
-    // --------------------------------------------------------------------
 
     /**
-     * write the session
+     * write the current session
      *
      * @access    public
      *
@@ -174,12 +184,17 @@ class SmvcMemcachedSession extends SmvcBaseSession
             }
 
             $this->setCookie(array($this->keys['session_id']));
+            // do some garbage collection
+            if (mt_rand(0, 100) < $this->config['gc_probability']) {
+                $expired = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
+                $result  = $this->storager->delete($this->config['table'], array('updated[<]' => $expired));
+
+            }
         }
 
         return $this;
     }
 
-    // --------------------------------------------------------------------
 
     /**
      * destroy the current session
@@ -196,7 +211,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
         // do we have something to destroy?
         if (!empty($this->keys)) {
             // delete the key from the memcached server
-            if ($this->memcached->delete($this->config['cookie_name'] . '_' . $this->keys['session_id']) === false) {
+            if ($this->storager->delete($this->config['cookie_name'] . '_' . $this->keys['session_id']) === false) {
                 throw new Exception('Memcached returned error code "' . $this->memcached->getResultCode(
                         ) . '" on delete. Check your configuration.');
             }
@@ -213,18 +228,23 @@ class SmvcMemcachedSession extends SmvcBaseSession
      * Writes the memcached entry
      *
      * @access    private
+     *
+     * @param $session_id
+     * @param $payload
+     *
+     * @throws Exception
      * @return  boolean, true if it was an existing session, false if not
      */
     protected function writeMemcached($session_id, $payload)
     {
         // write it to the memcached server
-        if ($this->memcached->set(
+        if ($this->storager->set(
                         $this->config['cookie_name'] . '_' . $session_id,
                         $payload,
                         $this->config['expiration_time']
                 ) === false
         ) {
-            throw new Exception('Memcached returned error code "' . $this->memcached->getResultCode(
+            throw new Exception('Memcached returned error code "' . $this->storager->getResultCode(
                     ) . '" on write. Check your configuration.');
         }
     }
@@ -243,7 +263,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
     protected function readMemcached($session_id)
     {
         // fetch the session data from the Memcached server
-        return $this->memcached->get($this->config['cookie_name'] . '_' . $session_id);
+        return $this->storager->get($this->config['cookie_name'] . '_' . $session_id);
     }
 
     // --------------------------------------------------------------------
@@ -336,5 +356,36 @@ class SmvcMemcachedSession extends SmvcBaseSession
     public function gc($maxLifeTime)
     {
         // TODO: Implement gc() method.
+    }
+
+    public function getStorageInstance()
+    {
+        if (empty($this->storager)) {
+            $memcacheConf = C('session.memcached', array());
+            if (empty($memcacheConf)) {
+                $memcacheConf = array(
+                        'server'   => C('MC_HOST', 'localhost'),
+                        'username' => C('MC_PORT', 11211),
+                        'password' => C('MC_WEIGHT', 100),
+                );
+            }
+            // do we have the PHP memcached extension available
+            if (!class_exists('Memcached')) {
+                throw new Exception('Memcached sessions are configured, but your PHP installation doesn\'t have the Memcached extension loaded.');
+            }
+
+            // instantiate the memcached object
+            $this->storager = new Memcached();
+
+            // add the configured servers
+            $this->storager->addServers($memcacheConf); //$this->storager->addServers($this->config['servers']);
+
+            // check if we can connect to the server(s)
+            if ($this->storager->getVersion() === false) {
+                throw new Exception('Memcached sessions are configured, but there is no connection possible. Check your configuration.');
+            }
+        }
+
+        return $this->storager;
     }
 }

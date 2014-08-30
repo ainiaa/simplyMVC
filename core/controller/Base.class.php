@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @author jeff liu
+ * @author Jeff Liu
  * 控制器基类 定义了 控制器的基本方法
  */
 class BaseController extends Object

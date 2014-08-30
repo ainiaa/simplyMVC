@@ -21,6 +21,10 @@ return array(
                         'port'     => '3306',
                         'pconnect' => false,
                 ),
+                'memcached'              => array(
+                        'host' => '127.0.0.1',
+                        'port' => '11211',
+                ),
                 'database'               => array(
                         'database_type'  => 'mysql',
                         'server'         => 'localhost',
