@@ -7,31 +7,7 @@
  */
 header('Content-Type:text/html;charset=utf-8');
 
-if (version_compare(PHP_VERSION, '5.2.0', '<')) { //判断php的版本是不是为php5
-    die('require PHP > 5.2.0 !');
-} else if (version_compare(PHP_VERSION, '5.4.0', '<')) {
-    ini_set('magic_quotes_runtime', 0);
-    define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc() ? true : false);
-} else {
-    define('MAGIC_QUOTES_GPC', false);
-}
-
-!defined('CORE_PATH') && define('CORE_PATH', __DIR__);
-
-//  版本信息
-define('SMVC_VERSION', '0.1.0');
-
-
-define('IS_CGI', substr(PHP_SAPI, 0, 3) == 'cgi' ? 1 : 0);
-define('IS_WIN', strstr(PHP_OS, 'WIN') ? 1 : 0);
-define('IS_CLI', PHP_SAPI == 'cli' ? 1 : 0);
-
-define('MEMORY_LIMIT_ON', function_exists('memory_get_usage'));
-
-// 项目名称
-defined('APP_NAME') or define('APP_NAME', basename(dirname($_SERVER['SCRIPT_FILENAME'])));
-
-define('VENDOR_PATH', dirname(CORE_PATH) . '/include/vendor/');
+include dirname(__FILE__) . '/config/runtimeConst.php';
 
 // 为了方便导入第三方类库 设置Vendor目录到include_path
 set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH);
@@ -55,6 +31,7 @@ if (function_exists('spl_autoload_register')) {
 
 class SimpleMVC
 {
+
 
     public function __construct()
     {
@@ -161,14 +138,6 @@ class SimpleMVC
             Importer::setIncludePath($autoloadPath);
         }
 
-        //        SmvcDebugHelper::instance()->debug(
-        //                array(
-        //                        'info'  => get_include_path(),
-        //                        'label' => 'get_include_path ',
-        //                        'level' => 'info',
-        //                )
-        //        );
-
         // 定义当前请求的系统常量
         define('NOW_TIME', $_SERVER['REQUEST_TIME']);
         define('REQUEST_METHOD', $_SERVER['REQUEST_METHOD']);
@@ -197,19 +166,18 @@ class SimpleMVC
      */
     public static function isAjax()
     {
-        $is_ajax = false;
-        !defined('VAR_AJAX_SUBMIT') && define('VAR_AJAX_SUBMIT', 'isAjax');
+        $isAjax = false;
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower(
                         $_SERVER['HTTP_X_REQUESTED_WITH']
                 ) == 'xmlhttprequest'
         ) {
-            $is_ajax = true;
+            $isAjax = true;
         } elseif (!empty($_POST[VAR_AJAX_SUBMIT])) {
-            $is_ajax = true;
+            $isAjax = true;
         } elseif (!empty($_GET[VAR_AJAX_SUBMIT])) {
-            $is_ajax = true;
+            $isAjax = true;
         }
-        return $is_ajax;
+        return $isAjax;
     }
 
     /**
