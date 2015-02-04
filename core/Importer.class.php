@@ -58,16 +58,15 @@ class Importer
      */
     public static function importFileByFullPath($filePath, $showError = true)
     {
-        $load_result = false;
+        $loadResult = false;
         if (is_file($filePath)) {
             if (is_readable($filePath)) {
-                $file_hash = md5($filePath);
-
-                if (!isset(Importer::$loadedFiles[$file_hash])) {
+                $fileHash = md5($filePath);
+                if (!isset(Importer::$loadedFiles[$fileHash])) {
                     include $filePath;
-                    self::$loadedFiles[$file_hash] = $filePath;
+                    self::$loadedFiles[$fileHash] = $filePath;
                 }
-                $load_result = true;
+                $loadResult = true;
             } else {
                 if ($showError) {
                     trigger_error('file_is_not_readable' . $filePath, E_USER_ERROR);
@@ -78,7 +77,7 @@ class Importer
                 trigger_error('file_no_exists:' . $filePath, E_USER_ERROR);
             }
         }
-        return $load_result;
+        return $loadResult;
     }
 
     /**
@@ -615,6 +614,16 @@ class Importer
         set_include_path(get_include_path() . PATH_SEPARATOR . $path);
     }
 
+    public static function init()
+    {
+        //设置加载路径
+        $autoloadPath = C('autoLoadPath');
+        if ($autoloadPath) {
+            $autoloadPath = explode(',', $autoloadPath);
+            $autoloadPath = implode(PATH_SEPARATOR, $autoloadPath);
+            Importer::setIncludePath($autoloadPath);
+        }
+    }
 
     /**
      * 加载基础文件

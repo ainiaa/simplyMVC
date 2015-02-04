@@ -26,3 +26,12 @@ if (version_compare(PHP_VERSION, '5.2.0', '<')) { //判断php的版本是不是�
 !defined('SMVC_VERSION') && define('VENDOR_PATH', dirname(CORE_PATH) . '/include/vendor/');
 
 !defined('VAR_AJAX_SUBMIT') && define('VAR_AJAX_SUBMIT', 'isAjax');
+
+// 定义当前请求的系统常量
+!defined('NOW_TIME') && define('NOW_TIME', $_SERVER['REQUEST_TIME']);
+!defined('REQUEST_METHOD') && define('REQUEST_METHOD', $_SERVER['REQUEST_METHOD']);
+!defined('IS_GET') && define('IS_GET', REQUEST_METHOD == 'GET' ? true : false);
+!defined('IS_POST') && define('IS_POST', REQUEST_METHOD == 'POST' ? true : false);
+!defined('IS_PUT') && define('IS_PUT', REQUEST_METHOD == 'PUT' ? true : false);
+!defined('IS_DELETE') && define('IS_DELETE', REQUEST_METHOD == 'DELETE' ? true : false);
+!defined('IS_AJAX') && define('IS_AJAX', SimpleMVC::isAjax());
