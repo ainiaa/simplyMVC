@@ -614,7 +614,11 @@ class Importer
         set_include_path(get_include_path() . PATH_SEPARATOR . $path);
     }
 
-    public static function init()
+    /**
+     * 初始化autoload 配置项
+     * @author Jeff Liu
+     */
+    public static function initAutoLoadConf()
     {
         //设置加载路径
         $autoloadPath = C('autoLoadPath');
@@ -632,6 +636,7 @@ class Importer
      */
     public static function importBaseFiles()
     {
+        //初始化autoload 配置项
         $baseFileList = SimpleMVC::getBaseFileList();
         if (is_array($baseFileList)) {
             foreach ($baseFileList as $file) {
@@ -640,6 +645,10 @@ class Importer
         }
     }
 
+    /**
+     * todo 这个也可以放到配置文件中
+     * @return array
+     */
     public static function fileMapping()
     {
         return array(
@@ -673,6 +682,13 @@ class Importer
         );
     }
 
+    /**
+     * @param $className
+     *
+     * @author Jeff Liu
+     *
+     * @return bool
+     */
     public static function loadMappingFile($className)
     {
         $loadResult  = false;

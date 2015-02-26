@@ -82,6 +82,11 @@ class SmvcConf implements ArrayAccess
 
     }
 
+    /**
+     * 初始化config
+     * @param $configPath
+     * @param $configFileExt
+     */
     public static function  init($configPath, $configFileExt)
     {
         SmvcConf::instance()->loadConfigFileList($configPath, $configFileExt);
