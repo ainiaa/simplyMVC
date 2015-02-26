@@ -12,5 +12,5 @@ return array(
                 CORE_PATH . '/SmvcConf.class.php',
                 CORE_PATH . '/core/Database.class.php',
                 CORE_PATH . '/functions.class.php',
-        )
+        ),
 );

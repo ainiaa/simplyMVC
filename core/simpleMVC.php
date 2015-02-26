@@ -9,9 +9,6 @@ header('Content-Type:text/html;charset=utf-8');
 
 include dirname(__FILE__) . '/config/runtimeConst.php';
 
-// 为了方便导入第三方类库 设置Vendor目录到include_path
-set_include_path(get_include_path() . PATH_SEPARATOR . VENDOR_PATH);
-
 include CORE_PATH . '/Importer.class.php';
 
 Importer::importFileByFullPath(ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php');
@@ -32,16 +29,6 @@ if (function_exists('spl_autoload_register')) {
 class SimpleMVC
 {
 
-
-    public function __construct()
-    {
-        /**
-         * 初始化框架
-         */
-        self::init(); //调用静态方法 不执行 该构造方法
-    }
-
-
     /**
      * @author Jeff Liu
      */
@@ -52,6 +39,10 @@ class SimpleMVC
         Dispatcher::dispatch();
     }
 
+    /**
+     * todo 这个可以放到一个 framework config文件里面
+     * @return array
+     */
     public static function getBaseFileList()
     {
         return array(
@@ -95,6 +86,35 @@ class SimpleMVC
      */
     private static function init()
     {
+        //加载框架文件
+        self::initFramewrok();
+
+        // 设定错误和异常处理
+        ExceptionHandle::init();
+
+        //加载所有的配置文件
+        self::initConf();
+
+        //初始化session
+        self::initSession();
+    }
+
+    /**
+     * 加载必须配置文件
+     */
+    private static function initConf()
+    {
+        SmvcConf::init(CONF_PATH, 'inc.php');
+    }
+
+    /**
+     * 初始化框架文件（加载）
+     * @author Jeff Liu
+     */
+    private static function initFramewrok()
+    {
+        Importer::initAutoLoadConf();
+
         if (file_exists(ROOT_PATH . '/public/tmp/~~core.php')) {
             Importer::importFileByFullPath(ROOT_PATH . '/public/tmp/~~core.php');
         } else if (method_exists('Importer', 'importBaseFiles')) {
@@ -109,19 +129,10 @@ class SimpleMVC
                 }
             }
         }
-        // 设定错误和异常处理
-        ExceptionHandle::init();
-
-        //加载所有的配置文件
-        SmvcConf::init(CONF_PATH, 'inc.php');
-
-
-        Importer::init();
-        self::initSession();
     }
 
     /**
-     * 需要重新实现
+     * todo 需要重新实现
      * 初始化session
      * @author Jeff Liu
      */
@@ -160,4 +171,5 @@ class SimpleMVC
     }
 }
 
+//启动。。
 SimpleMVC::startup();

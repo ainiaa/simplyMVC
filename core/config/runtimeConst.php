@@ -9,7 +9,11 @@ if (version_compare(PHP_VERSION, '5.2.0', '<')) { //判断php的版本是不是�
     define('MAGIC_QUOTES_GPC', false);
 }
 
-!defined('CORE_PATH') && define('CORE_PATH', __DIR__);
+!defined('CORE_PATH') && define('CORE_PATH', dirname(__DIR__) .'/core');
+
+!defined('CONF_PATH') && define('CONF_PATH', dirname(CORE_PATH) . '/config'); //config路径
+!defined('INCLUDE_PATH') && define('INCLUDE_PATH', dirname(CORE_PATH) . '/include'); //include目录的地址
+!defined('PEAR_PATH') && define('PEAR_PATH', INCLUDE_PATH . '/lib/pear'); //include目录的地址
 
 //  版本信息
 !defined('SMVC_VERSION') && define('SMVC_VERSION', '0.1.0');
