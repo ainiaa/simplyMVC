@@ -8,23 +8,9 @@
 header('Content-Type:text/html;charset=utf-8');
 
 include dirname(__FILE__) . '/config/runtimeConst.php';
-
 include CORE_PATH . '/Importer.class.php';
 
-Importer::importFileByFullPath(ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php');
-
-/**
- * 实现自动加载功能
- */
-if (function_exists('spl_autoload_register')) {
-    spl_autoload_register(array('Importer', 'autoLoad'));
-} else {
-    function __autoload($sClassName)
-    {
-        Importer::autoLoad($sClassName);
-    }
-}
-
+//Importer::importFileByFullPath(ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php');
 
 class SimpleMVC
 {
@@ -56,8 +42,10 @@ class SimpleMVC
                 CORE_PATH . '/view/View.class.php',
                 CORE_PATH . '/SmvcConf.class.php',
                 CORE_PATH . '/functions.class.php',
+                CORE_PATH . '/exception/ExceptionHandle.class.php',
                 VENDOR_PATH . '/FirePHP.class.php',
                 VENDOR_PATH . '/Medoo/medoo.php',
+
         );
     }
 
@@ -89,6 +77,8 @@ class SimpleMVC
         //加载框架文件
         self::initFramewrok();
 
+        self::initAutoLoad();
+
         // 设定错误和异常处理
         ExceptionHandle::init();
 
@@ -113,8 +103,6 @@ class SimpleMVC
      */
     private static function initFramewrok()
     {
-        Importer::initAutoLoadConf();
-
         if (file_exists(ROOT_PATH . '/public/tmp/~~core.php')) {
             Importer::importFileByFullPath(ROOT_PATH . '/public/tmp/~~core.php');
         } else if (method_exists('Importer', 'importBaseFiles')) {
@@ -129,6 +117,23 @@ class SimpleMVC
                 }
             }
         }
+
+        Importer::initAutoLoadConf();
+    }
+
+    /**
+     * 实现自动加载功能
+     */
+    public static function initAutoLoad()
+    {
+        if (function_exists('spl_autoload_register')) {
+            spl_autoload_register(array('Importer', 'autoLoad'));
+        } else {
+            function __autoload($sClassName)
+            {
+                Importer::autoLoad($sClassName);
+            }
+        }
     }
 
     /**
@@ -138,7 +143,7 @@ class SimpleMVC
      */
     public static function initSession()
     {
-        Session::instance('db');
+        //Session::instance('db');
     }
 
     /**

@@ -19,25 +19,25 @@ class defaultController extends FrontendController
 //                )
 //        );
         echo __METHOD__, ' 在index之前执行 ... <br />';
-        echo IniI18N::t('first.hello', 'en_us'), IniI18N::t('first.world', 'en_us'), '<br />';
-        echo IniI18N::t('second.hello', 'en_us', 'other'), IniI18N::t('second.world', 'en_us', 'other'), '<br />';
-        echo IniI18N::t('first.hello', 'zh_tw'), IniI18N::t('first.world', 'zh_tw'), '<br />';
-
-        echo ArrayI18N::t('first.hello', 'en_us'), ArrayI18N::t('first.world', 'en_us'), '<br />';
-        echo ArrayI18N::t('second.hello', 'en_us', 'other'), ArrayI18N::t('second.world', 'en_us', 'other'), '<br />';
-
-
-        echo JsonI18N::t('first.hello', 'en_us'), JsonI18N::t('first.world', 'en_us'), '<br />';
-
-
-        echo XmlI18N::t('first.hello', 'en_us'), XmlI18N::t('first.world', 'en_us'), '<br />';
+//        echo IniI18N::t('first.hello', 'en_us'), IniI18N::t('first.world', 'en_us'), '<br />';
+//        echo IniI18N::t('second.hello', 'en_us', 'other'), IniI18N::t('second.world', 'en_us', 'other'), '<br />';
+//        echo IniI18N::t('first.hello', 'zh_tw'), IniI18N::t('first.world', 'zh_tw'), '<br />';
+//
+//        echo ArrayI18N::t('first.hello', 'en_us'), ArrayI18N::t('first.world', 'en_us'), '<br />';
+//        echo ArrayI18N::t('second.hello', 'en_us', 'other'), ArrayI18N::t('second.world', 'en_us', 'other'), '<br />';
+//
+//
+//        echo JsonI18N::t('first.hello', 'en_us'), JsonI18N::t('first.world', 'en_us'), '<br />';
+//
+//
+//        echo XmlI18N::t('first.hello', 'en_us'), XmlI18N::t('first.world', 'en_us'), '<br />';
 
         //        tag('ShowPageTrace');
     }
 
     public function indexAction()
     {
-        echo __METHOD__;
+        echo __METHOD__,'$_REQUEST:',var_export($_REQUEST,1),'<br />';
         $this->assign('helloWorld', 'Hello World  xxxx  xx !');
 
         $this->assign('helloWorld1', 'Hello World gggg !');

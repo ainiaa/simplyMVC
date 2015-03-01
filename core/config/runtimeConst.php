@@ -9,7 +9,7 @@ if (version_compare(PHP_VERSION, '5.2.0', '<')) { //判断php的版本是不是�
     define('MAGIC_QUOTES_GPC', false);
 }
 
-!defined('CORE_PATH') && define('CORE_PATH', dirname(__DIR__) .'/core');
+!defined('CORE_PATH') && define('CORE_PATH', dirname(__DIR__));
 
 !defined('CONF_PATH') && define('CONF_PATH', dirname(CORE_PATH) . '/config'); //config路径
 !defined('INCLUDE_PATH') && define('INCLUDE_PATH', dirname(CORE_PATH) . '/include'); //include目录的地址
@@ -27,7 +27,7 @@ if (version_compare(PHP_VERSION, '5.2.0', '<')) { //判断php的版本是不是�
 // 项目名称
 !defined('APP_NAME') && define('APP_NAME', basename(dirname($_SERVER['SCRIPT_FILENAME'])));
 
-!defined('SMVC_VERSION') && define('VENDOR_PATH', dirname(CORE_PATH) . '/include/vendor/');
+!defined('VENDOR_PATH') && define('VENDOR_PATH', dirname(CORE_PATH) . '/include/vendor/');
 
 !defined('VAR_AJAX_SUBMIT') && define('VAR_AJAX_SUBMIT', 'isAjax');
 
