@@ -20,9 +20,9 @@ class Dispatcher
          */
         Router::parseUrl();
 
-        $controllerName = Router::getController();
+        $controllerName = Router::getControllerName();
         $controller     = self::getController($controllerName);
-        $actionName     = Router::getAction();
+        $actionName     = Router::getActionName();
         $params         = self::getParams($controller, $actionName);
 
         self::preDispatch(

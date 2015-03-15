@@ -176,5 +176,5 @@ class SimpleMVC
     }
 }
 
-//启动。。
+//启动框架
 SimpleMVC::startup();

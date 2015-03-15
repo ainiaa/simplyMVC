@@ -130,7 +130,7 @@ class Router
      *
      * @return string
      */
-    public static function getController($info = array())
+    public static function getControllerName($info = array())
     {
         if ($info) {
             self::$controller = isset($info['controller']) ? $info['controller'] : C('defaultController', 'default');
@@ -150,7 +150,7 @@ class Router
      *
      * @return string
      */
-    public static function getAction($info = array())
+    public static function getActionName($info = array())
     {
         if ($info) {
             self::$action = isset($info['action']) ? $info['action'] : C('defaultAction', 'index');
@@ -166,7 +166,6 @@ class Router
     /**
      * TODO
      *
-     * @param $var
      */
     public static function getParams($info = array())
     {
