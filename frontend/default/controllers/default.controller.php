@@ -46,7 +46,7 @@ class defaultController extends FrontendController
 
         $this->assign('all', $all);
 
-        SmvcDebugHelper::instance()->debug(
+        SmvcDebugHelper::getInstance()->debug(
                 array(
                         'info'  => $all,
                         'label' => '$all',

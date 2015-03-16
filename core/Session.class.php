@@ -49,7 +49,7 @@ class Session
     {
         $config = C('session');
 
-        SmvcDebugHelper::instance()->debug(
+        SmvcDebugHelper::getInstance()->debug(
                 array(
                         'info'  => $config,
                         'label' => '$config ' . __METHOD__,
@@ -75,7 +75,7 @@ class Session
         $driver = null;
 
         $driver = new $class($config);
-        SmvcDebugHelper::instance()->debug(
+        SmvcDebugHelper::getInstance()->debug(
                 array(
                         'info'  => $driver,
                         'label' => '$driver ' . __METHOD__,
@@ -83,7 +83,7 @@ class Session
                 )
         );
 
-        SmvcDebugHelper::instance()->debug(
+        SmvcDebugHelper::getInstance()->debug(
                 array(
                         'info'  => $config,
                         'label' => '$config ' . __METHOD__,
@@ -92,7 +92,7 @@ class Session
         );
         // get the driver's cookie name
         $cookieName = isset($config['cookie_name']) ? $config['cookie_name'] : 'smvcid';
-        SmvcDebugHelper::instance()->debug(
+        SmvcDebugHelper::getInstance()->debug(
                 array(
                         'info'  => $cookieName,
                         'label' => '$cookieName ' . __METHOD__,

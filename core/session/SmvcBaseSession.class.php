@@ -501,7 +501,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         if ($enable_cookie) {
             $payload = $this->serialize($payload);
 
-            SmvcDebugHelper::instance()->debug(
+            SmvcDebugHelper::getInstance()->debug(
                     array(
                             'info'  => $payload,
                             'label' => '$payload ori ' . __METHOD__,
@@ -510,7 +510,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
             );
             // encrypt the payload if needed
             $this->config['encrypt_cookie'] and $payload = Crypt::encode($payload);
-            SmvcDebugHelper::instance()->debug(
+            SmvcDebugHelper::getInstance()->debug(
                     array(
                             'info'  => $payload,
                             'label' => '$payload encode' . __METHOD__,
@@ -518,7 +518,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
                     )
             );
 
-            SmvcDebugHelper::instance()->debug(
+            SmvcDebugHelper::getInstance()->debug(
                     array(
                             'info'  => Crypt::decode($payload),
                             'label' => '$payload decode' . __METHOD__,
@@ -571,12 +571,12 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         // was the cookie value posted?
         $cookie = Router::getPost($this->config['post_cookie_name'], false);
 
-        SmvcDebugHelper::instance()->debug(array(
+        SmvcDebugHelper::getInstance()->debug(array(
                         'info' => $cookie,
                         'label' => '$cookie ' . __METHOD__,
                         'level' => 'warn',
                 ));
-        SmvcDebugHelper::instance()->debug(array(
+        SmvcDebugHelper::getInstance()->debug(array(
                         'info' => $_COOKIE,
                         'label' => '$_COOKIE ' . __METHOD__,
                         'level' => 'warn',
@@ -584,7 +584,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         // if not found, fetch the regular cookie
         if ($cookie === false) {
             $cookie_name = isset($this->config['cookie_name']) ? $this->config['cookie_name'] : 'smvcid';
-            SmvcDebugHelper::instance()->debug(
+            SmvcDebugHelper::getInstance()->debug(
                     array(
                             'info'  => $this->config,
                             'label' => '$this->config ' . __METHOD__,
@@ -594,7 +594,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
             $cookie = Cookie::get(
                     $cookie_name
             ); //isset($_COOKIE[$this->config['cookie_name']]) ? $_COOKIE[$this->config['cookie_name']] : false;
-            SmvcDebugHelper::instance()->debug(
+            SmvcDebugHelper::getInstance()->debug(
                     array(
                             'info'  => $cookie,
                             'label' => '$cookie ' . __METHOD__,
@@ -617,7 +617,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         if ($cookie !== false) {
             // fetch the payload
             $this->config['encrypt_cookie'] and $cookie = Crypt::decode($cookie);
-            SmvcDebugHelper::instance()->debug(
+            SmvcDebugHelper::getInstance()->debug(
                     array(
                             'info'  => $cookie,
                             'label' => '$cookie ' . __METHOD__,

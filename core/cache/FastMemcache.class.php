@@ -24,11 +24,11 @@ class FastMemcache extends SmvcMemcache
      */
     private function qget($key)
     {
-        if (!isset(self::$cache[$this->memcacheserver])) {
-            self::$cache[$this->memcacheserver] = array();
+        if (!isset(self::$cache[$this->memcacheServer])) {
+            self::$cache[$this->memcacheServer] = array();
         }
 
-        return isset(self::$cache[$this->memcacheserver][$key][0]) ? self::$cache[$this->memcacheserver][$key][0] : null;
+        return isset(self::$cache[$this->memcacheServer][$key][0]) ? self::$cache[$this->memcacheServer][$key][0] : null;
     }
 
     /**
@@ -43,11 +43,11 @@ class FastMemcache extends SmvcMemcache
      */
     private function qset($key, $value, $limit = 2160000, $iswrite = false)
     {
-        if (!isset(self::$cache[$this->memcacheserver])) {
-            self::$cache[$this->memcacheserver] = array();
+        if (!isset(self::$cache[$this->memcacheServer])) {
+            self::$cache[$this->memcacheServer] = array();
         }
 
-        self::$cache[$this->memcacheserver][$key] = array($value, $limit, $iswrite);
+        self::$cache[$this->memcacheServer][$key] = array($value, $limit, $iswrite);
 
         return 1;
     }
@@ -66,7 +66,7 @@ class FastMemcache extends SmvcMemcache
             $ret   = array();
             $losts = array();
             foreach ($key as $k) {
-                if (isset(self::$cache[$this->memcacheserver][$k])) {
+                if (isset(self::$cache[$this->memcacheServer][$k])) {
                     $ret[$k] = $this->qget($k);
                 } else {
                     $losts[] = $k;
@@ -83,7 +83,7 @@ class FastMemcache extends SmvcMemcache
 
             return $ret;
         } else {
-            if (isset(self::$cache[$this->memcacheserver][$key])) {
+            if (isset(self::$cache[$this->memcacheServer][$key])) {
                 return $this->qget($key);
             } else { //未命中本地缓存
                 $data = parent::get($key, $perstring);
@@ -117,8 +117,8 @@ class FastMemcache extends SmvcMemcache
      */
     public function del($key)
     {
-        if (isset(self::$cache[$this->memcacheserver][$key])) {
-            unset(self::$cache[$this->memcacheserver][$key]);
+        if (isset(self::$cache[$this->memcacheServer][$key])) {
+            unset(self::$cache[$this->memcacheServer][$key]);
         }
 
         return parent::del($key);
@@ -129,8 +129,8 @@ class FastMemcache extends SmvcMemcache
      */
     function __destruct()
     {
-        if (isset(self::$cache[$this->memcacheserver])) {
-            $cache = self::$cache[$this->memcacheserver];
+        if (isset(self::$cache[$this->memcacheServer])) {
+            $cache = self::$cache[$this->memcacheServer];
             foreach ($cache as $key => $val) {
                 if ($val[2] === true) {
                     parent::set($key, $val[0], $val[1]);

@@ -72,7 +72,7 @@ class SmvcDebugHelper implements ArrayAccess
      * @static
      * @return SmvcDebugHelper
      */
-    public static function instance()
+    public static function getInstance()
     {
         if (self::$instance == null) {
             $instance = new SmvcDebugHelper();

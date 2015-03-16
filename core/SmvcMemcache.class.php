@@ -13,7 +13,7 @@ class SmvcMemcache
      * @var Memcache
      */
     protected $memcache = null;
-    protected $memcacheserver = 0;
+    protected $memcacheServer = 0;
     protected $cachePrefix = '';
     private static $instance = null;
     private $pconnect;
