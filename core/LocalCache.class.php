@@ -4,10 +4,6 @@
  * 本地静态缓存
  *
  * @author  Jeff Liu
- * @version 0.1.0
- * 使用方式
- * $lc = LocalCache::instance("redis");
- * $lc['aa'] = 10;
  */
 class LocalCache implements ArrayAccess
 {
@@ -15,90 +11,97 @@ class LocalCache implements ArrayAccess
      * 静态实例
      * @var array
      */
-    private static $instance = array();
+    private static $cachedData = array();
 
-    public static function instance($name)
+    /**
+     * @param string $name
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public static function getData($name, $default = false)
     {
-        if (!isset(self::$instance[$name])) {
-            self::$instance[$name] = new LocalCache();
+        if (!isset(self::$cachedData[$name])) {
+            $ret = $default;
+        } else {
+            $ret = self::$cachedData[$name];
         }
 
-        return self::$instance[$name];
+        return $ret;
     }
 
     /**
-     * 缓存
-     * @var array
+     * @param        $name
+     * @param        $data
+     * @param string $operation
      */
-    private $cache;
-
-    /**
-     * 构造函数
-     */
-    public function __construct()
+    public static function setData($name, $data, $operation = 'replace')
     {
-        $this->cache = array();
+        if ($operation == 'replace') {
+            self::cacheSingle($name, $data);
+        } else if ($operation == 'merge') {
+            $finalData = self::getNeedCachedData($name, $data);
+            self::cacheSingle($name, $finalData);
+        }
     }
 
     /**
-     * Whether a offset exists
+     * @param $name
+     * @param $data
      *
-     * @param mixed $offset <p>
-     *                      An offset to check for.
-     *                      </p>
-     *
-     * @return boolean true on success or false on failure.
-     * </p>
-     * <p>
-     * The return value will be casted to boolean if non-boolean was returned.
+     * @return array
      */
+    public static function getNeedCachedData($name, $data)
+    {
+        $finalData = $data;
+        if (is_array($data) || is_object($data)) {
+            $originCached = self::getData($name);
+            if (is_object($data)) {//将object转换为数组
+                $data = get_object_vars($data);
+            }
+
+            if ($originCached) {
+                $finalData = array_merge((array)$originCached, (array)$data);
+            } else {
+                $finalData = $data;
+            }
+        }
+
+        return $finalData;
+    }
+
+    /**
+     * 主要用于存储简单类型的值 或者
+     *
+     * @param $name
+     * @param $data
+     *
+     * @return bool
+     */
+    public static function cacheSingle($name, $data)
+    {
+        self::$cachedData[$name] = $data;
+        return true;
+    }
+
+
     public function offsetExists($offset)
     {
-        return isset($this->cache[$offset]);
+        return isset(self::$cachedData[$offset]);
     }
 
-    /**
-     * Offset to retrieve
-     *
-     * @param mixed $offset <p>
-     *                      The offset to retrieve.
-     *                      </p>
-     *
-     * @return mixed Can return all value types.
-     */
     public function offsetGet($offset)
     {
-        return isset($this->cache[$offset]) ? $this->cache[$offset] : null;
+        return isset(self::$cachedData[$offset]) ? self::$cachedData[$offset] : null;
     }
 
-    /**
-     * Offset to set
-     *
-     * @param mixed $offset <p>
-     *                      The offset to assign the value to.
-     *                      </p>
-     * @param mixed $value  <p>
-     *                      The value to set.
-     *                      </p>
-     *
-     * @return void
-     */
     public function offsetSet($offset, $value)
     {
-        $this->cache[$offset] = $value;
+        self::$cachedData[$offset] = $value;
     }
 
-    /**
-     * Offset to unset
-     *
-     * @param mixed $offset <p>
-     *                      The offset to unset.
-     *                      </p>
-     *
-     * @return void
-     */
     public function offsetUnset($offset)
     {
-        unset($this->cache[$offset]);
+        unset(self::$cachedData[$offset]);
     }
 }
