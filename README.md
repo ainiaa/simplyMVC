@@ -64,7 +64,6 @@
       * php <font color="green">`done`</font>
       * json <font color="green">`done`</font>
       * xml <font color="green">`done`</font>
-      * db `pending` -- optional I18N多为file db不是很必要
    * L10N  `pending` -- optional
 
 13、RBAC ACL  `pending`   -- optional

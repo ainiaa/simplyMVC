@@ -2,6 +2,9 @@
 
 class CoreMemcache
 {
+    /**
+     * @var Memcache
+     */
     private $memcache = null;
     protected $memcacheserver = 0;
     protected $cache_prefix = '';
