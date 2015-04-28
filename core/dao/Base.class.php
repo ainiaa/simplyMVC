@@ -9,7 +9,7 @@ class BaseDAO extends Object
     /**
      * @var medoo
      */
-    protected $db = null;
+    protected $database = null;
 
     public function __construct()
     {
@@ -22,19 +22,25 @@ class BaseDAO extends Object
         $this->initDb();
     }
 
+    /**
+     * todo 数据库 原理上来说可以通用。可以提到一个公用的地方 统一处理
+     * @return medoo
+     */
     public function initDb()
     {
-        if (empty($this->db)) {
-            $this->db = new medoo(array(
-                    'database_type' => C('DB_TYPE', 'mysql'),
-                    'database_name' => C('DB_NAME', 'test'),
-                    'server'        => C('DB_HOST', 'localhost'),
-                    'username'      => C('DB_USER', 'root'),
-                    'password'      => C('DB_PASS', ''),
-            ));
+        if (empty($this->database)) {
+            $this->database = new medoo(
+                    array(
+                            'database_type' => C('DB_TYPE', 'mysql'),
+                            'database_name' => C('DB_NAME', 'test'),
+                            'server'        => C('DB_HOST', 'localhost'),
+                            'username'      => C('DB_USER', 'root'),
+                            'password'      => C('DB_PASS', ''),
+                    )
+            );
         }
 
-        return $this->db;
+        return $this->database;
     }
 
     /**
@@ -50,7 +56,7 @@ class BaseDAO extends Object
      */
     public function add($data)
     {
-        return $this->db->insert($this->tableName, $data);
+        return $this->database->insert($this->tableName, $data);
     }
 
     /**
@@ -82,7 +88,7 @@ class BaseDAO extends Object
     public function multiAdd($data)
     {
         array_unshift($data, $this->tableName);
-        return call_user_func_array(array($this->db, 'insert'), $data);
+        return call_user_func_array(array($this->database, 'insert'), $data);
     }
 
 
@@ -115,7 +121,7 @@ class BaseDAO extends Object
      */
     public function update($data, $where = '')
     {
-        return $this->db->update($this->tableName, $data, $where);
+        return $this->database->update($this->tableName, $data, $where);
     }
 
     /**
@@ -148,8 +154,7 @@ class BaseDAO extends Object
      */
     public function getOne($columns, $where = array())
     {
-        $return = $this->db->get($this->tableName, $columns, $where);
-        return $return;
+        return $this->database->get($this->tableName, $columns, $where);
     }
 
     /**
@@ -178,11 +183,7 @@ class BaseDAO extends Object
      */
     public function getAll($columns = '*', $where = array())
     {
-        $return = $this->db->select($this->tableName, $columns, $where);
-
-        echo '<br >last sql:',$this->db->last_query(),'<br >';
-
-        return $return;
+        return $this->database->select($this->tableName, $columns, $where);
     }
 
     /**
@@ -210,7 +211,7 @@ class BaseDAO extends Object
      */
     public function getAllWithJoin($join, $columns, $where = array())
     {
-        return $this->db->select($this->tableName, $join, $columns, $where);
+        return $this->database->select($this->tableName, $join, $columns, $where);
     }
 
 
@@ -226,7 +227,7 @@ class BaseDAO extends Object
      */
     public function delete($where = array())
     {
-        return $this->db->delete($this->tableName, $where);
+        return $this->database->delete($this->tableName, $where);
     }
 
     /**
@@ -252,7 +253,7 @@ class BaseDAO extends Object
      */
     public function getCount($where)
     {
-        return $this->db->count($this->tableName, $where);
+        return $this->database->count($this->tableName, $where);
     }
 
     /**
@@ -263,7 +264,7 @@ class BaseDAO extends Object
      */
     public function getMax($column, $where)
     {
-        return $this->db->max($this->tableName, $column, $where);
+        return $this->database->max($this->tableName, $column, $where);
     }
 
     /**
@@ -274,7 +275,7 @@ class BaseDAO extends Object
      */
     public function getMin($column, $where)
     {
-        return $this->db->min($this->tableName, $column, $where);
+        return $this->database->min($this->tableName, $column, $where);
     }
 
     /**
@@ -285,7 +286,7 @@ class BaseDAO extends Object
      */
     public function getAvg($column, $where)
     {
-        return $this->db->avg($this->tableName, $column, $where);
+        return $this->database->avg($this->tableName, $column, $where);
     }
 
     /**
@@ -296,7 +297,7 @@ class BaseDAO extends Object
      */
     public function getSum($column, $where)
     {
-        return $this->db->sum($this->tableName, $column, $where);
+        return $this->database->sum($this->tableName, $column, $where);
     }
 
     /**
@@ -307,7 +308,7 @@ class BaseDAO extends Object
      */
     public function has($where)
     {
-        return $this->db->has($this->tableName, $where);
+        return $this->database->has($this->tableName, $where);
     }
 
     /**
@@ -318,7 +319,7 @@ class BaseDAO extends Object
      */
     public function hasWithJoin($join, $where)
     {
-        return $this->db->has($this->tableName, $join, $where);
+        return $this->database->has($this->tableName, $join, $where);
     }
 
     /**
@@ -328,7 +329,7 @@ class BaseDAO extends Object
      */
     public function query($query)
     {
-        return $this->db->query($query);
+        return $this->database->query($query);
     }
 
     /**
@@ -338,7 +339,7 @@ class BaseDAO extends Object
      */
     public function quote($string)
     {
-        return $this->db->quote($string);
+        return $this->database->quote($string);
     }
 
     /**
@@ -346,15 +347,15 @@ class BaseDAO extends Object
      */
     public function error()
     {
-        return $this->db->error();
+        return $this->database->error();
     }
 
     /**
      * @return mixed Return the last query performed.
      */
-    public function last_query()
+    public function lastQuery()
     {
-        return $this->db->last_query();
+        return $this->database->last_query();
     }
 
     /**
@@ -362,6 +363,6 @@ class BaseDAO extends Object
      */
     public function getDatabaseInfo()
     {
-        return $this->db->info();
+        return $this->database->info();
     }
 }
