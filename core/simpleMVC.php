@@ -45,7 +45,6 @@ class SimpleMVC
                 CORE_PATH . '/exception/ExceptionHandle.class.php',
                 VENDOR_PATH . '/FirePHP.class.php',
                 VENDOR_PATH . '/Medoo/medoo.php',
-
         );
     }
 
@@ -75,18 +74,26 @@ class SimpleMVC
     private static function init()
     {
         //加载框架文件
-        self::initFramewrok();
+        self::loadFramewrok();
 
         self::initAutoLoad();
 
         // 设定错误和异常处理
-        ExceptionHandle::init();
+        self::initExceptionHandle();
 
         //加载所有的配置文件
         self::initConf();
 
         //初始化session
         self::initSession();
+    }
+
+    /**
+     *
+     */
+    public static function initExceptionHandle()
+    {
+        ExceptionHandle::init();
     }
 
     /**
@@ -101,12 +108,12 @@ class SimpleMVC
      * 初始化框架文件（加载）
      * @author Jeff Liu
      */
-    private static function initFramewrok()
+    private static function loadFramewrok()
     {
         if (file_exists(ROOT_PATH . '/public/tmp/~~core.php')) {
             Importer::importFileByFullPath(ROOT_PATH . '/public/tmp/~~core.php');
-        } else if (method_exists('Importer', 'importBaseFiles')) {
-            Importer::importBaseFiles();
+        } else if (method_exists('Importer', 'loadFramewrok')) {
+            Importer::loadFramewrok();
             self::createBaseFileCache();
         } else {
             self::createBaseFileCache();
@@ -143,6 +150,9 @@ class SimpleMVC
      */
     public static function initSession()
     {
+        if (C('session.auto_initialize')) {
+            Session::instance();//todo
+        }
         //Session::instance('db');
     }
 

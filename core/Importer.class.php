@@ -634,7 +634,7 @@ class Importer
      * @author Jeff Liu
      * @date   2014-04-15
      */
-    public static function importBaseFiles()
+    public static function loadFramewrok()
     {
         //初始化autoload 配置项
         $baseFileList = SimpleMVC::getBaseFileList();

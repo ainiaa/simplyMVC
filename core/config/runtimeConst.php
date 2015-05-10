@@ -16,7 +16,7 @@ if (version_compare(PHP_VERSION, '5.2.0', '<')) { //判断php的版本是不是�
 !defined('PEAR_PATH') && define('PEAR_PATH', INCLUDE_PATH . '/lib/pear'); //include目录的地址
 
 //  版本信息
-!defined('SMVC_VERSION') && define('SMVC_VERSION', '0.1.0');
+!defined('SMVC_VERSION') && define('SMVC_VERSION', '0.2.0');
 
 !defined('IS_CGI') && define('IS_CGI', substr(PHP_SAPI, 0, 3) == 'cgi' ? 1 : 0);
 !defined('IS_WIN') && define('IS_WIN', strstr(PHP_OS, 'WIN') ? 1 : 0);

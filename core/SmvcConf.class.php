@@ -84,6 +84,7 @@ class SmvcConf implements ArrayAccess
 
     /**
      * 初始化config
+     *
      * @param $configPath
      * @param $configFileExt
      */
@@ -167,12 +168,60 @@ class SmvcConf implements ArrayAccess
     {
         if ($key == '*' || $key == null) {
             return $this->configData;
-        } else if (isset($this->configData[$key])) {
-            return $this->configData[$key];
         } else {
-            return $default;
+            return self::getWithDot($key, $this->configData, $default);
         }
     }
+
+    /**
+     *
+     * $origin = array(
+     *     'first' => array(
+     *         'second'=> array(
+     *             'third' => array(
+     *                 'fourth' => 'fourth content'
+     *             ),
+     *         ),
+     *     ),
+     * );
+     *
+     * $key = 'first.second.third';//通过点号来分割
+     * self::getWithDot($key, $origin, false);
+     *
+     * @param      $key
+     * @param      $configData
+     * @param bool $default
+     *
+     * @return bool|null
+     */
+    public static function getWithDot($key, $configData, $default = false)
+    {
+        $finalConfig = null;
+        if (strpos($key, '.') !== false) {//包含 '.'
+            $deepList  = explode('.', $key);
+            $deepCount = count($deepList);
+            $lastIndex = $deepCount - 1;
+            for ($deepIndex = 0; $deepIndex < $deepCount; $deepIndex++) {
+                $currentDeep       = $deepList[$deepIndex];
+                $currentConfigData = isset($configData[$currentDeep]) ? $configData[$currentDeep] : null;
+                if (empty($currentConfigData) || $deepIndex === $lastIndex) {
+                    $finalConfig = $currentConfigData;
+                    break;
+                } else {
+                    $configData = $currentConfigData;
+                }
+            }
+        } else {
+            $finalConfig = isset($origin[$key]) ? $origin[$key] : null;
+        }
+
+        if (empty($finalConfig)) {
+            $finalConfig = $default;
+        }
+
+        return $finalConfig;
+    }
+
 
     /**
      * @param null   $key
