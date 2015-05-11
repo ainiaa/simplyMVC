@@ -103,13 +103,16 @@ class Session
         if (isset(self::$_instances[$cookieName])) {
             // if so, they must be using the same driver class!
             if (self::$_instances[$cookieName] instanceof $class) {
-                throw new Exception('You can not instantiate two different sessions using the same cookie name "' . $cookieName . '"');
+                throw new Exception(
+                        'You can not instantiate two different sessions using the same cookie name "' . $cookieName . '"'
+                );
             }
         } else {
             // register a shutdown event to update the session
             // init the session
             $driver->init();
-            $driver->read();
+            $id = $driver->newSessionId();
+            $driver->read($id);
 
             register_shutdown_function(array(&$driver, "write"), array(''));
 
@@ -144,6 +147,10 @@ class Session
      */
     public static function instance($instance = null)
     {
+        if (is_null($instance) && C('session.driver')) {
+            $instance = C('session.driver');
+        }
+
         if (isset(self::$_proxy[$instance]) && self::$_proxy[$instance]) {
             return self::$_proxy[$instance];
         } else {

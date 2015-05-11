@@ -36,6 +36,8 @@ class SimpleMVC
                 CORE_PATH . '/Factory.class.php',
                 CORE_PATH . '/Dispatcher.class.php',
                 CORE_PATH . '/Object.class.php',
+                CORE_PATH . '/Session.class.php',
+                CORE_PATH . '/session/SessionException.class.php',
                 CORE_PATH . '/controller/Base.class.php',
                 CORE_PATH . '/dao/Base.class.php',
                 CORE_PATH . '/service/Base.class.php',
@@ -73,16 +75,23 @@ class SimpleMVC
      */
     private static function init()
     {
+        self::initAutoLoad();
+
         //加载框架文件
         self::loadFramewrok();
-
-        self::initAutoLoad();
 
         // 设定错误和异常处理
         self::initExceptionHandle();
 
         //加载所有的配置文件
         self::initConf();
+
+        Importer::initAutoLoadConf();
+
+        //        echo '<pre>';
+        //        var_export(C('session'));
+        //        echo '</pre>';
+        //        exit;
 
         //初始化session
         self::initSession();
@@ -124,8 +133,6 @@ class SimpleMVC
                 }
             }
         }
-
-        Importer::initAutoLoadConf();
     }
 
     /**

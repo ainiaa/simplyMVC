@@ -7,7 +7,7 @@ class SmvcCookieSession extends SmvcBaseSession
      * array of driver config defaults
      */
     protected static $_defaults = array(
-            'cookie_name' => 'fuelcid',
+            'cookie_name' => 'smvcid',
     );
 
     // --------------------------------------------------------------------
@@ -82,11 +82,11 @@ class SmvcCookieSession extends SmvcBaseSession
      * @access    public
      * @return    $this
      */
-    public function write()
+    public function write($id)
     {
         // do we have something to write?
         if (!empty($this->keys) or !empty($this->data) or !empty($this->flash)) {
-            parent::write();
+            parent::write($id);
 
             // rotate the session id if needed
             $this->rotate(false);
@@ -121,7 +121,7 @@ class SmvcCookieSession extends SmvcBaseSession
                 switch ($name) {
                     case 'cookie_name':
                         if (empty($item) or !is_string($item)) {
-                            $item = 'fuelcid';
+                            $item = 'smvcid';
                         }
                         break;
 
@@ -143,7 +143,7 @@ class SmvcCookieSession extends SmvcBaseSession
      * Garbage collection. Remove all expired entries atomically.
      * @return boolean
      */
-    public function gc()
+    public function gc($maxLifeTime)
     {
         // TODO: Implement gc() method.
     }

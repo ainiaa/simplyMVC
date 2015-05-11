@@ -212,7 +212,7 @@ class SmvcConf implements ArrayAccess
                 }
             }
         } else {
-            $finalConfig = isset($origin[$key]) ? $origin[$key] : null;
+            $finalConfig = isset($configData[$key]) ? $configData[$key] : null;
         }
 
         if (empty($finalConfig)) {
