@@ -10,6 +10,8 @@ class View
      */
     private $engine = null;
 
+    private static $instance = null;
+
     /**
      * @var array
      */
@@ -25,7 +27,19 @@ class View
             'auto_literal'    => true, // Smarty3新特性
     );
 
-    function __construct()
+    /**
+     * @return View
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new View();
+        }
+
+        return self::$instance;
+    }
+
+    private function __construct()
     {
         $this->init();
     }
@@ -74,26 +88,53 @@ class View
         }
     }
 
+    /**
+     * @param $var
+     * @param $value
+     *
+     * @return mixed
+     */
     public function assign($var, $value)
     {
-        $this->engine->assign($var, $value);
+        return $this->engine->assign($var, $value);
     }
 
+    /**
+     * @param $file
+     *
+     * @return mixed
+     */
     public function fetch($file)
     {
         return $this->engine->fetch($file);
     }
 
+    /**
+     * @param null $var
+     *
+     * @return mixed
+     */
     public function get($var = null)
     {
         return $this->engine->get($var);
     }
 
+    /**
+     * @param $file
+     *
+     * @return mixed
+     */
     public function display($file)
     {
         return $this->engine->display($file);
     }
 
+    /**
+     * @param $method
+     * @param $args
+     *
+     * @return mixed
+     */
     public function __call($method, $args)
     {
         return $this->engine->$method($args);

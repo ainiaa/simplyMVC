@@ -6,6 +6,9 @@
  */
 class BaseController extends Object
 {
+    /**
+     * @var View
+     */
     protected $view = null; //视图对象
     protected $visitor = null; //访问者对象
 
@@ -24,7 +27,7 @@ class BaseController extends Object
      *
      * @return
      */
-    function assign($var = null, $value = null)
+    public function assign($var = null, $value = null)
     {
         //初始化 视图类
         $this->initView();
@@ -90,7 +93,7 @@ class BaseController extends Object
     protected function initView()
     {
         if (null === $this->view) {
-            $this->view = new View();
+            $this->view = View::getInstance();
         }
     }
 

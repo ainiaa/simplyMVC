@@ -46,7 +46,7 @@ class BaseDAO extends Object
     /**
      *
      * 创建一条新的记录
-     * @author jeffliu
+     * @author Jeff Liu
      * powered by jeff 2011-5-31
      * @see    http://medoo.in/api/insert
      *
