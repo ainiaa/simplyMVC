@@ -19,6 +19,15 @@ class Persister
     }
 
     /**
+     * Singleton insurance.
+     * @return Persister
+     */
+    private function __clone()
+    {
+
+    }
+
+    /**
      *
      * @return Persister
      */

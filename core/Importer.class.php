@@ -604,7 +604,6 @@ class Importer
 
     /**
      * 设置加载路径（帮助自动加载）
-     * @todo   需要仔细想想怎么实现比较好
      * @author Jeff Liu
      *
      * @param $path
@@ -618,7 +617,7 @@ class Importer
      * 初始化autoload 配置项
      * @author Jeff Liu
      */
-    public static function initAutoLoadConf()
+    public static function initAutoLoad()
     {
         //设置加载路径
         $autoloadPath = C('autoLoadPath');

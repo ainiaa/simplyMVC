@@ -31,23 +31,7 @@ class SimpleMVC
      */
     public static function getBaseFileList()
     {
-        return array(
-                CORE_PATH . '/Router.class.php',
-                CORE_PATH . '/Factory.class.php',
-                CORE_PATH . '/Dispatcher.class.php',
-                CORE_PATH . '/Object.class.php',
-                CORE_PATH . '/Session.class.php',
-                CORE_PATH . '/session/SessionException.class.php',
-                CORE_PATH . '/controller/Base.class.php',
-                CORE_PATH . '/dao/Base.class.php',
-                CORE_PATH . '/service/Base.class.php',
-                CORE_PATH . '/view/View.class.php',
-                CORE_PATH . '/SmvcConf.class.php',
-                CORE_PATH . '/functions.class.php',
-                CORE_PATH . '/exception/ExceptionHandle.class.php',
-                VENDOR_PATH . '/FirePHP.class.php',
-                VENDOR_PATH . '/Medoo/medoo.php',
-        );
+        return include CORE_PATH . '/config/frameworkFileList.inc.php';
     }
 
     /**
@@ -55,7 +39,6 @@ class SimpleMVC
      */
     public static function createBaseFileCache()
     {
-        return false; //todo 暂时屏蔽  使用这个的话 加载某些文件的时候 会出现问题
         $content      = '<?php ';
         $baseFileList = self::getBaseFileList();
         foreach ($baseFileList as $file) {
@@ -86,12 +69,7 @@ class SimpleMVC
         //加载所有的配置文件
         self::initConf();
 
-        Importer::initAutoLoadConf();
-
-        //        echo '<pre>';
-        //        var_export(C('session'));
-        //        echo '</pre>';
-        //        exit;
+        Importer::initAutoLoad();
 
         //初始化session
         self::initSession();
@@ -151,16 +129,14 @@ class SimpleMVC
     }
 
     /**
-     * todo 需要重新实现
      * 初始化session
      * @author Jeff Liu
      */
     public static function initSession()
     {
         if (C('session.auto_initialize')) {
-            Session::instance();//todo
+            Session::instance(C('session.driver'));
         }
-        //Session::instance('db');
     }
 
     /**
