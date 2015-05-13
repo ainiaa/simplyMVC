@@ -26,7 +26,6 @@ class SimpleMVC
     }
 
     /**
-     * todo 这个可以放到一个 framework config文件里面
      * @return array
      */
     public static function getBaseFileList()
