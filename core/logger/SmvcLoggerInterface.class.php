@@ -16,6 +16,14 @@
 interface SmvcLoggerInterface
 {
 
+    const LOG_NOTICE = 0;
+    const LOG_WARNING = 1;
+    const LOG_ERROR = 2;
+    const LOG_DEBUG = 3;
+    const LOG_FATAL = 4;
+    const LOG_INFO = 5;
+    const LOG_EXCEPTION = 6;
+
     public function log($info = array( /* 'msg' => '', 'level' => ''*/));
 
     public function error($info = array( /* 'msg' => ''*/));

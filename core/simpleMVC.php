@@ -68,6 +68,7 @@ class SimpleMVC
         //加载所有的配置文件
         self::initConf();
 
+        //设置自动加载系列
         Importer::initAutoLoad();
 
         //初始化session

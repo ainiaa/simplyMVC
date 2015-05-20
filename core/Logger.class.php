@@ -4,15 +4,42 @@ class Logger
 {
     private $driver;
 
-    public function __construct($config, $specifiedDriver = false)
+    private static $loggerInstance = null;
+
+    /**
+     * @param null $config
+     * @param bool $specifiedDriver
+     *
+     * @return SmvcLoggerInterface
+     */
+    public static function getInstance($config = null, $specifiedDriver = false)
     {
+        if (is_null($config)) {
+            $config = C('logger');
+        }
         if ($specifiedDriver) {
             $config['driver'] = $specifiedDriver;
-        } else {
-            $config['driver'] = '';
         }
         $driver = ucwords($config['driver']);
 
+        if (!isset(self::$loggerInstance[$driver])) {
+            self::$loggerInstance[$driver] = new self($config);
+        }
+
+        return self::$loggerInstance[$driver];
+    }
+
+    private function __clone()
+    {
+    }
+
+
+    /**
+     * @param $config
+     */
+    private function __construct($config)
+    {
+        $driver       = ucwords($config['driver']);
         $this->driver = new $driver($config);
     }
 

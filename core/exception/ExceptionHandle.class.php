@@ -11,6 +11,10 @@ class ExceptionHandle
     public static function appException($e)
     {
         echo $e->__toString();
+
+        if (defined('LOG_RECORD') && LOG_RECORD) {
+            Logger::getInstance()->log(array('msg' => $e->__toString(), 'level' => SmvcLoggerInterface::LOG_EXCEPTION));
+        }
     }
 
     /**
@@ -40,9 +44,9 @@ class ExceptionHandle
                         ob_start('ob_gzhandler');
                     }
                 }
-                $errorStr = "$errstr " . $errfile . " 第 $errline 行.";
+                $errorStr = sprintf('%s %s  第 %s 行.', $errstr, $errfile, $errline);
                 if (defined('LOG_RECORD') && LOG_RECORD) {
-                    //                Log::write("[$errno] " . $errorStr, Log::ERR);
+                    Logger::getInstance()->log(array('msg' => $errorStr, 'level' => SmvcLoggerInterface::LOG_ERROR));
                 }
                 function_exists('halt') ? halt($errorStr) : exit('ERROR:' . $errorStr); //todo halt方法不存在
                 break;
@@ -50,8 +54,11 @@ class ExceptionHandle
             case E_USER_WARNING:
             case E_USER_NOTICE:
             default:
-                $errorStr = "[$errno] $errstr " . $errfile . " 第 $errline 行.";
+                $errorStr = sprintf('[%s] %s %s 第 %s 行.', $errno, $errstr, $errfile, $errline);
                 echo $errorStr;
+                if (defined('LOG_RECORD') && LOG_RECORD) {
+                    Logger::getInstance()->log(array('msg' => $errorStr, 'level' => SmvcLoggerInterface::LOG_WARNING));
+                }
                 break;
         }
     }
@@ -64,6 +71,9 @@ class ExceptionHandle
         }
     }
 
+    /**
+     *
+     */
     public static function init()
     {
         $isDebugMode = C('smvcDebug');
