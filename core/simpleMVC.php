@@ -48,6 +48,10 @@ class SimpleMVC
             }
             $content .= $currentContent;
         }
+
+        if (!is_dir(dirname(ROOT_PATH . '/public/tmp/~~core.php'))) {//如果 public/tmp目录不存在的会报warning错误
+            mkdir(dirname(ROOT_PATH . '/public/tmp/~~core.php') . '/', 0777, true);
+        }
         file_put_contents(ROOT_PATH . '/public/tmp/~~core.php', $content);
     }
 

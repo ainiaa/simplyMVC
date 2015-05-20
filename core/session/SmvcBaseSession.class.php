@@ -56,7 +56,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         // create a new session
         $this->keys['session_id']  = $this->newSessionId();
         $this->keys['previous_id'] = $this->keys['session_id']; // prevents errors if previous_id has a unique index
-        $this->keys['ip_hash']     = md5(Router::ip() . Router::realIp());
+        $this->keys['ip_hash']     = md5(Router::getRemoteIp() . Router::clientIp());
         $this->keys['user_agent']  = Router::getUserAgent();
         $this->keys['created']     = SmvcUtilHelper::getTime();
         $this->keys['updated']     = $this->keys['created'];
