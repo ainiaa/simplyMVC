@@ -3,7 +3,7 @@ return array(
         CORE_PATH . '/Router.class.php',
         CORE_PATH . '/Factory.class.php',
         CORE_PATH . '/Dispatcher.class.php',
-        CORE_PATH . '/Object.class.php',
+        CORE_PATH . '/SmvcObjectclass.php',
         CORE_PATH . '/controller/Base.class.php',
         CORE_PATH . '/dao/Base.class.php',
         CORE_PATH . '/service/Base.class.php',

@@ -28,79 +28,93 @@ class Factory
     public static function getInstance($instanceName = null, $quoteObj = array(), $params = array(), $getNow = false)
     {
         if (!is_string($instanceName) || $instanceName == '') {
-            throw new Exception('$instanceName must be string!!!');
+            throw new Exception('$instanceName must be a string!!!');
         }
-        $params     = $params ? : array();
+        $params     = $params ?: array();
         $instanceid = $instanceName . '_' . hash('crc32', serialize($params));
         if (!isset(self::$instances[$instanceid])) {
             if ($getNow) {
                 self::$instances[$instanceid] = self::getInstanceNow($instanceName, $params);
             } else {
-                $tmp         = new FactoryProxy();
-                $tmp->class  = $instanceName;
-                $tmp->params = $params;
+                $proxy         = new FactoryProxy();
+                $proxy->class  = $instanceName;
+                $proxy->params = $params;
                 if (!empty($quoteObj) && is_array($quoteObj)) {
                     if (!is_object($quoteObj[0])) {
-                        throw new Exception('$p must be object!!!');
+                        throw new Exception('$quoteObj[0] must be object!!!');
                     }
                     if (isset($quoteObj[1])) {
                         if (!is_string($quoteObj[1]) || $quoteObj[1] == '') {
-                            throw new Exception('$pp must be string!!!');
+                            throw new Exception('$quoteObj[1] must be string!!!');
                         }
                     } else {
                         $quoteObj[1] = $instanceName;
                     }
-                    $tmp->myQuote = $quoteObj;
+                    $proxy->myQuote = $quoteObj;
                 }
-                self::$instances[$instanceid] = $tmp;
+                self::$instances[$instanceid] = $proxy;
             }
         }
         return self::$instances[$instanceid];
     }
 
+    /**
+     * 立刻获得所需对象实例
+     *
+     * @param       $name
+     * @param array $constructparams
+     *
+     * @return object
+     * @throws Exception
+     */
     public static function getInstanceNow($name, $constructparams = array())
     {
         if (substr($name, -10) === 'Controller') {
             if (class_exists($name)) {
                 $action = new $name();
-                foreach ($action as $eachp => $v) {
-                    if (substr($eachp, -7) === 'Service') {
-                        $action->$eachp = self::getInstance($eachp, array($action, $eachp));
+                foreach ($action as $eachParamKey => $eachParamValue) {
+                    if (substr($eachParamKey, -7) === 'Service') {
+                        $action->$eachParamKey = self::getInstance($eachParamKey, array($action, $eachParamKey));
                     } else {
-                        if (isset($constructparams[$eachp])) {
-                            $action->$eachp = $constructparams[$eachp];
+                        if (isset($constructparams[$eachParamKey])) {
+                            $action->$eachParamKey = $constructparams[$eachParamKey];
                         }
                     }
                 }
                 return $action;
             } else {
-                throw new Exception("Class: {$name} is not exists!");
+                throw new Exception('Class: ' . $name . ' is not exists!');
             }
         } elseif (substr($name, -7) === 'Service') {
-            $tmp = self::RetNewClass($name, $constructparams);
-            foreach ($tmp as $pk => $pv) {
-                //                echo '$pk =>',$pk,'==>$pv',var_export($pv,1),'<br />';
-                if (is_null($pv)) {
-                    if (substr($pk, -5) === 'DAODb' || substr($pk, -8) === 'DAORedis' || substr($pk, -3) == 'DAO') {
-                        $tmp->$pk = self::getInstance($pk, array($tmp, $pk));
+            $serviceObject = self::getRealObject($name, $constructparams);
+            foreach ($serviceObject as $eachParamKey1 => $eachParamValue1) {
+                if (is_null($eachParamValue1)) {
+                    if (substr($eachParamKey1, -5) === 'DAODb' || substr($eachParamKey1, -8) === 'DAORedis' || substr(
+                                    $eachParamKey1,
+                                    -3
+                            ) == 'DAO'
+                    ) {
+                        $serviceObject->$eachParamKey1 = self::getInstance(
+                                $eachParamKey1,
+                                array($serviceObject, $eachParamKey1)
+                        );
                     }
                 }
             }
-            //            exit;
-            return $tmp;
+            return $serviceObject;
         } elseif (substr($name, -5) === 'DAODb' || substr($name, -8) === 'DAORedis') {
             $class = $name;
             if (!is_array($constructparams)) {
                 $constructparams = array();
             }
-            return self::RetNewClass($class, $constructparams);
+            return self::getRealObject($class, $constructparams);
         } else {
             $class = $name;
+            return self::getRealObject($class, $constructparams);
         }
-        return new $class($constructparams);
     }
 
-    static private function RetNewClass($class, $constructparams)
+    private static function getRealObject($class, $constructparams)
     {
         if (!is_array($constructparams)) {
             $constructparams = array($constructparams);
@@ -120,7 +134,10 @@ class Factory
 
 }
 
-//$xxService 等的托管代理类
+/**
+ * 等的托管代理类
+ * Class FactoryProxy
+ */
 class FactoryProxy
 {
     public $class = null;
@@ -133,9 +150,9 @@ class FactoryProxy
         if (!is_null($this->params)) {
             $instanceid = $this->class . '_' . hash('crc32', serialize($this->params));
         }
-        if (!isset(Factory::$instances[$instanceid]) || get_class(
-                        Factory::$instances[$instanceid]
-                ) == 'FactoryProxy'
+        if (!isset(Factory::$instances[$instanceid]) || get_class(Factory::$instances[$instanceid]) == get_class(
+                        $this
+                )
         ) {
             Factory::$instances[$instanceid] = null;
             Factory::$instances[$instanceid] = Factory::getInstance(

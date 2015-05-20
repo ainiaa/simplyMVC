@@ -1,27 +1,20 @@
 <?php
 
 /**
- *    所有类的基础类
+ * 所有类的基础类
  *
- * @author    Garbin
- * @usage     none
+ * @author    Jeff Liu
  */
-class Object
+class SmvcObject
 {
 
-    var $_errors = array();
-    var $_errnum = 0;
+    private $_errors = array();
+    private $_errnum = 0;
 
     private static $i = 0;
     private static $fl = null;
 
-    function __construct()
-    {
-        $this->Object();
-    }
-
-
-    function Object()
+    public function __construct()
     {
     }
 
@@ -32,9 +25,9 @@ class Object
      * @access public
      * +----------------------------------------------------------
      *
-     * @param $name   属性名称
-     * @param $value  属性值
-    +----------------------------------------------------------
+     * @param string $name  属性名称
+     * @param string $value 属性值
+     *                      +----------------------------------------------------------
      */
     public function __set($name, $value)
     {
@@ -50,8 +43,8 @@ class Object
      * @access public
      * +----------------------------------------------------------
      *
-     * @param $name 属性名称
-    +----------------------------------------------------------
+     * @param string $name 属性名称
+     *                     +----------------------------------------------------------
      *
      * @return mixed
     +----------------------------------------------------------
@@ -68,15 +61,18 @@ class Object
 
     /**
      * 获取调用当前方法的方法的所在文件位置，行数
-     * @author zhoubin
      *
-     * @param unknown_type $c 查找层级，不填为第一子方法
+     * @author Jeff Liu
+     *
+     * @param array $c 查找层级，不填为第一子方法
+     *
+     * @return null|string
      */
     public static function get_called_class($c = 2)
     {
         $bt = debug_backtrace();
         //使用call_user_func或call_user_func_array函数调用类方法，处理如下
-        if (array_key_exists(3, $bt) && array_key_exists('function', $bt[3]) && in_array(
+        if (isset($bt[3]) && isset($bt[3]['function']) && in_array(
                         $bt[3]['function'],
                         array('call_user_func', 'call_user_func_array')
                 )
@@ -101,7 +97,7 @@ class Object
         if (self::$fl == $bt[$c - 1]['file'] . $bt[$c - 1]['line']) {
             self::$i++;
         } else {
-            self::$i = 0;
+            self::$i  = 0;
             self::$fl = $bt[$c - 1]['file'] . ' Line:[' . $bt[$c - 1]['line'] . ']';
 
         }
@@ -115,13 +111,15 @@ class Object
     /**
      *    触发错误
      *
-     * @author    Garbin
+     * @author    Jeff Liu
      *
-     * @param     string $errmsg
+     * @param        $msg
+     * @param string $obj
      *
-     * @return    void
+     * @internal  param string $errmsg
+     *
      */
-    function _error($msg, $obj = '')
+    public function _error($msg, $obj = '')
     {
         if (is_array($msg)) {
             $this->_errors = array_merge($this->_errors, $msg);
@@ -135,10 +133,10 @@ class Object
     /**
      *    检查是否存在错误
      *
-     * @author    Garbin
+     * @author    Jeff Liu
      * @return    int
      */
-    function has_error()
+    public function hasError()
     {
         return $this->_errnum;
     }
@@ -146,10 +144,10 @@ class Object
     /**
      *    获取错误列表
      *
-     * @author    Garbin
+     * @author    Jeff Liu
      * @return    array
      */
-    function get_error()
+    public function getError()
     {
         return $this->_errors;
     }

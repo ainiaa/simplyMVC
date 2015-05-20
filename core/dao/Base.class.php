@@ -1,6 +1,6 @@
 <?php
 
-class BaseDAO extends Object
+class BaseDAO extends SmvcObject
 {
 
     protected $tableName = '';

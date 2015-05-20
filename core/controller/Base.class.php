@@ -4,7 +4,7 @@
  * @author Jeff Liu
  * 控制器基类 定义了 控制器的基本方法
  */
-class BaseController extends Object
+class BaseController extends SmvcObject
 {
     /**
      * @var View
@@ -15,6 +15,7 @@ class BaseController extends Object
 
     public function __construct()
     {
+        parent::__construct();
         //初始化 视图类, session 和 访问者
         $this->init();
     }
@@ -25,7 +26,7 @@ class BaseController extends Object
      * @param mixed $var
      * @param mixed $value
      *
-     * @return
+     * @return mixed
      */
     public function assign($var = null, $value = null)
     {
@@ -37,7 +38,7 @@ class BaseController extends Object
 
     /**
      * 获得模版 替换之后的内容
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param string $file
      *
@@ -53,7 +54,7 @@ class BaseController extends Object
 
     /**
      * 获得 模版变量
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param mixed $var
      *
@@ -69,9 +70,11 @@ class BaseController extends Object
 
     /**
      * 显示模版信息
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param string $tpl
+     *
+     * @return mixed
      */
     function display($tpl = null)
     {
@@ -100,7 +103,7 @@ class BaseController extends Object
 
     /**
      * 初始化访问者 TODO 具体怎么初始化Visitor 还需要实现
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function initVisitor()
     {
@@ -110,7 +113,7 @@ class BaseController extends Object
 
     /**
      * 发送get请求
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param string $url
      * @param mixed  $data
@@ -124,7 +127,7 @@ class BaseController extends Object
 
     /**
      * 发送post请求
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param string $url
      * @param array  $data
@@ -138,7 +141,7 @@ class BaseController extends Object
 
     /**
      * 请求公共处理逻辑
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param string $url
      * @param array  $data
@@ -243,6 +246,7 @@ class BaseController extends Object
 
     /**
      * 获取模板引擎实例
+     * @return View
      */
     public function getView()
     {

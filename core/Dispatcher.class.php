@@ -114,6 +114,7 @@ class Dispatcher
                     case 'PUT':
                         parse_str(file_get_contents('php://input'), $vars);
                         break;
+                    case 'GET':
                     default:
                         $vars = $_GET;
                 }

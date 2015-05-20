@@ -1,6 +1,6 @@
 <?php
 
-class BaseService extends Object
+class BaseService extends SmvcObject
 {
     public $BaseDAO;
 }
