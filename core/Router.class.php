@@ -1,21 +1,29 @@
 <?php
 
 /**
- * Created by JetBrains PhpStorm.
- * User: Administrator
- * Date: 13-1-31
- * Time: 下午11:48
- * To change this template use File | Settings | File Templates.
+ * Class Router
  */
 class Router
 {
 
+    /**
+     * @var string 分组名称
+     */
     public static $group;
 
+    /**
+     * @var string module 名称
+     */
     public static $module;
 
+    /**
+     * @var string 控制器名称
+     */
     public static $controller;
 
+    /**
+     * @var string action名称
+     */
     public static $action;
 
     /**
@@ -31,6 +39,11 @@ class Router
         }
     }
 
+    /**
+     * @param $value
+     *
+     * @return array|string
+     */
     public static function stripSlashesDeep($value)
     {
         if (is_array($value)) {
@@ -307,7 +320,7 @@ class Router
      *
      * @return  string
      */
-    public static function ip($default = '0.0.0.0')
+    public static function getRemoteIp($default = '0.0.0.0')
     {
         return self::getServer('REMOTE_ADDR', $default);
     }
@@ -340,7 +353,7 @@ class Router
      *
      * @return  string  the real ip address of the user
      */
-    public static function realIp($default = '0.0.0.0', $exclude_reserved = false)
+    public static function clientIp($default = '0.0.0.0', $exclude_reserved = false)
     {
         static $server_keys = null;
 
@@ -388,7 +401,7 @@ class Router
      *
      * @return  string
      */
-    public static function protocol()
+    public static function getProtocol()
     {
         if (self::getServer('HTTPS') == 'on' or self::getServer('HTTPS') == 1 or self::getServer(
                         'SERVER_PORT'
