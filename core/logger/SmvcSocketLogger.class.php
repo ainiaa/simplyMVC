@@ -46,12 +46,6 @@ class SmvcSocketLogger extends SmvcBaseLogger
      */
     private $isCompress = true;
 
-    /**
-     *
-     * @var
-     */
-    private static $instance = null;
-
     private $handle;
 
     /**
