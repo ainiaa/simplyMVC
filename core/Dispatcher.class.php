@@ -20,11 +20,19 @@ class Dispatcher
          */
         Router::parseUrl();
 
-        $controllerName = Router::getControllerName();
-        $controller     = self::getController($controllerName);
-        $actionName     = Router::getActionName();
-        $params         = self::getParams($controller, $actionName);
 
+        //获得controller
+        $controllerName = Router::getControllerName();
+
+        //获得controller实例
+        $controller = self::getController($controllerName);
+
+        //获得action
+        $actionName = Router::getActionName();
+
+        $params = self::getParams($controller, $actionName);
+
+        //前置操作
         self::preDispatch(
                 array(
                         'controller' => $controller,
@@ -33,6 +41,9 @@ class Dispatcher
                 )
         );
 
+
+
+        //这一块使用反射是不是太重了？？？
         try {
             //执行当前操作
             $method = new ReflectionMethod($controller, $actionName);
@@ -66,6 +77,8 @@ class Dispatcher
             $method = new ReflectionMethod($controller, '__call');
             $method->invokeArgs($controller, array($actionName, ''));
         }
+
+        //前置操作
         self::postDispatch(
                 array(
                         'controller' => $controller,

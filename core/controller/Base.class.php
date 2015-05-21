@@ -10,13 +10,17 @@ class BaseController extends SmvcObject
      * @var View
      */
     protected $view = null; //视图对象
+
+    /**
+     * @var null
+     */
     protected $visitor = null; //访问者对象
 
 
     public function __construct()
     {
         parent::__construct();
-        //初始化 视图类, session 和 访问者
+
         $this->init();
     }
 
@@ -93,6 +97,9 @@ class BaseController extends SmvcObject
         $this->initVisitor();
     }
 
+    /**
+     * 初始化 view
+     */
     protected function initView()
     {
         if (null === $this->view) {
@@ -120,9 +127,9 @@ class BaseController extends SmvcObject
      *
      * @return array
      */
-    public static function getRequest($url, $data)
+    public static function sendGet($url, $data)
     {
-        return self::request($url, $data, 'get');
+        return SmvcHttpHelper::sendGet($url, $data);
     }
 
     /**
@@ -134,46 +141,13 @@ class BaseController extends SmvcObject
      *
      * @return array
      */
-    public static function postRequest($url, $data)
+    public static function sendPost($url, $data)
     {
-        return self::request($url, $data, 'post');
-    }
-
-    /**
-     * 请求公共处理逻辑
-     * @author Jeff Liu
-     *
-     * @param string $url
-     * @param array  $data
-     * @param string $type
-     *
-     * @return array
-     */
-    protected static function request($url, $data, $type = 'get')
-    {
-        $lst = array();
-        $ch  = curl_init($url);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if ($type == 'post') {
-            $params = '';
-            if (empty($data)) {
-                $params = http_build_query($data);
-            }
-            curl_setopt($ch, CURLOPT_POST, 1); //启用POST提交
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params); //启用POST提交
-        }
-
-        $lst['rst']  = curl_exec($ch);
-        $lst['info'] = curl_getinfo($ch);
-        curl_close($ch);
-
-        return $lst;
+        return SmvcHttpHelper::sendPost($url, $data);
     }
 
 
     /**
-     *
      * 跳转程序
      *
      * 应用程序的控制器类可以覆盖该函数以使用自定义的跳转程序

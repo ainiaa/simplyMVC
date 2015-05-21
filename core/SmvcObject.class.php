@@ -101,15 +101,12 @@ class SmvcObject
             self::$fl = $bt[$c - 1]['file'] . ' Line:[' . $bt[$c - 1]['line'] . ']';
 
         }
-        //$lines = file($bt[$c]['file']);
-        //preg_match_all('/([a-zA-Z0-9\_]+)::'.$bt[$c]['function'].'/',$lines[$bt[$c]['line']-1],$matches);
-        //return $matches[1][self::$i];
         return self::$fl;
     }
 
 
     /**
-     *    触发错误
+     * 触发错误
      *
      * @author    Jeff Liu
      *

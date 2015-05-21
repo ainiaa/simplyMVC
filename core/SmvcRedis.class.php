@@ -6,7 +6,11 @@
  */
 class SmvcRedis
 {
+    /**
+     * @var Redis
+     */
     private static $instance = array();
+
     /**
      * @var Redis
      */
