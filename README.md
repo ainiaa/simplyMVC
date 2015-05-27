@@ -14,7 +14,7 @@
    * core/SmvcConf.class.php  <font color="green">`done`</font>
    * based on Configula `pending`  -- optional
 
-4、template的具体实现 (使用第三方 smarty )   `pending`  -- optional
+4、template的具体实现 (使用第三方 smarty )   `doing`  -- optional
 
    * 使用 原生态的PHP 作为模板语言  <font color="green">`done`</font>
    * 使用 smarty (太庞大了)  <font color="green">`done`</font>

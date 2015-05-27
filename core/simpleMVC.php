@@ -15,6 +15,7 @@ include CORE_PATH . '/Importer.class.php';
 class SimpleMVC
 {
 
+
     /**
      * @author Jeff Liu
      */
@@ -49,10 +50,7 @@ class SimpleMVC
             $content .= $currentContent;
         }
 
-        if (!is_dir(dirname(ROOT_PATH . '/public/tmp/~~core.php'))) {//如果 public/tmp目录不存在的会报warning错误
-            mkdir(dirname(ROOT_PATH . '/public/tmp/~~core.php') . '/', 0777, true);
         }
-        file_put_contents(ROOT_PATH . '/public/tmp/~~core.php', $content);
     }
 
     /**
@@ -61,6 +59,7 @@ class SimpleMVC
      */
     private static function init()
     {
+
         self::initAutoLoad();
 
         //加载框架文件
@@ -101,8 +100,6 @@ class SimpleMVC
      */
     private static function loadFramewrok()
     {
-        if (file_exists(ROOT_PATH . '/public/tmp/~~core.php')) {
-            Importer::importFileByFullPath(ROOT_PATH . '/public/tmp/~~core.php');
         } else if (method_exists('Importer', 'loadFramewrok')) {
             Importer::loadFramewrok();
             self::createBaseFileCache();
@@ -144,6 +141,8 @@ class SimpleMVC
     }
 
     /**
+     * 判断当前请求是否为ajax请求
+     *
      * @access public
      * @author Jeff Liu
      */
