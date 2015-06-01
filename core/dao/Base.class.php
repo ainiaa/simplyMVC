@@ -9,7 +9,25 @@ class BaseDAO extends SmvcObject
     /**
      * @var medoo
      */
-    protected $database = null;
+    protected $readerStorage = null;
+
+    /**
+     * @var medoo
+     */
+    protected $writerStorage = null;
+
+    /**
+     * 最后一次使用的
+     * @var String
+     */
+    protected $latestStorageType = null;
+
+    const LATEST_STORAGE_WRITER = 1;
+
+    const LATEST_STORAGE_READER = 2;
+
+
+    protected $storageType = null;
 
     public function __construct()
     {
@@ -28,19 +46,47 @@ class BaseDAO extends SmvcObject
      */
     public function initDb()
     {
-        if (empty($this->database)) {
-            $this->database = new medoo(
+        if (empty($this->writerStorage)) {
+            $dbMasterConfig      = C('db.master');
+            $masterIndex         = array_rand($dbMasterConfig);
+            $masterConifg        = $dbMasterConfig[$masterIndex];
+            $this->writerStorage = new medoo(
                     array(
-                            'database_type' => C('DB_TYPE', 'mysql'),
-                            'database_name' => C('DB_NAME', 'test'),
-                            'server'        => C('DB_HOST', 'localhost'),
-                            'username'      => C('DB_USER', 'root'),
-                            'password'      => C('DB_PASS', ''),
+                            'database_type' => $masterConifg['DB_TYPE'],
+                            'database_name' => $masterConifg['DB_NAME'],
+                            'server'        => $masterConifg['DB_HOST'],
+                            'username'      => $masterConifg['DB_USER'],
+                            'password'      => $masterConifg['DB_PASS'],
                     )
             );
         }
 
-        return $this->database;
+        if (empty($this->readerStorage)) {
+            $dbSlaveConfig       = C('db.slave');
+            $slaveIndex          = array_rand($dbSlaveConfig);
+            $slaveConifg         = $dbSlaveConfig[$slaveIndex];
+            $this->readerStorage = new medoo(
+                    array(
+                            'database_type' => $slaveConifg['DB_TYPE'],
+                            'database_name' => $slaveConifg['DB_NAME'],
+                            'server'        => $slaveConifg['DB_HOST'],
+                            'username'      => $slaveConifg['DB_USER'],
+                            'password'      => $slaveConifg['DB_PASS'],
+                    )
+            );
+        }
+    }
+
+    public function setLatestStorageType($type)
+    {
+        if ($type === self::LATEST_STORAGE_WRITER || $type === self::LATEST_STORAGE_READER) {
+            $this->latestStorageType = $type;
+        }
+    }
+
+    public function getLatestStorageType()
+    {
+        return $this->latestStorageType;
     }
 
     /**
@@ -56,7 +102,8 @@ class BaseDAO extends SmvcObject
      */
     public function add($data)
     {
-        return $this->database->insert($this->tableName, $data);
+        $this->setLatestStorageType(self::LATEST_STORAGE_WRITER);
+        return $this->writerStorage->insert($this->tableName, $data);
     }
 
     /**
@@ -87,8 +134,9 @@ class BaseDAO extends SmvcObject
      */
     public function multiAdd($data)
     {
+        $this->setLatestStorageType(self::LATEST_STORAGE_WRITER);
         array_unshift($data, $this->tableName);
-        return call_user_func_array(array($this->database, 'insert'), $data);
+        return call_user_func_array(array($this->writerStorage, 'insert'), $data);
     }
 
 
@@ -121,7 +169,8 @@ class BaseDAO extends SmvcObject
      */
     public function update($data, $where = '')
     {
-        return $this->database->update($this->tableName, $data, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_WRITER);
+        return $this->writerStorage->update($this->tableName, $data, $where);
     }
 
     /**
@@ -154,7 +203,8 @@ class BaseDAO extends SmvcObject
      */
     public function getOne($columns, $where = array())
     {
-        return $this->database->get($this->tableName, $columns, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->get($this->tableName, $columns, $where);
     }
 
     /**
@@ -183,7 +233,8 @@ class BaseDAO extends SmvcObject
      */
     public function getAll($columns = '*', $where = array())
     {
-        return $this->database->select($this->tableName, $columns, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->select($this->tableName, $columns, $where);
     }
 
     /**
@@ -211,7 +262,8 @@ class BaseDAO extends SmvcObject
      */
     public function getAllWithJoin($join, $columns, $where = array())
     {
-        return $this->database->select($this->tableName, $join, $columns, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->select($this->tableName, $join, $columns, $where);
     }
 
 
@@ -227,7 +279,8 @@ class BaseDAO extends SmvcObject
      */
     public function delete($where = array())
     {
-        return $this->database->delete($this->tableName, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->writerStorage->delete($this->tableName, $where);
     }
 
     /**
@@ -253,7 +306,8 @@ class BaseDAO extends SmvcObject
      */
     public function getCount($where)
     {
-        return $this->database->count($this->tableName, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->count($this->tableName, $where);
     }
 
     /**
@@ -264,7 +318,8 @@ class BaseDAO extends SmvcObject
      */
     public function getMax($column, $where)
     {
-        return $this->database->max($this->tableName, $column, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->max($this->tableName, $column, $where);
     }
 
     /**
@@ -275,7 +330,8 @@ class BaseDAO extends SmvcObject
      */
     public function getMin($column, $where)
     {
-        return $this->database->min($this->tableName, $column, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->min($this->tableName, $column, $where);
     }
 
     /**
@@ -286,7 +342,8 @@ class BaseDAO extends SmvcObject
      */
     public function getAvg($column, $where)
     {
-        return $this->database->avg($this->tableName, $column, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->avg($this->tableName, $column, $where);
     }
 
     /**
@@ -297,7 +354,8 @@ class BaseDAO extends SmvcObject
      */
     public function getSum($column, $where)
     {
-        return $this->database->sum($this->tableName, $column, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->sum($this->tableName, $column, $where);
     }
 
     /**
@@ -308,7 +366,8 @@ class BaseDAO extends SmvcObject
      */
     public function has($where)
     {
-        return $this->database->has($this->tableName, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->has($this->tableName, $where);
     }
 
     /**
@@ -319,17 +378,33 @@ class BaseDAO extends SmvcObject
      */
     public function hasWithJoin($join, $where)
     {
-        return $this->database->has($this->tableName, $join, $where);
+        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        return $this->readerStorage->has($this->tableName, $join, $where);
     }
 
     /**
-     * @param $query
+     * @param int $query 字符串
+     *
+     * @param int $type
      *
      * @return object The PDOStatement object.
      */
-    public function query($query)
+    public function query($query, $type = null)
     {
-        return $this->database->query($query);
+        if (is_null($type)) {
+            if ('SELECT' === strtoupper(substr($query, 0, 6))) {
+                $type = self::LATEST_STORAGE_READER;
+            } else {
+                $type = self::LATEST_STORAGE_WRITER;
+            }
+        }
+
+        if ($type === self::LATEST_STORAGE_READER) {
+            return $this->readerStorage->query($query);
+        } else if ($type === self::LATEST_STORAGE_WRITER) {
+            return $this->writerStorage->query($query);
+        }
+        return null;
     }
 
     /**
@@ -339,7 +414,7 @@ class BaseDAO extends SmvcObject
      */
     public function quote($string)
     {
-        return $this->database->quote($string);
+        return $this->readerStorage->quote($string);
     }
 
     /**
@@ -347,7 +422,11 @@ class BaseDAO extends SmvcObject
      */
     public function error()
     {
-        return $this->database->error();
+        if ($this->latestStorageType === self::LATEST_STORAGE_READER) {
+            return $this->readerStorage->error();
+        } else {
+            return $this->writerStorage->error();
+        }
     }
 
     /**
@@ -355,7 +434,11 @@ class BaseDAO extends SmvcObject
      */
     public function lastQuery()
     {
-        return $this->database->last_query();
+        if ($this->latestStorageType === self::LATEST_STORAGE_READER) {
+            return $this->readerStorage->last_query();
+        } else {
+            return $this->writerStorage->last_query();
+        }
     }
 
     /**
@@ -363,6 +446,10 @@ class BaseDAO extends SmvcObject
      */
     public function getDatabaseInfo()
     {
-        return $this->database->info();
+        if ($this->latestStorageType === self::LATEST_STORAGE_READER) {
+            return $this->readerStorage->info();
+        } else {
+            return $this->writerStorage->info();
+        }
     }
 }
