@@ -529,18 +529,27 @@ class Importer
     public static function autoLoad($className)
     {
         //        echo '$className:', $className, '<br />';
-        if ('Controller' == substr($className, -10)) { //controller类
-            $controllerName = substr_replace($className, '', -10);
+        $controllerSuffer    = 'Controller';
+        $controllerSufferLen = strlen($controllerSuffer);
+        $daoSuffer           = 'DAO';
+        $daoSufferLen        = strlen($daoSuffer);
+        $serviceSuffer       = 'Service';
+        $serviceSufferLen    = strlen($serviceSuffer);
+        $helperSuffer        = 'Helper';
+        $helperSufferLen     = strlen($helperSuffer);
+
+        if ($controllerSuffer === substr($className, -$controllerSufferLen)) { //controller类
+            $controllerName = substr_replace($className, '', -$controllerSufferLen);
             self::loadController(lcfirst($controllerName));
-        } else if ('DAO' == substr($className, -3)) { //dao类
-            $daoName = substr_replace($className, '', -3);
+        } else if ($daoSuffer === substr($className, -$daoSufferLen)) { //dao类
+            $daoName = substr_replace($className, '', -$daoSufferLen);
             self::loadDAO(lcfirst($daoName));
-        } else if ('Service' == substr($className, -7)) { //service类
-            $serviceName = substr_replace($className, '', -7);
+        } else if ($serviceSuffer === substr($className, -$serviceSufferLen)) { //service类
+            $serviceName = substr_replace($className, '', -$serviceSufferLen);
             self::loadService(lcfirst($serviceName));
-        } else if ('Helper' == substr($className, -6)) { //辅助类
+        } else if ($helperSuffer === substr($className, -$helperSufferLen)) { //辅助类
             //TODO 需要考虑 group moduel 里面的helper？？？  分组下面需要有吗？？？
-            //            $helperName = substr_replace($className, '', -6);
+            //            $helperName = substr_replace($className, '', -$helperSufferLen);
             self::loadHelper(lcfirst($className));
         } else {
 

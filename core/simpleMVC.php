@@ -36,11 +36,13 @@ class SimpleMVC
     }
 
     /**
+     *
      * 将core文件写入到一个文件里面 这样纸需要加载一次就行了。
+     *
+     * @author Jeff Liu
      */
     public static function createBaseFileCache()
     {
-        echo 'useAllInOneCache:',var_export(C('useAllInOneCache', false),1),'<br />';
         if (defined('USE_ALLINONE_CACHE') && USE_ALLINONE_CACHE) {
             $content      = '<?php ';
             $baseFileList = self::getBaseFileList();
@@ -61,13 +63,15 @@ class SimpleMVC
     }
 
     /**
-     * 初始化系统
+     * 初始化框架
+     *
      * @author Jeff Liu
      */
     private static function init()
     {
         self::$frameFileAllInOne = ROOT_PATH . '/public/tmp/~~core.php';
 
+        //注册自动加载
         self::initAutoLoad();
 
         //加载框架文件
@@ -108,19 +112,21 @@ class SimpleMVC
      */
     private static function loadFramewrok()
     {
-        if (file_exists(self::$frameFileAllInOne)) {
+        if (defined('USE_ALLINONE_CACHE') && USE_ALLINONE_CACHE && file_exists(self::$frameFileAllInOne)) {
             Importer::importFileByFullPath(self::$frameFileAllInOne);
         } else if (method_exists('Importer', 'loadFramewrok')) {
             Importer::loadFramewrok();
-            self::createBaseFileCache();
         } else {
-            self::createBaseFileCache();
             $baseFileList = self::getBaseFileList();
             if (is_array($baseFileList)) {
                 foreach ($baseFileList as $file) {
                     Importer::importFileByFullPath($file);
                 }
             }
+        }
+
+        if (defined('USE_ALLINONE_CACHE') && USE_ALLINONE_CACHE) {
+            self::createBaseFileCache();
         }
     }
 
