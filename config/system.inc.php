@@ -7,9 +7,11 @@
  * To change this template use File | Settings | File Templates.
  */
 return array(
-        'actionSuffix'     => 'Action',
-        'controllerSuffix' => 'Controller',
-        'serviceSuffix'    => 'Service',
-        'daoSuffix'        => 'DAO',
-        'helperSuffix'     => 'Helper',
+        'actionSuffix'        => 'Action',
+        'controllerSuffix'    => 'Controller',
+        'serviceSuffix'       => 'Service',
+        'daoSuffix'           => 'DAO',
+        'helperSuffix'        => 'Helper',
+        'controllerParamName' => 'c',
+        'actionParamName'     => 'a',
 );

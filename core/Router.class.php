@@ -82,15 +82,76 @@ class Router
         self::removeMagicQuotes();
     }
 
+
     /**
      * 路由检测
-     * TODO
+     *
      * @access public
      * @return boolean
      */
-    static public function routerCheck()
+    public static function routerCheck()
     {
-        $return = false;
+        $controller = self::getControllerName(null, false);
+        $action     = self::getActionName(null, false);
+        echo $controller, ':', $action, '<br/>';
+        if (C('routerFilterMode', 'none') === 'whiteList') {//白名单
+            //只有 请求的route 在白名单中才可以执行
+            $whiteList = C('routerFilterWhiteList', array());
+            $return    = false;
+            if ($whiteList) {
+                if ('*.*' === $whiteList) {
+                    $return = true;
+                } else {
+                    foreach ($whiteList as $currentRoute) {
+                        $currentRouteController = isset($currentRoute['controller']) ? $currentRoute['controller'] : '*';
+                        $currentRouteAction     = isset($currentRoute['action']) ? $currentRoute['action'] : '*';
+                        if ($currentRouteController === '*' && $currentRouteAction === '*') {
+                            $return = true;
+                            break;
+                        } else if ($currentRouteController === '*' && $action === $currentRouteAction) {
+                            $return = true;
+                            break;
+                        } else if ($currentRouteAction === '*' && $controller === $currentRouteController) {
+                            $return = true;
+                            break;
+                        } else if ($currentRouteController === $controller && $action === $currentRouteAction) {
+                            $return = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        } else if (C('routerFilterMode', 'none') === 'blacklist') {//黑名单
+            //只有 请求的route 不在黑名单中才可以执行
+            $blacklist = C('routerFilterBlackList', array());
+            $return    = true;
+            if ($blacklist) {
+                if ('*.*' === $blacklist) {
+                    $return = false;
+                } else {
+                    foreach ($blacklist as $currentRoute) {
+                        $currentRouteController = isset($currentRoute['controller']) ? $currentRoute['controller'] : '*';
+                        $currentRouteAction     = isset($currentRoute['action']) ? $currentRoute['action'] : '*';
+                        if ($currentRouteController === '*' && $currentRouteAction === '*') {
+                            $return = false;
+                            break;
+                        } else if ($currentRouteController === '*' && $action === $currentRouteAction) {
+                            $return = false;
+                            break;
+                        } else if ($currentRouteAction === '*' && $controller === $currentRouteController) {
+                            $return = false;
+                            break;
+                        } else if ($currentRouteController === $controller && $action === $currentRouteAction) {
+                            $return = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            $return = true;
+        }
+
         return $return;
     }
 
@@ -141,18 +202,40 @@ class Router
      *
      * @param array $info
      *
+     * @param bool  $appendSuffer
+     *
      * @return string
      */
-    public static function getControllerName($info = array())
+    public static function getControllerName($info = array(), $appendSuffer = true)
     {
-        if ($info) {
-            self::$controller = isset($info['controller']) ? $info['controller'] : C('defaultController', 'default');
-        } else {
-            if (empty(self::$controller)) {
-                self::$controller = C('defaultController', 'default');
+
+        if (empty(self::$controller)) {
+            $controllerParamName = C('controllerParamName', 'c');
+            if ($info) {
+                self::$controller = isset($info[$controllerParamName]) ? $info[$controllerParamName] : C(
+                        'defaultController',
+                        'default'
+                );
+            } else {
+                if (isset($_GET[$controllerParamName])) {
+                    $controllerName = $_GET[$controllerParamName];
+                } else if (isset($_POST[$controllerParamName])) {
+                    $controllerName = $_POST[$controllerParamName];
+                } else if (isset($_COOKIE[$controllerParamName])) {
+                    $controllerName = $_COOKIE[$controllerParamName];
+                } else {
+                    $controllerName = C('defaultController', 'default');
+                }
+                self::$controller = $controllerName;
             }
         }
-        return self::$controller . C('controllerSuffix');
+
+        if ($appendSuffer) {
+            $controllerName = self::$controller . C('controllerSuffix');
+        } else {
+            $controllerName = self::$controller;
+        }
+        return $controllerName;
     }
 
     /**
@@ -163,16 +246,33 @@ class Router
      *
      * @return string
      */
-    public static function getActionName($info = array())
+    public static function getActionName($info = array(), $appendSuffer = true)
     {
-        if ($info) {
-            self::$action = isset($info['action']) ? $info['action'] : C('defaultAction', 'index');
-        } else {
-            if (empty(self::$action)) {
-                self::$action = C('defaultAction', 'index');
+        if (empty(self::$action)) {
+            $actionParamName = C('actionParamName', 'a');
+            if ($info) {
+                self::$action = isset($info[$actionParamName]) ? $info[$actionParamName] : C('defaultAction', 'index');
+            } else {
+                if (isset($_GET[$actionParamName])) {
+                    $actionName = $_GET[$actionParamName];
+                } else if (isset($_POST[$actionParamName])) {
+                    $actionName = $_POST[$actionParamName];
+                } else if (isset($_COOKIE[$actionParamName])) {
+                    $actionName = $_COOKIE[$actionParamName];
+                } else {
+                    $actionName = C('defaultAction', 'default');
+                }
+                self::$action = $actionName;
             }
         }
-        return self::$action . C('actionSuffix');
+
+        if ($appendSuffer) {
+            $actionName = self::$action . C('actionSuffix');
+        } else {
+            $actionName = self::$action;
+        }
+
+        return $actionName;
     }
 
 

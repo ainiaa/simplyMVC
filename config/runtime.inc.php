@@ -16,4 +16,15 @@ return array(
     //类自动加载目录 多个目录之间使用逗号分割
         'autoLoadPath'             => CORE_PATH . ',' . CORE_PATH . '/cache/' . ',' . CORE_PATH . '/i18n/' . ',' . CORE_PATH . '/helper/' . ',' . CORE_PATH . '/session/',
         'defaultLocal'             => 'en_us',//默认语言
+
+    //开启 路由过滤
+        'routerFilterMode'         => 'blacklist',//whiteList :开启白名单, blacklist:开启黑名单, none:不过滤
+        'routerFilterWhiteList'    => array(),//需要 routerFilterMode 设置为 whiteList 可用
+        'routerFilterBlackList'    => array(
+                array('controller' => 'page', 'action' => '*'),
+                array('controller' => '*', 'action' => 'test'),
+                array('controller' => 'cc', 'action' => 'ca'),
+        ),//需要 routerFilterMode 设置为 blacklist 可用
+
+        'useAllInOneCache'         => true,//是否使用文件缓存 填写 true 或者 false
 );

@@ -7,7 +7,7 @@
  */
 header('Content-Type:text/html;charset=utf-8');
 
-include dirname(__FILE__) . '/config/runtimeConst.php';
+include dirname(__FILE__) . '/config/runtimeConst.inc.php';
 include CORE_PATH . '/Importer.class.php';
 
 //Importer::importFileByFullPath(ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php');
@@ -15,6 +15,7 @@ include CORE_PATH . '/Importer.class.php';
 class SimpleMVC
 {
 
+    private static $frameFileAllInOne;
 
     /**
      * @author Jeff Liu
@@ -39,17 +40,23 @@ class SimpleMVC
      */
     public static function createBaseFileCache()
     {
-        $content      = '<?php ';
-        $baseFileList = self::getBaseFileList();
-        foreach ($baseFileList as $file) {
-            $currentContent = php_strip_whitespace($file);
-            $currentContent = trim(substr($currentContent, 5)); //去掉<?php
-            if ('?>' == substr($currentContent, -2)) {
-                $currentContent = substr($currentContent, 0, -2);
-            }
-            $content .= $currentContent;
-        }
 
+        if (C('useAllInOneCache', false) === true) {
+            $content      = '<?php ';
+            $baseFileList = self::getBaseFileList();
+            foreach ($baseFileList as $file) {
+                $currentContent = php_strip_whitespace($file);
+                $currentContent = trim(substr($currentContent, 5)); //去掉<?php
+                if ('?>' == substr($currentContent, -2)) {
+                    $currentContent = substr($currentContent, 0, -2);
+                }
+                $content .= $currentContent;
+            }
+
+            if (!is_dir(dirname(self::$frameFileAllInOne))) {//如果 public/tmp目录不存在的会报warning错误
+                mkdir(dirname(self::$frameFileAllInOne) . '/', 0777, true);
+            }
+            file_put_contents(self::$frameFileAllInOne, $content);
         }
     }
 
@@ -59,6 +66,7 @@ class SimpleMVC
      */
     private static function init()
     {
+        self::$frameFileAllInOne = ROOT_PATH . '/public/tmp/~~core.php';
 
         self::initAutoLoad();
 
@@ -100,6 +108,8 @@ class SimpleMVC
      */
     private static function loadFramewrok()
     {
+        if (file_exists(self::$frameFileAllInOne)) {
+            Importer::importFileByFullPath(self::$frameFileAllInOne);
         } else if (method_exists('Importer', 'loadFramewrok')) {
             Importer::loadFramewrok();
             self::createBaseFileCache();

@@ -21,11 +21,18 @@ class Dispatcher
         Router::parseUrl();
 
 
+
+        $checkResult = Router::routerCheck();
+
+        if (!$checkResult) {//路由检测失败
+            throw new Exception('route deny!!!');
+        }
+
         //获得controller
         $controllerName = Router::getControllerName();
 
         //获得controller实例
-        $controller = self::getController($controllerName);
+        $controller = self::getControllerInstance($controllerName);
 
         //获得action
         $actionName = Router::getActionName();
@@ -40,8 +47,6 @@ class Dispatcher
                         'params'     => $params
                 )
         );
-
-
 
         //这一块使用反射是不是太重了？？？
         try {
@@ -97,7 +102,7 @@ class Dispatcher
      *
      * @return object
      */
-    public static function getController($controller_name)
+    public static function getControllerInstance($controller_name)
     {
         $controller = Factory::getInstanceNow($controller_name);
         return $controller;

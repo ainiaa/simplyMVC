@@ -4,7 +4,7 @@ return array(
         CORE_PATH . '/Router.class.php',
         CORE_PATH . '/Factory.class.php',
         CORE_PATH . '/Dispatcher.class.php',
-        CORE_PATH . '/SmvcObjectclass.php',
+        CORE_PATH . '/SmvcObject.class.php',
         CORE_PATH . '/Session.class.php',
         CORE_PATH . '/session/SessionException.class.php',
         CORE_PATH . '/controller/Base.class.php',
