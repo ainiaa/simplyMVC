@@ -10,8 +10,6 @@ header('Content-Type:text/html;charset=utf-8');
 include dirname(__FILE__) . '/config/runtimeConst.inc.php';
 include CORE_PATH . '/Importer.class.php';
 
-//Importer::importFileByFullPath(ROOT_PATH . '/core/helper/SmvcDebugHelper.class.php');
-
 class SimpleMVC
 {
 
