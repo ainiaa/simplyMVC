@@ -61,7 +61,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 添加数据之前的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function preAdd()
     {
@@ -70,7 +70,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 添加数据之后的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function postAdd()
     {
@@ -94,7 +94,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 添加数据之前的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function preMultiAdd()
     {
@@ -102,7 +102,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 添加数据之后的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function postMultiAdd()
     {
@@ -126,7 +126,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 更新数据之前的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function preUpdate()
     {
@@ -135,7 +135,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 更新数据之后的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function postUpdate()
     {
@@ -144,7 +144,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 获得数据
-     * @author jeff liu
+     * @author Jeff Liu
      * powered by jeff 2011-5-31
      *
      * @param array|string $columns
@@ -159,7 +159,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 获得数据之前的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function preGetOne()
     {
@@ -168,7 +168,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 获得数据之后的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function postGetOne()
     {
@@ -188,7 +188,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 获得数据之前的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function preGetAll()
     {
@@ -196,7 +196,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 获得数据之后的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function postGetAll()
     {
@@ -217,7 +217,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 删除数据
-     * @author jeff liu
+     * @author Jeff Liu
      * @see    http://medoo.in/api/delete
      * powered by jeff 2011-5-31
      *
@@ -232,7 +232,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 删除数据之前的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function preDelete()
     {
@@ -240,7 +240,7 @@ class BaseDAO extends SmvcObject
 
     /**
      * 删除数据之后的动作
-     * @author jeff liu
+     * @author Jeff Liu
      */
     protected function postDelete()
     {

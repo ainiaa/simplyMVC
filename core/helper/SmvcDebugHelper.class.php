@@ -2,7 +2,7 @@
 
 /**
  *
- * @author jeff liu
+ * @author Jeff Liu
  */
 class SmvcDebugHelper implements ArrayAccess
 {

@@ -3,7 +3,7 @@
 /**
  *
  * 用于include文件
- * @author jeff liu
+ * @author Jeff Liu
  * TODO 在加载非当前group，module下的controller的时候 还需要注意 对应model和dao初始化问题。。。
  */
 class Importer
@@ -48,7 +48,7 @@ class Importer
 
     /**
      *
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param string $filePath
      *
@@ -522,7 +522,7 @@ class Importer
 
     /**
      * 自动加载
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param String $className 需要加载的类名
      */
@@ -577,7 +577,7 @@ class Importer
 
     /**
      *
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param string $filePath
      *
