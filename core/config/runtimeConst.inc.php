@@ -39,3 +39,5 @@ if (version_compare(PHP_VERSION, '5.2.0', '<')) { //判断php的版本是不是�
 !defined('IS_PUT') && define('IS_PUT', REQUEST_METHOD == 'PUT' ? true : false);
 !defined('IS_DELETE') && define('IS_DELETE', REQUEST_METHOD == 'DELETE' ? true : false);
 !defined('IS_AJAX') && define('IS_AJAX', SimpleMVC::isAjax());
+
+!defined('USE_ALLINONE_CACHE') && define('USE_ALLINONE_CACHE', true);//是否使用文件缓存

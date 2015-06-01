@@ -40,8 +40,8 @@ class SimpleMVC
      */
     public static function createBaseFileCache()
     {
-
-        if (C('useAllInOneCache', false) === true) {
+        echo 'useAllInOneCache:',var_export(C('useAllInOneCache', false),1),'<br />';
+        if (defined('USE_ALLINONE_CACHE') && USE_ALLINONE_CACHE) {
             $content      = '<?php ';
             $baseFileList = self::getBaseFileList();
             foreach ($baseFileList as $file) {
