@@ -2,16 +2,16 @@
 
 /**
  * 任务派发类
- * @author jeff liu
+ * @author Jeff Liu
  */
 class Dispatcher
 {
 
     /**
      * 任务派遣方法
-     * @author jeff liu
-     * @throws ReflectionException
-     * @return boolean
+     * @author Jeff Liu
+     * @return bool
+     * @throws Exception
      */
     public static function dispatch()
     {
@@ -19,8 +19,6 @@ class Dispatcher
          * 解析url
          */
         Router::parseUrl();
-
-
 
         $checkResult = Router::routerCheck();
 
@@ -169,7 +167,7 @@ class Dispatcher
 
     /**
      * 派遣任务后需要执行的动作
-     * @author jeff liu
+     * @author Jeff Liu
      *
      * @param array $info
      */

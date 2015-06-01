@@ -95,61 +95,92 @@ class Router
         $action     = self::getActionName(null, false);
         echo $controller, ':', $action, '<br/>';
         if (C('routerFilterMode', 'none') === 'whiteList') {//白名单
-            //只有 请求的route 在白名单中才可以执行
-            $whiteList = C('routerFilterWhiteList', array());
-            $return    = false;
-            if ($whiteList) {
-                if ('*.*' === $whiteList) {
-                    $return = true;
-                } else {
-                    foreach ($whiteList as $currentRoute) {
-                        $currentRouteController = isset($currentRoute['controller']) ? $currentRoute['controller'] : '*';
-                        $currentRouteAction     = isset($currentRoute['action']) ? $currentRoute['action'] : '*';
-                        if ($currentRouteController === '*' && $currentRouteAction === '*') {
-                            $return = true;
-                            break;
-                        } else if ($currentRouteController === '*' && $action === $currentRouteAction) {
-                            $return = true;
-                            break;
-                        } else if ($currentRouteAction === '*' && $controller === $currentRouteController) {
-                            $return = true;
-                            break;
-                        } else if ($currentRouteController === $controller && $action === $currentRouteAction) {
-                            $return = true;
-                            break;
-                        }
-                    }
-                }
-            }
+            $return = self::routerCheckByWhiteList($controller, $action);
         } else if (C('routerFilterMode', 'none') === 'blacklist') {//黑名单
-            //只有 请求的route 不在黑名单中才可以执行
-            $blacklist = C('routerFilterBlackList', array());
-            $return    = true;
-            if ($blacklist) {
-                if ('*.*' === $blacklist) {
-                    $return = false;
-                } else {
-                    foreach ($blacklist as $currentRoute) {
-                        $currentRouteController = isset($currentRoute['controller']) ? $currentRoute['controller'] : '*';
-                        $currentRouteAction     = isset($currentRoute['action']) ? $currentRoute['action'] : '*';
-                        if ($currentRouteController === '*' && $currentRouteAction === '*') {
-                            $return = false;
-                            break;
-                        } else if ($currentRouteController === '*' && $action === $currentRouteAction) {
-                            $return = false;
-                            break;
-                        } else if ($currentRouteAction === '*' && $controller === $currentRouteController) {
-                            $return = false;
-                            break;
-                        } else if ($currentRouteController === $controller && $action === $currentRouteAction) {
-                            $return = false;
-                            break;
-                        }
-                    }
-                }
-            }
+            $return = self::routerCheckByBlackList($controller, $action);
         } else {
             $return = true;
+        }
+        return $return;
+    }
+
+
+    /**
+     * router检验白名单
+     *
+     * @param $controller
+     * @param $action
+     *
+     * @return bool
+     */
+    public static function routerCheckByWhiteList($controller, $action)
+    {
+        //只有 请求的route 在白名单中才可以执行
+        $whiteList = C('routerFilterWhiteList', array());
+        $return    = false;
+        if ($whiteList) {
+            if ('*.*' === $whiteList) {
+                $return = true;
+            } else {
+                foreach ($whiteList as $currentRoute) {
+                    $currentRouteController = isset($currentRoute['controller']) ? $currentRoute['controller'] : '*';
+                    $currentRouteAction     = isset($currentRoute['action']) ? $currentRoute['action'] : '*';
+                    if ($currentRouteController === '*' && $currentRouteAction === '*') {
+                        $return = true;
+                        break;
+                    } else if ($currentRouteController === '*' && $action === $currentRouteAction) {
+                        $return = true;
+                        break;
+                    } else if ($currentRouteAction === '*' && $controller === $currentRouteController) {
+                        $return = true;
+                        break;
+                    } else if ($currentRouteController === $controller && $action === $currentRouteAction) {
+                        $return = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $return;
+    }
+
+
+    /**
+     * router检验黑名单
+     *
+     * @param $controller
+     * @param $action
+     *
+     * @return bool
+     */
+    public static function routerCheckByBlackList($controller, $action)
+    {
+        //只有 请求的route 不在黑名单中才可以执行
+        $blacklist = C('routerFilterBlackList', array());
+        $return    = true;
+        if ($blacklist) {
+            if ('*.*' === $blacklist) {
+                $return = false;
+            } else {
+                foreach ($blacklist as $currentRoute) {
+                    $currentRouteController = isset($currentRoute['controller']) ? $currentRoute['controller'] : '*';
+                    $currentRouteAction     = isset($currentRoute['action']) ? $currentRoute['action'] : '*';
+                    if ($currentRouteController === '*' && $currentRouteAction === '*') {
+                        $return = false;
+                        break;
+                    } else if ($currentRouteController === '*' && $action === $currentRouteAction) {
+                        $return = false;
+                        break;
+                    } else if ($currentRouteAction === '*' && $controller === $currentRouteController) {
+                        $return = false;
+                        break;
+                    } else if ($currentRouteController === $controller && $action === $currentRouteAction) {
+                        $return = false;
+                        break;
+                    }
+                }
+            }
         }
 
         return $return;
