@@ -9,7 +9,7 @@
 class TestService extends BaseService
 {
     /**
-     * @var TestDAO
+     * @var TestDBDAO
      */
     public $TestDAO;
 
