@@ -26,17 +26,17 @@ interface SmvcLoggerInterface
 
     public function log($info = array( /* 'msg' => '', 'level' => ''*/));
 
-    public function error($info = array( /* 'msg' => ''*/));
+    public function error($info = array( /* 'msg' => '', 'no' => '', 'param' => array()*/));
 
-    public function info($info = array( /* 'msg' => ''*/));
+    public function info($info = array( /* 'msg' => '', 'param' => array()*/));
 
-    public function warn($info = array( /* 'msg' => ''*/));
+    public function warn($info = array( /* 'msg' => '', 'param' => array()*/));
 
-    public function debug($info = array( /* 'msg' => ''*/));
+    public function debug($info = array( /* 'msg' => '', 'param' => array()*/));
 
-    public function notice($info = array( /* 'msg' => ''*/));
+    public function notice($info = array( /* 'msg' => '', 'param' => array()*/));
 
-    public function fatal($info = array( /* 'msg' => ''*/));
+    public function fatal($info = array( /* 'msg' => '', 'no' => '', 'param' => array()*/));
 
     public function write($message);
 

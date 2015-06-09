@@ -37,43 +37,65 @@ class SmvcBaseLogger implements SmvcLoggerInterface
     {
     }
 
-    public function log($info = array( /* 'msg' => '', 'level' => ''*/))
+    /**
+     * @param array $info
+     */
+    public function log($info = array( /* 'msg' => '', 'no' => '', 'param' => array()*/))
     {
         $message = $this->formatMessage($info);
         $this->write($message);
     }
 
-    public function error($info = array( /* 'msg' => ''*/))
+    /**
+     * @param array $info
+     */
+    public function error($info = array( /*'msg' => '', 'no' => '', 'param' => array()*/))
     {
         $info['level'] = 'error';
         $this->log($info);
     }
 
-    public function info($info = array( /* 'msg' => ''*/))
+    /**
+     * @param array $info
+     */
+    public function info($info = array( /* 'msg' => '', 'param' => array()*/))
     {
         $info['level'] = 'info';
         $this->log($info);
     }
 
-    public function warn($info = array( /* 'msg' => ''*/))
+    /**
+     * @param array $info
+     */
+    public function warn($info = array( /* 'msg' => '', 'param' => array()*/))
     {
         $info['level'] = 'warn';
         $this->log($info);
     }
 
-    public function debug($info = array( /* 'msg' => ''*/))
+    /**
+     * @param array $info
+     */
+    public function debug($info = array( /* 'msg' => '', 'param' => array()*/))
     {
         $info['level'] = 'debug';
         $this->log($info);
     }
 
-    public function notice($info = array( /* 'msg' => ''*/))
+    /**
+     * @param array $info
+     */
+    public function notice($info = array( /* 'msg' => '', 'param' => array()*/))
     {
         $info['level'] = 'notice';
         $this->log($info);
     }
 
-    public function fatal($info = array( /* 'msg' => ''*/))
+
+    /**
+     * @param array $info
+     */
+    public function fatal($info = array( /* 'msg' => '', 'no' => '', 'param' => array()*/))
     {
         $info['level'] = 'fatal';
         $this->log($info);
@@ -105,11 +127,25 @@ class SmvcBaseLogger implements SmvcLoggerInterface
         $this->dateFormat = isset($info['dateFormat']) ? $info['dateFormat'] : $this->defaultDateFormat; //$dateFormat;
     }
 
-    public function formatMessage($info = array( /*'level' => '', 'msg' => '', 'format' => ''*/))
-    {
+    /**
+     * 格式化 message
+     *
+     * @param array $info
+     *
+     * @return string
+     */
+    public function formatMessage(
+            $info = array( /*'level' => '', 'msg' => '', 'no' => '', 'param' => array(), 'format' => ''*/)
+    ) {
         $level = isset($info['level']) ? $info['level'] : $this->logLevel;
         $msg   = isset($info['msg']) ? $info['msg'] : '';
-        return "[{$this->getTimestamp()}] [{$level}] {$msg}" . PHP_EOL;
+        $no    = isset($info['no']) ? $info['no'] : null;
+        $param = isset($info['param']) ? $info['param'] : array();
+        if ($param) {
+            return "{$this->getTimestamp()}|{$level}|{$no}|{$msg}|" . var_export($param, 1) . PHP_EOL;
+        } else {
+            return "{$this->getTimestamp()}|{$level}|{$no}|{$msg}" . PHP_EOL;
+        }
     }
 
     /**
