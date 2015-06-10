@@ -8,6 +8,27 @@ class SmvcArrayHelper
 {
 
     /**
+     * @param        $string
+     * @param string $explode
+     *
+     * @return array
+     */
+    public static function trimExplodeArray($string, $explode = ',')
+    {
+        if (is_string($string)) {
+            $string = explode($explode, $string);
+        }
+
+        if (is_array($string)) {
+            foreach ($string as &$v) {
+                is_string($v) && $v = trim($v);
+            }
+        }
+
+        return $string;
+    }
+
+    /**
      * Takes a value and checks if it is a Closure or not, if it is it
      * will return the result of the closure, if not, it will simply return the
      * value.
@@ -699,7 +720,7 @@ class SmvcArrayHelper
             }
         }
 
-        $args[] = & $array;
+        $args[] = &$array;
 
         call_smv_func_array('array_multisort', $args);
         return $array;
@@ -740,7 +761,9 @@ class SmvcArrayHelper
         }
 
         if (!is_array($source) or !is_array($replace)) {
-            throw new Exception('SmvcArrayHelper::replace_key() - $source must an array. $replace must be an array or string.');
+            throw new Exception(
+                    'SmvcArrayHelper::replace_key() - $source must an array. $replace must be an array or string.'
+            );
         }
 
         $result = array();
@@ -875,7 +898,7 @@ class SmvcArrayHelper
     /**
      * Checks if the given array is a multidimensional array.
      *
-     * @param   array    $arr      the array to check
+     * @param   array    $arr     the array to check
      * @param array|bool $allKeys if true, check that all elements are arrays
      *
      * @return  bool   true if its a multidimensional array, false if not
@@ -1207,7 +1230,7 @@ if (!function_exists('call_smv_func_array')) {
             }
         } elseif (is_array($callback) and isset($callback[1]) and is_string($callback[0])) {
             list($class, $method) = $callback;
-//            $class = '\\' . ltrim($class, '\\');//不需要添加 \
+            //            $class = '\\' . ltrim($class, '\\');//不需要添加 \
 
             // calling the method directly is faster then call_user_func_array() !
             switch (count($args)) {
