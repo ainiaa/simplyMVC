@@ -11,13 +11,13 @@ class TestService extends BaseService
     /**
      * @var TestDBDAO
      */
-    public $TestDAO;
+    public $TestDBDAO;
 
     public function getAll()
     {
         $where = array(
                 "id[<]" => 3
         );
-        return $this->TestDAO->getAll('*', $where);
+        return $this->TestDBDAO->getAll('*', $where);
     }
 }
