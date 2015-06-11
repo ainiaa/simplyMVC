@@ -74,12 +74,20 @@ class Router
 
     /**
      * 解析url
-     * TODO
+     *
      * 目前还是使用的tp的代码 还需要整理
      */
     public static function parseUrl()
     {
         self::removeMagicQuotes();
+
+        $g = self::getGroup($_REQUEST);
+
+        $m = self::getModule($_REQUEST);
+
+
+        echo '$g:', $g, '  $m:', $m, '<br />';
+
     }
 
 
@@ -196,8 +204,9 @@ class Router
      */
     public static function getGroup($info = array())
     {
+        $groupParamName = C('groupParamName', 'g');
         if ($info) {
-            self::$group = isset($info['group']) ? $info['group'] : C('defaultGroup', 'frontend');
+            self::$group = isset($info[$groupParamName]) ? $info[$groupParamName] : C('defaultGroup', 'frontend');
         } else {
             if (empty(self::$group)) {
                 self::$group = C('defaultGroup', 'frontend');
@@ -216,8 +225,9 @@ class Router
      */
     public static function getModule($info = array())
     {
+        $moduleParamName = C('moduleParamName', 'm');
         if ($info) {
-            self::$module = isset($info['module']) ? $info['module'] : C('defaultModule', 'default');
+            self::$module = isset($info[$moduleParamName]) ? $info[$moduleParamName] : C('defaultModule', 'default');
         } else {
             if (empty(self::$module)) {
                 self::$module = C('defaultModule', 'default');
