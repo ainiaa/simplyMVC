@@ -41,10 +41,6 @@ class BaseDBDAO extends SmvcObject
     {
         parent::__construct();
 
-        if (empty($this->realTableName)) {
-            $this->tableName = C('DB_PREFIX') . $this->tableName;
-        }
-
         $this->initDb();
     }
 
@@ -67,6 +63,8 @@ class BaseDBDAO extends SmvcObject
                             'password'      => $masterConifg['DB_PASS'],
                     )
             );
+
+            $this->setTableName($masterConifg);
         }
 
         if (empty($this->readerStorage)) {
@@ -82,6 +80,20 @@ class BaseDBDAO extends SmvcObject
                             'password'      => $slaveConifg['DB_PASS'],
                     )
             );
+        }
+    }
+
+
+    /**
+     * @param $dbConfig
+     */
+    private function setTableName($dbConfig)
+    {
+        if (empty($this->realTableName)) {
+            $dbPrefix        = isset($dbConfig['DB_PREFIX']) ? $dbConfig['DB_PREFIX'] : '';
+            $this->tableName = $dbPrefix . $this->tableName;
+        } else {
+            $this->tableName = $this->realTableName;
         }
     }
 

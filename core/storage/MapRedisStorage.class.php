@@ -146,7 +146,7 @@ class MapRedisStorage
      */
     private static function redisHandle($key)
     {
-        $configArray = SC::getRedisClient($key);
+        $configArray = SC::getRedisConfig($key);
 
         if (empty($configArray['serverStatus'])) {
             #   exit ('Redis server is not work! ');

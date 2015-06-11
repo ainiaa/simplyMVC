@@ -7,7 +7,7 @@ return array(
                 'master' => array(//主库
                         array(
                                 'DB_HOST'   => 'localhost', //数据库HOST
-                                'DB_NAME'   => 'test', //数据库名
+                                'DB_NAME'   => 'smvc_test_master', //数据库名
                                 'DB_PORT'   => '3306', //数据库端口
                                 'DB_PREFIX' => 'smvc_',
                                 'DB_TYPE'   => 'mysql',
@@ -18,7 +18,7 @@ return array(
                 'slave'  => array(//从库
                         array(
                                 'DB_HOST'   => 'localhost', //数据库HOST
-                                'DB_NAME'   => 'test', //数据库名
+                                'DB_NAME'   => 'smvc_test_slave', //数据库名
                                 'DB_PORT'   => '3306', //数据库端口
                                 'DB_PREFIX' => 'smvc_',
                                 'DB_TYPE'   => 'mysql',
@@ -27,7 +27,7 @@ return array(
                         ),
                         array(
                                 'DB_HOST'   => 'localhost', //数据库HOST
-                                'DB_NAME'   => 'test', //数据库名
+                                'DB_NAME'   => 'smvc_test_slave', //数据库名
                                 'DB_PORT'   => '3306', //数据库端口
                                 'DB_PREFIX' => 'smvc_',
                                 'DB_TYPE'   => 'mysql',
@@ -36,7 +36,7 @@ return array(
                         ),
                         array(
                                 'DB_HOST'   => 'localhost', //数据库HOST
-                                'DB_NAME'   => 'test', //数据库名
+                                'DB_NAME'   => 'smvc_test_slave', //数据库名
                                 'DB_PORT'   => '3306', //数据库端口
                                 'DB_PREFIX' => 'smvc_',
                                 'DB_TYPE'   => 'mysql',

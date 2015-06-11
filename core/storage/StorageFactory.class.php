@@ -8,14 +8,22 @@ class StorageFactory
     const DBNAME_GIFT = 'fs_dev_interaction';
     const DBNAME_CONFIG = 'fs_configs_zh';
 
-    public static function getDbClient($key)
+    /**
+     * 获得数据库实例
+     *
+     * @param $key
+     *
+     * @return mixed
+     */
+    public static function getDbConfig($key)
     {
         $splitKey = self::splitMapKey($key);
         if (!isset($splitKey[1])) {
             return Logger::getInstance()->error(
-                    array('msg'   => 'SConf001',
-                          'no'    => 'SConf001',
-                          'param' => array('paramString' => 'key  no split ' . $key)
+                    array(
+                            'msg'   => 'SConf001',
+                            'no'    => 'SConf001',
+                            'param' => array('paramString' => 'key  no split ' . $key)
                     )
             );
         }
@@ -55,7 +63,14 @@ class StorageFactory
         return $db;
     }
 
-    public static function getMcClient($key)
+    /**
+     * 获得memcache / memcached 实例
+     *
+     * @param $key
+     *
+     * @return mixed
+     */
+    public static function getMcConfig($key)
     {
         $splitKey = self::splitMapKey($key);
         if (!isset($splitKey[1])) {
@@ -105,14 +120,22 @@ class StorageFactory
         return $mc;
     }
 
-    public static function getRedisClient($key)
+    /**
+     * 获得redis 实例
+     *
+     * @param $key
+     *
+     * @return mixed
+     */
+    public static function getRedisConfig($key)
     {
         $splitKey = self::splitMapKey($key);
         if (!isset($splitKey[1])) {
             return Logger::getInstance()->error(
-                    array('msg'   => 'SConf003',
-                          'no'    => 'SConf003',
-                          'param' => array('paramString' => 'key  no split ' . $key)
+                    array(
+                            'msg'   => 'SConf003',
+                            'no'    => 'SConf003',
+                            'param' => array('paramString' => 'key  no split ' . $key)
                     )
             );
         }
@@ -153,13 +176,19 @@ class StorageFactory
         return $redis;
     }
 
+    /**
+     * @param $code
+     *
+     * @return mixed
+     */
     public static function getKeyMapStorage($code)
     {
         if (empty(self::$keyMapStorage[$code])) {
             return Logger::getInstance()->error(
-                    array('msg'   => 'SConf003',
-                          'no'    => 'SConf003',
-                          'param' => array('paramString' => 'code no Map storage : ' . $code)
+                    array(
+                            'msg'   => 'SConf003',
+                            'no'    => 'SConf003',
+                            'param' => array('paramString' => 'code no Map storage : ' . $code)
                     )
             );
         }
@@ -167,24 +196,34 @@ class StorageFactory
         return self::$keyMapStorage[$code];
     }
 
+
+    /**
+     * @return array
+     */
     public static function getAllKeyMapStorage()
     {
         return self::$keyMapStorage;
     }
 
+
+    /**
+     * @param        $key
+     * @param string $separtor
+     *
+     * @return array
+     */
     public static function splitMapKey($key, $separtor = '/')
     {
         $result = explode($separtor, $key);
-        #   if (count($result) > 2)
-        #   {
-        #       $tmp[0] =   $result[0];
-        #       unset($result[0]);
-        #       $tmp[1] =   implode($separtor, $result);
-        #       $result =   $tmp;
-        #   }
         return $result;
     }
 
+    /**
+     * @param        $splitKey
+     * @param string $separtor
+     *
+     * @return string
+     */
     public static function mergeKey($splitKey, $separtor = '')
     {
         if (count($splitKey) > 2) {
@@ -196,6 +235,11 @@ class StorageFactory
         return $result;
     }
 
+    /**
+     * @param $key
+     *
+     * @return array|null
+     */
     public static function getSplitLib($key)
     {
         if (empty(self::$splitLibMapSwitch)) {
@@ -273,20 +317,16 @@ class StorageFactory
     #   #   'DB-REDIS'      #   REDIS 缓存，DB后备
     #   
     # Key => Storage    
-    private static $keyMapStorage = array(
-    );
+    private static $keyMapStorage = array();
 
     # DB Index List
-    private static $dbIndexList = array(
-    );
+    private static $dbIndexList = array();
 
     # Mc Index List     
-    private static $mcIndexList = array(
-    );
+    private static $mcIndexList = array();
 
     # Redis Index List  
-    private static $redisIndexList = array(
-    );
+    private static $redisIndexList = array();
 
 }
 

@@ -810,7 +810,7 @@ class MapDbStorage
      */
     private static function dbHandle($key)  
     {
-        $configArray = SC::getDbClient($key);
+        $configArray = SC::getDbConfig($key);
         if (empty(SC::$dbHostConfig[$configArray['clientServer']])) {
             #   exit ('DB server is not exist! ');
             #      'MDS001';

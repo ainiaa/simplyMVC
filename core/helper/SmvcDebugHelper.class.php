@@ -112,7 +112,7 @@ class SmvcDebugHelper implements ArrayAccess
         }
         $debugLevel = strtolower($debugLevel); //默认应该是log
         if (!in_array($debugLevel, array('log', 'info', 'error', 'warn'), true)) {
-            $debugLevel = 'dump';
+            $debugLevel = 'log';
         }
         return $this->debugInstance->$debugLevel($info, $label, $options);
     }

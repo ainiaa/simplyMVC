@@ -27,8 +27,6 @@ return array(
                 array('controller' => 'cc', 'action' => 'ca'),
         ),//需要 routerFilterMode 设置为 blacklist 可用
 
-        'useAllInOneCache'         => true,//是否使用文件缓存 填写 true 或者 false
-
         'DEFAULT_CACHE_TIME'       => 86400,//默认缓存时间
         'SECOND_30'                => 30,//30秒
         'MINUTE_1'                 => 60,//1分钟

@@ -292,7 +292,7 @@ class MapMemcacheStorage
             return null;
         }
 
-        $configArray = SC::getMcClient($key);
+        $configArray = SC::getMcConfig($key);
 
         if (empty($configArray['serverStatus'])) {
             #   exit ('Mc server is not work! ');

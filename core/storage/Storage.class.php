@@ -95,7 +95,7 @@ class Storage
 
     private static function getManyDbDataToManyMc($param)
     {
-        $dbConfig = SC::getDbClient($param['key']);
+        $dbConfig = SC::getDbConfig($param['key']);
         if (!empty(AC::$errorNo)) {
             return Logger::getInstance()->error(
                     array('msg' => 'SL006', 'no' => 'SL006', 'param' => array('paramString' => 'SL006'))
@@ -123,7 +123,7 @@ class Storage
 
     private static function getManyDbDataToMc($param)
     {
-        $dbConfig = SC::getDbClient($param['key']);
+        $dbConfig = SC::getDbConfig($param['key']);
         if (!empty(AC::$errorNo)) {
             return Logger::getInstance()->error(
                     array('msg' => 'SL010', 'no' => 'SL010', 'param' => array('paramString' => 'SL010'))
@@ -280,7 +280,7 @@ class Storage
             return null;
         }
 
-        $mcConfig = SC::getMcClient($param['key']);
+        $mcConfig = SC::getMcConfig($param['key']);
         if (empty($mcConfig['primary']) || empty($param['where'][$mcConfig['primary']])) {
             return $result;
         }
@@ -334,7 +334,7 @@ class Storage
             return null;
         }
 
-        $mcConfig = SC::getMcClient($param['key']);
+        $mcConfig = SC::getMcConfig($param['key']);
         if (empty($mcConfig['primary']) || empty($param['where'][$mcConfig['primary']])) {
             MapMemcacheStorage::remove($param);
             return $result;
@@ -424,7 +424,7 @@ class Storage
             return true;
         }
 
-        $mcConfig = SC::getMcClient($param['key']);
+        $mcConfig = SC::getMcConfig($param['key']);
         if (empty($mcConfig['primary'])) {
             return self::delMcData($param);
         }
@@ -452,7 +452,7 @@ class Storage
             return true;
         }
 
-        $mcConfig = SC::getMcClient($param['key']);
+        $mcConfig = SC::getMcConfig($param['key']);
         if (empty($mcConfig['primary'])) {
             return self::delMcData($param);
         }
@@ -482,7 +482,7 @@ class Storage
             return true;
         }
 
-        $mcConfig = SC::getMcClient($param['key']);
+        $mcConfig = SC::getMcConfig($param['key']);
         if (empty($mcConfig['primary'])) {
             return self::delMcData($param);
         }
@@ -652,7 +652,7 @@ class Storage
     {
         $result = self::$loopArray[0]($param);
         if (is_array($result) && isset($param['where'])) {
-            $mcConfig = SC::getMcClient($param['key']);
+            $mcConfig = SC::getMcConfig($param['key']);
             if (isset($mcConfig['primary']) && isset($param['where'][$mcConfig['primary']])) {
                 $key = $param['where'][$mcConfig['primary']];
                 isset($result[$key]) && $result = $result[$key];
@@ -695,7 +695,7 @@ class Storage
         if (empty($loopArray['format'])) {
             return null;
         }
-        $mcConfig = SC::getMcClient($param['key']);
+        $mcConfig = SC::getMcConfig($param['key']);
 
         $resultData = null;
         if (isset($loopArray['mc']) && isset($param['value'])) {
@@ -828,7 +828,7 @@ class Storage
         if (empty($value) || !is_array($value)) {
             return $value;
         }
-        $mcConfig = SC::getMcClient($key);
+        $mcConfig = SC::getMcConfig($key);
         if (empty($mcConfig['primary'])) {
             return false;
         }
@@ -865,7 +865,7 @@ class Storage
         if (empty($value) || !is_array($value)) {
             return $value;
         }
-        $mcConfig = SC::getMcClient($key);
+        $mcConfig = SC::getMcConfig($key);
         if (empty($mcConfig['primary'])) {
             return false;
         }
