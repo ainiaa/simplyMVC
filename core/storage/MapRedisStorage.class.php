@@ -845,15 +845,6 @@ class MapRedisStorage
      */
     private static function sendErrorLog($result, $param)
     {
-        if (empty($result)) {
-            /*$statLog = array(
-                'tag'   =>  'trackData',
-                'tid'   =>  'redis|'. self::$redisClient. ':userSplitLib:'. DOP::encodeData(AC::$userSplitLib),
-                'item'  =>  DOP::encodeData($param),
-            );
-
-            GK::gatherStatLog($statLog);*/
-        }
     }
 }
 

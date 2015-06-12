@@ -24,7 +24,17 @@ class Dispatcher
 
         if (!$checkResult) {//路由检测失败
             throw new Exception('route deny!!!');
+        } else {
+            //设置  usersplit
+            self::setRuntimeConst();
+            /**
+             * @var UserSplitService
+             */
+            $userSplitService = Factory::getInstanceNow('UserSplitService');
+            $userSplit = $userSplitService->getUserSplit(USER_ID);
+            LocalCache::setData('userSplit', $userSplit);
         }
+
 
         //获得controller
         $controllerName = Router::getControllerName();
@@ -91,6 +101,17 @@ class Dispatcher
         ); //todo 需要重新实现
         return;
     }
+
+    /**
+     * 设置运行时 常量 todo 还需要处理
+     */
+    private static function setRuntimeConst()
+    {
+        if (!defined('USER_ID')) {
+            define('USER_ID', 1);//TODO 怎么获得uid
+        }
+    }
+
 
     /**
      * 获得controller 实例

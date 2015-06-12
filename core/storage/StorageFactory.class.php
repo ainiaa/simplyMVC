@@ -49,8 +49,9 @@ class StorageFactory
             $db['clientServer'] = $config['indexList'][$tableSuffix];
         }
 
-        if (self::$splitLibMapSwitch && !empty($config['splitLib']) && isset(AC::$userSplitLib['db'])) {
-            isset(self::$splitLibMapServer[AC::$userSplitLib['db']]) && $db['clientServer'] = self::$splitLibMapServer[AC::$userSplitLib['db']];
+        $userSplitLib = self::getRealSplitLib();
+        if (self::$splitLibMapSwitch && !empty($config['splitLib']) && isset($userSplitLib['db'])) {
+            isset(self::$splitLibMapServer[$userSplitLib['db']]) && $db['clientServer'] = self::$splitLibMapServer[$userSplitLib['db']];
         }
 
         $db['mapPrefix'] = $splitKey[0];
@@ -62,6 +63,36 @@ class StorageFactory
 
         return $db;
     }
+
+    private static $userSplitLib;
+
+
+    /**
+     * 获得userSplitLib
+     *
+     * @param $uId
+     *
+     * @return mixed
+     */
+    public static function getUserSplitLib($uId)
+    {
+        if (!isset(self::$userSplitLib[$uId])) {
+            self::$userSplitLib[$uId] = self::getSplitLib($uId);
+        }
+        return self::$userSplitLib[$uId];
+    }
+
+
+    /**
+     * 获得最终的 split配置项
+     * @return mixed
+     */
+    public static function getRealSplitLib()
+    {
+        $uId = 0;//这个需要处理
+        return self::getUserSplitLib($uId);
+    }
+
 
     /**
      * 获得memcache / memcached 实例
@@ -106,7 +137,7 @@ class StorageFactory
         $mc['primary']      = $config['primary'];
 
         if (empty($config['expire'])) {
-            $mc['expire'] = C('DEFAULT_CACHE_TIME', '3600');
+            $mc['expire'] = C('DEFAULT_CACHE_TIME', 3600);
         } else {
             $mc['expire'] = $config['expire'];
         }
@@ -163,8 +194,9 @@ class StorageFactory
         $redis['selectDb']     = $config['select'];
         $redis['clientServer'] = $config['indexList'][$redisIndex];
 
-        if (self::$splitLibMapSwitch && !empty($config['splitLib']) && isset(AC::$userSplitLib['redis'])) {
-            isset(self::$splitLibMapServer[AC::$userSplitLib['redis']]) && $redis['clientServer'] = self::$splitLibMapServer[AC::$userSplitLib['redis']];
+        $userSplitLib = self::getRealSplitLib();
+        if (self::$splitLibMapSwitch && !empty($config['splitLib']) && isset($userSplitLib['redis'])) {
+            isset(self::$splitLibMapServer[$userSplitLib['redis']]) && $redis['clientServer'] = self::$splitLibMapServer[$userSplitLib['redis']];
         }
 
         if (!empty($config['assemble']) && isset($splitKey[1])) {
@@ -252,28 +284,29 @@ class StorageFactory
 
     # split Lib Map Switch
     # lib server 此处DB,Redis参与Split的配置，都必须同步设置，包括数量一直和key从a,b 开始一致，不参与的server 从z,y,x 等倒排序使用
-    public static $splitLibMapSwitch = false;
-    public static $splitLibMapServer = null;
+    public static $splitLibMapSwitch = true;
+    public static $splitLibMapServer = array(0 => 'a', 1 => 'b');
+    public static $splitLibMapRedis = array(0 => 'a', 1 => 'a', '2' => 'b');
 
-    # DB Host Config    
+    # DB Host Config
     public static $dbHostConfig = array(
-            'a' => array('host' => '172.17.0.24', 'port' => '3306', 'user' => 'php', 'passwd' => 'shinezone2008'),
-            'b' => array('host' => '172.17.0.24', 'port' => '3306', 'user' => 'php', 'passwd' => 'shinezone2008'),
+            'a' => array('host' => '127.0.0.1', 'port' => '3306', 'user' => 'php', 'passwd' => '123456'),
+            'b' => array('host' => '127.0.0.1', 'port' => '3306', 'user' => 'php', 'passwd' => '123456'),
     );
-    # Mc Host Config    
+    # Mc Host Config
     public static $mcHostConfig = array(
-            'a' => array('host' => '172.17.0.80', 'port' => '11210'),
-            'b' => array('host' => '172.17.0.80', 'port' => '11210'),
-    );
-    # Redis Host Config     
+            'a' => array('host' => '127.0.0.1', 'port' => '11210'),
+            'b' => array('host' => '127.0.0.1', 'port' => '11210'),
+    );/*}}}*/
+    # Redis Host Config
     public static $redisHostConfig = array(
-            'a' => array('host' => '172.17.0.80', 'port' => '6370'),
-            'b' => array('host' => '172.17.0.80', 'port' => '6370'),
+            'a' => array('host' => '127.0.0.1', 'port' => '6370'),
+            'b' => array('host' => '127.0.0.1', 'port' => '6370'),
     );
 
     # Log Server Config 
     public static $logServerConfig = array(
-            'host'          => '172.17.0.80',
+            'host'          => '127.0.0.1',
             'port'          => '6001',
             'connTimeOut'   => 5,
             'sendTimeOut'   => 5,

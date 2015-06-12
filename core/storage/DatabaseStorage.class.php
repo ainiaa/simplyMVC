@@ -3,7 +3,7 @@
 class DatabaseStorage
 {
     /**
-     * @var PDO
+     * @var PDO  真正的db
      */
     private static $dbHandle;
 
@@ -39,6 +39,13 @@ class DatabaseStorage
         return $result;
     }
 
+    /**
+     * 获得多条记录
+     *
+     * @param string $sql 需要执行的sql语句
+     *
+     * @return array|bool
+     */
     public function getManyResult($sql)
     {
         $result = false;
@@ -56,11 +63,22 @@ class DatabaseStorage
         return $result;
     }
 
+    /**
+     * 获得最后一次插入的id
+     * @return int
+     */
     public function getInsertId()
     {
         return $this->dbLink->lastInsertId();
     }
 
+    /**
+     * 执行sql（更新操作）
+     *
+     * @param $sql
+     *
+     * @return bool|int|PDOStatement
+     */
     public function dbExec($sql)
     {
         $result = false;
@@ -83,7 +101,7 @@ class DatabaseStorage
             return $line;
         } else {
             $error  = $result->errorInfo();
-            $string = $sql . '-' . DOP::encodeData($error);
+            $string = $sql . '-' . SmvcUtilHelper::encodeData($error);
             return Logger::getInstance()->error(
                     array('msg' => $string, 'no' => 'DBS001', 'param' => array('paramString' => $string))
             );
@@ -91,7 +109,7 @@ class DatabaseStorage
     }
 
     /**
-     * 执行sql查询
+     * 执行查询sql(查询)
      *
      * @param string $sql
      *

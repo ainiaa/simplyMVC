@@ -11,6 +11,9 @@
 class BaseDBDAO extends SmvcObject
 {
 
+    protected static $writeKey = 'db.master';
+    protected static $readKey = 'db.slave';
+
     protected $tableName = '';
     protected $realTableName = '';
 
@@ -41,18 +44,33 @@ class BaseDBDAO extends SmvcObject
     {
         parent::__construct();
 
+        if (empty(self::$writeKey) || !is_scalar(self::$writeKey)) {
+            self::$writeKey = 'db.master';
+        }
+
+        if (empty(self::$readKey) || !is_scalar(self::$readKey)) {
+            self::$readKey = 'db.slave';
+        }
+
         $this->initDb();
     }
 
     /**
      * todo 数据库 原理上来说可以通用。可以提到一个公用的地方 统一处理
+     *
      * @return medoo
      */
     public function initDb()
     {
+        $dbMasterConfig = C(self::$writeKey);
+        $userSplit      = LocalCache::getData('userSplit');
+        if ($userSplit) {
+            $masterIndex = isset($userSplit['db']) ? $userSplit['db'] : 0;
+        } else {
+            $masterIndex = array_rand($dbMasterConfig);
+        }
+
         if (empty($this->writerStorage)) {
-            $dbMasterConfig      = C('db.master');
-            $masterIndex         = array_rand($dbMasterConfig);
             $masterConifg        = $dbMasterConfig[$masterIndex];
             $this->writerStorage = new medoo(
                     array(
@@ -68,9 +86,9 @@ class BaseDBDAO extends SmvcObject
         }
 
         if (empty($this->readerStorage)) {
-            $dbSlaveConfig       = C('db.slave');
-            $slaveIndex          = array_rand($dbSlaveConfig);
-            $slaveConifg         = $dbSlaveConfig[$slaveIndex];
+            $dbSlaveConfig       = C(self::$readKey);
+            $slaveIndex          = array_rand($dbSlaveConfig[$masterIndex]);
+            $slaveConifg         = $dbSlaveConfig[$masterIndex][$slaveIndex];
             $this->readerStorage = new medoo(
                     array(
                             'database_type' => $slaveConifg['DB_TYPE'],
@@ -97,6 +115,11 @@ class BaseDBDAO extends SmvcObject
         }
     }
 
+    /**
+     * 设置最后一次 storage type
+     *
+     * @param $type
+     */
     public function setLatestStorageType($type)
     {
         if ($type === self::LATEST_STORAGE_WRITER || $type === self::LATEST_STORAGE_READER) {
@@ -104,6 +127,11 @@ class BaseDBDAO extends SmvcObject
         }
     }
 
+    /**
+     * 获得最后一次的storage type
+     *
+     * @return String
+     */
     public function getLatestStorageType()
     {
         return $this->latestStorageType;
@@ -472,4 +500,5 @@ class BaseDBDAO extends SmvcObject
             return $this->writerStorage->info();
         }
     }
+
 }
