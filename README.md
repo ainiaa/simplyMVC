@@ -27,10 +27,10 @@
    * memcache <font color="green">`done`</font>
    * redis <font color="green">`done`</font>
 
-6、db的 具体实现   `pending` -- optional <font color="red">implement this at first of all</font>
+6、db的 具体实现   `done`
 
-   * db 分库   `pending`
-   * db 分表   `pending`
+   * db 分库   `done`
+   * db 分表   `done`
 
 7、ORM的具体实现   `pending`   -- optional
 
