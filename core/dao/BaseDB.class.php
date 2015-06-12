@@ -33,9 +33,15 @@ class BaseDBDAO extends SmvcObject
      */
     protected $latestStorageType = null;
 
+
+    protected $pk = null;
+
+    protected $sk = null;
+
     const LATEST_STORAGE_WRITER = 1;
 
     const LATEST_STORAGE_READER = 2;
+
 
 
     protected $storageType = null;
@@ -54,6 +60,74 @@ class BaseDBDAO extends SmvcObject
 
         $this->initDb();
     }
+
+
+    /**
+     * 是否为1：n的关系
+     *
+     * @return bool
+     */
+    public function isMulit()
+    {
+        return null !== $this->sk;
+    }
+
+
+    /**
+     * 根据给定的主键值或由主键值组成的数组，删除相应的记录。
+     *
+     * @param mixed $condition 主键值或主键值数组。
+     *
+     * @return boolean
+     */
+    public function deleteByPk($condition)
+    {
+        //若当前表有辅助主键，且传进来的参数是数组，数组长度大于1
+
+        $where = sprintf('%s=%s', $this->pk, $condition[$this->pk]);
+        if ($this->isMulit() && isset($condition[$this->sk])) {
+            $where .= sprintf('AND %s="%s"', $this->sk, $condition[$this->sk]);
+        }
+        $ret = $this->delete($where);
+        return $ret;
+    }
+
+
+    /**
+     * 通过主键获取数据。
+     *
+     * @param mixed $pk 主键信息。
+     * @param array $pinfo
+     *
+     * @return  array
+     */
+    public function getByPk($pk)
+    {
+        $where      = sprintf('%s=%s', $this->pk, $pk);
+        $originData = $this->getAll('*', $where);
+        if ($this->isMulit()) {
+            $originData = $this->format($originData);
+        }
+        return $originData;
+    }
+
+    /**
+     * 格式化数据
+     *
+     * @param array $datas
+     *
+     * @return mixed
+     */
+    private function format($datas)
+    {
+        $ret = array();
+        foreach ($datas as $data) {
+            $sk       = $data[$this->sk];
+            $ret[$sk] = $data;
+        }
+        return $ret;
+    }
+
 
     /**
      * todo 数据库 原理上来说可以通用。可以提到一个公用的地方 统一处理

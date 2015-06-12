@@ -1,0 +1,366 @@
+<?php
+
+/**
+ * Class DBRedisDAO Redis DB 数据存储类   (redis左右db的缓存)
+ * @author  Jeff Liu
+ * @version 0.1
+ */
+abstract class BaseRedisDBDAO extends BaseDBDAO
+{
+    /**
+     * @var LocalCache
+     */
+    private $localCache;
+
+    protected $uId;
+
+    /**
+     * 构造函数
+     *
+     * @param null $mode 抛弃
+     * @param null $uid  抛弃
+     */
+    public function __construct($mode = null, $uid = null)
+    {
+        $this->localCache = LocalCache::getData($this->_table);
+        $this->uId        = LocalCache::getData('uId');
+        parent::__construct();
+    }
+
+    /**
+     * todo 这个需要处理
+     * 初始化系统, 分表等
+     *
+     * @param number $uid
+     */
+    protected function init($uid)
+    {
+        $this->uid = $uid;
+    }
+
+    /**
+     * 获得cache主键
+     * @return string
+     */
+    private function getPK()
+    {
+        return $this->_table . ':' . $this->uId;
+    }
+
+    /**
+     * 添加数据
+     *
+     * @param array $datas
+     *
+     * @return mixed
+     */
+    public function add($datas, $getLastInsertId = false)
+    {
+        return $this->addData($datas, $getLastInsertId);
+    }
+
+    /**
+     * 添加数据
+     *
+     * @param array $datas
+     *
+     * @throws Exception
+     * @return int
+     */
+    public function addData($datas, $getLastInsertId = false)
+    {
+        if (isset($datas[$this->pk])) {
+            $pk = $datas[$this->pk];
+            $this->init($pk);
+
+            $datas = array_merge($this->_tStructure_dValue, $datas);
+            $ret   = parent::add($datas);
+
+            if ($ret > 0) {
+                $key = $this->getPK();
+                if ($this->isMulit()) {
+                    $sk = $datas[$this->sk];
+                    if (isset($this->localCache[$key])) {
+                        $tem                    = $this->localCache[$key];
+                        $tem[$sk]               = $datas;
+                        $this->localCache[$key] = $tem;
+                    }
+
+                    if ($this->redis->exists($key)) {
+                        $this->redis->hMset($key, array($sk => $datas));
+                    }
+                } else {
+                    $this->localCache[$key] = $datas;
+                    $this->redis->hMset($key, $datas);
+                }
+            } else {
+                $this->errorInfo(__METHOD__, func_get_args());
+            }
+            return $ret;
+        } else {
+            throw new Exception('pk empty');
+        }
+    }
+
+    /**
+     * 更新数据(必须包含Pk字段)
+     *
+     * @param array $currentData
+     * @param array $pinfo
+     *
+     * @return int
+     */
+    public function updateByPk($currentData, $pinfo = array())
+    {
+        $pk = $currentData[$this->pk];
+        if (count($this->_tStructure_dValue) !== count($currentData)) {    //不完整完整字段, 合并更新
+
+            $where = sprintf('%s=%s', $this->pk, $currentData[$this->pk]);
+
+            if ($this->isMulit()) {
+                $originData = $this->get($currentData[$this->pk], $currentData[$this->sk]);
+                $where      = sprintf(' AND %s="%s"', $this->sk, $currentData[$this->sk]);
+                unset($currentData[$this->pk], $currentData[$this->sk]);
+            } else {
+                $originData = $this->getByPk($pk);
+                unset($currentData[$this->pk]);
+            }
+
+            $ret = parent::update($currentData, $where);
+
+            if ($originData) {
+                $currentData = array_merge($originData, $currentData);
+                unset($originData);
+            }
+        } else {
+            $ret = parent::update($currentData, $pinfo);
+        }
+
+        $key = $this->getPK();
+
+        if ($this->isMulit()) {
+            $sk = $currentData[$this->sk];
+
+            $tmp                    = $this->localCache[$key];
+            $tmp[$sk]               = $currentData;
+            $this->localCache[$key] = $tmp;
+
+            $this->redis->hMset($key, array($sk => $currentData));
+
+            unset($sk, $tmp);
+        } else {
+            $this->localCache[$key] = $currentData;
+            $this->redis->hMset($key, $currentData);
+        }
+
+        unset($currentData, $key);
+        return $ret;
+    }
+
+
+    /**
+     * 按照主键获取数据
+     *
+     * @param mixed $pk
+     * @param array $pinfo
+     *
+     * @return array|mixed
+     */
+    public function getByPk($pk, $pinfo = array())
+    {
+        if (is_array($pk)) {
+            unset($pinfo);
+            return $this->getBySk($pk);
+        } else {
+            $this->uid = $pk;
+            $key       = $this->getPK();
+            if (!isset($this->localCache[$key])) {
+                $this->init($pk);
+                if ($this->isMulit()) {
+                    $datas = $this->redis->hGetAll($key);
+                } else {
+                    $datas = $this->redis->hGets($key);
+                }
+                if (!$datas) {
+                    $datas = parent::getByPk($pk, $pinfo);
+
+                    if ($datas) {
+                        $this->redis->hMset($key, $datas);
+                    }
+
+                    return $datas;
+                } else {
+                    $this->localCache[$key] = $datas;
+
+                    return $datas;
+                }
+            } else {
+                return $this->localCache[$key];
+            }
+        }
+    }
+
+    /**
+     * 删除数据，直接调用bypk
+     *
+     * @param       $ids
+     * @param array $pinfo
+     *
+     * @return bool
+     */
+    public function deleteBySk($ids, $pinfo = array())
+    {
+        return $this->deleteByPk($ids, $pinfo);
+    }
+
+    /**
+     * 根据给定的主键值或由主键值组成的数组，删除相应的记录。
+     *
+     * @param mixed $condition 主键值或主键值数组。
+     * @param array $pinfo
+     *
+     * @return boolean
+     */
+    public function deleteByPk($condition, $pinfo = array())
+    {
+        if (is_array($condition)) {
+            $pk = $condition[$this->pk];
+            $this->init($pk);
+            $sk  = $condition[$this->sk];
+            $key = $this->getPK($pk);
+            $ret = parent::deleteByPk($condition, $pinfo);
+
+            if ($ret > 0) {
+                //清除缓存
+                $this->redis->hdel($key, $sk);
+
+                if (isset($this->localCache[$key])) {   //清除本地缓存
+                    $tem = $this->localCache[$key];
+                    unset($tem[$sk]);
+                    $this->localCache[$key] = $tem;
+                }
+            } else {
+                $this->errorInfo(__METHOD__, func_get_args());
+            }
+        } else {
+            $this->init($condition);
+            $key = $this->getPK($condition);
+            $ret = parent::deleteByPk($condition, $pinfo);
+
+            if ($ret > 0) {
+                $this->redis->delete($key);
+                unset($this->localCache[$key]);
+            } else {
+                $this->errorInfo(__METHOD__, func_get_args());
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
+     * 错误信息记录
+     */
+    private function errorInfo($method, $params)
+    {
+        $class = get_called_class();
+        list(, $method) = explode('::', $method);
+        $methodInfo = $class . '->' . $method . '(' . var_export($params, 1) . ')';
+        echo $methodInfo;
+    }
+
+    /**
+     * 根据联合主键查询数据
+     *
+     * @param number $pkid
+     * @param number $skid
+     *
+     * @return array
+     */
+    public function get($pkid, $skid)
+    {
+        $infos = array(
+                $this->pk => $pkid,
+                $this->sk => $skid
+        );
+
+        return $this->getBySk($infos);
+    }
+
+    /**
+     * 读取单个用户或者联合主键数据
+     *
+     * @param number|array $infos
+     *
+     * @return array
+     */
+    public function getBySk($infos)
+    {
+        if (is_array($infos)) {
+            $uid = isset($infos[$this->pk]) ? $infos[$this->pk] : null;
+            $sk  = isset($infos[$this->sk]) ? $infos[$this->sk] : null;
+            $this->init($uid);
+
+            $key = $this->getPK();
+
+            if (!isset($this->localCache[$key])) {
+                $datas = $this->redis->hGetAll($key);
+
+                if (!$datas) {
+                    $datas = parent::getByPk($uid);
+                    if ($datas) {   //fix local & redis cache
+                        $this->redis->hMset($key, $datas);
+                        $this->localCache[$key] = $datas;
+                    }
+                } else {   //fix local cache
+                    $this->localCache[$key] = $datas;
+                }
+
+                return isset($datas[$sk]) ? $datas[$sk] : null;
+            } else {
+                return isset($this->localCache[$key][$sk]) ? $this->localCache[$key][$sk] : null;
+            }
+        } else {
+            $this->init($infos);
+
+            $key = $this->getPK();
+            if (!isset($this->localCache[$key])) {
+                $datas = $this->redis->hGetAll($key);
+
+                if (!$datas) {
+                    $datas = parent::getByPk($infos, array('mulit' => true));
+                    if ($datas) {    //fix local & redis cache
+                        $this->redis->hMset($key, $datas);
+                        $this->localCache[$key] = $datas;
+                    }
+                } else {    //fix local cache
+                    $this->localCache[$key] = $datas;
+                }
+            } else {
+                $datas = $this->localCache[$key];
+            }
+        }
+        unset($infos);
+        return $datas;
+    }
+
+    /**
+     * @param number $pk
+     *
+     * @return int
+     */
+    protected function getCountBySk($pk)
+    {
+        return count($this->getBySk($pk));
+    }
+
+    /**
+     * 设置主ID
+     *
+     * @param number $uid
+     */
+    protected function setMainId($uid)
+    {
+        $this->uid = $uid;
+    }
+}
