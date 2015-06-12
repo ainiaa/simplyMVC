@@ -136,6 +136,7 @@ class Importer
      */
     public static function loadController($controllerName, $groupName = '@', $moduleName = '@')
     {
+        $controllerFileSuffer = C('controllerFileSuffer');
         if ('@' == $groupName) {
             $groupName = Router::getGroup();;
         }
@@ -143,10 +144,10 @@ class Importer
         if ('@' == $moduleName) {
             $moduleName = Router::getModule();
         }
-        $baseControllerFile = APP_PATH . '/' . $groupName . '/' . $groupName . '.controller.php';
+        $baseControllerFile = APP_PATH . '/' . $groupName . '/' . $groupName . $controllerFileSuffer;
         self::importFileByFullPath($baseControllerFile);
 
-        $controllerFileName = $controllerName . '.controller.php';
+        $controllerFileName = $controllerName . $controllerFileSuffer;
 
         $controllerFile = APP_PATH . '/' . $groupName . '/' . $moduleName . '/controllers/' . $controllerFileName;
         $loadResult     = self::importFileByFullPath($controllerFile);
@@ -193,6 +194,7 @@ class Importer
      */
     public static function loadService($serviceName, $groupName = '@', $moduleName = '@')
     {
+        $serviceFileSuffer = C('serviceFileSuffer');
         if ('@' == $groupName) {
             $groupName = Router::getGroup();
         }
@@ -201,8 +203,7 @@ class Importer
             $moduleName = Router::getModule();
         }
 
-        $serviceFileName = $serviceName . '.service.php';
-
+        $serviceFileName = $serviceName . $serviceFileSuffer;
 
         $serviceFile = APP_PATH . $groupName . '/' . $moduleName . '/services/' . ucfirst($serviceFileName);
         //echo $model_file,':',var_export(is_file($model_file));exit;
@@ -324,6 +325,8 @@ class Importer
      */
     public static function loadDAO($daoName, $groupName = '@', $moduleName = '@')
     {
+        $daoFileSuffer = C('daoFileSuffer');
+
         if ('@' == $groupName) {
             $groupName = Router::getGroup();
         }
@@ -332,7 +335,7 @@ class Importer
             $moduleName = Router::getModule();
         }
 
-        $daoFileName = $daoName . '.dao.php';
+        $daoFileName = $daoName . $daoFileSuffer;
 
         $daoFile    = APP_PATH . '/' . $groupName . '/' . $moduleName . '/daos/' . $daoFileName;
         $loadResult = self::importFileByFullPath($daoFile);

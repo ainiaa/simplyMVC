@@ -12,7 +12,7 @@ return array(
                                 'DB_PREFIX' => 'smvc_',
                                 'DB_TYPE'   => 'mysql',
                                 'DB_USER'   => 'root',
-                                'DB_PASS'   => '',
+                                'DB_PASS'   => 'root',
                         ),
                 ),
                 'master' => array(//主库
@@ -23,7 +23,7 @@ return array(
                                 'DB_PREFIX' => 'smvc_',
                                 'DB_TYPE'   => 'mysql',
                                 'DB_USER'   => 'root',
-                                'DB_PASS'   => '',
+                                'DB_PASS'   => 'root',
                         ),
                         array(//第二个主库
                                 'DB_HOST'   => 'localhost', //数据库HOST
@@ -32,7 +32,7 @@ return array(
                                 'DB_PREFIX' => 'smvc_',
                                 'DB_TYPE'   => 'mysql',
                                 'DB_USER'   => 'root',
-                                'DB_PASS'   => '',
+                                'DB_PASS'   => 'root',
                         ),
                 ),
                 'slave'  => array(//从库
@@ -44,7 +44,7 @@ return array(
                                         'DB_PREFIX' => 'smvc_',
                                         'DB_TYPE'   => 'mysql',
                                         'DB_USER'   => 'root',
-                                        'DB_PASS'   => '',
+                                        'DB_PASS'   => 'root',
                                 ),
                                 array(
                                         'DB_HOST'   => 'localhost', //数据库HOST
@@ -53,7 +53,7 @@ return array(
                                         'DB_PREFIX' => 'smvc_',
                                         'DB_TYPE'   => 'mysql',
                                         'DB_USER'   => 'root',
-                                        'DB_PASS'   => '',
+                                        'DB_PASS'   => 'root',
                                 ),
                         ),
                         1 => array(//第二个master对应的slave
@@ -64,7 +64,7 @@ return array(
                                         'DB_PREFIX' => 'smvc_',
                                         'DB_TYPE'   => 'mysql',
                                         'DB_USER'   => 'root',
-                                        'DB_PASS'   => '',
+                                        'DB_PASS'   => 'root',
                                 ),
                                 array(
                                         'DB_HOST'   => 'localhost', //数据库HOST
@@ -73,7 +73,7 @@ return array(
                                         'DB_PREFIX' => 'smvc_',
                                         'DB_TYPE'   => 'mysql',
                                         'DB_USER'   => 'root',
-                                        'DB_PASS'   => '',
+                                        'DB_PASS'   => 'root',
                                 ),
                         ),
 

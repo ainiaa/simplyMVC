@@ -27,14 +27,15 @@ class Dispatcher
         } else {
             //设置  usersplit
             self::setRuntimeConst();
-            /**
-             * @var UserSplitService
-             */
-            $userSplitService = Factory::getInstanceNow('UserSplitService');
-            $uId              = self::getUserId();
+
+            $uId = self::getUserId();
             LocalCache::setData('uId', $uId);
-            if (C('useUserSplit', false)) {//是否使用分库功能
-                $userSplit = $userSplitService->getUserSplit($uId);
+            if (C('useUserSplit', false) && $uId) {//是否使用分库功能 切 正确的获得了uid
+                /**
+                 * @var UserSplitService
+                 */
+                $userSplitService = Factory::getInstanceNow('UserSplitService');
+                $userSplit        = $userSplitService->getUserSplit($uId);
             } else {
                 $userSplit = null;
             }
