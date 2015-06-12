@@ -64,7 +64,7 @@ class BaseDBDAO extends SmvcObject
     {
         $dbMasterConfig = C(self::$writeKey);
         $userSplit      = LocalCache::getData('userSplit');
-        if ($userSplit) {
+        if ($userSplit && C('useUserSplit', false)) {
             $masterIndex = isset($userSplit['db']) ? $userSplit['db'] : 0;
         } else {
             $masterIndex = array_rand($dbMasterConfig);

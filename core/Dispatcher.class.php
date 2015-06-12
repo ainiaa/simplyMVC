@@ -33,7 +33,11 @@ class Dispatcher
             $userSplitService = Factory::getInstanceNow('UserSplitService');
             $uId              = self::getUserId();
             LocalCache::setData('uId', $uId);
-            $userSplit = $userSplitService->getUserSplit($uId);
+            if (C('useUserSplit', false)) {//是否使用分库功能
+                $userSplit = $userSplitService->getUserSplit($uId);
+            } else {
+                $userSplit = null;
+            }
             LocalCache::setData('userSplit', $userSplit);
         }
 
@@ -47,6 +51,7 @@ class Dispatcher
         //获得action
         $actionName = Router::getActionName();
 
+        //获得Params
         $params = self::getParams($controller, $actionName);
 
         //前置操作
