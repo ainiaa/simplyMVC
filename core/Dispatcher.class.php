@@ -31,7 +31,9 @@ class Dispatcher
              * @var UserSplitService
              */
             $userSplitService = Factory::getInstanceNow('UserSplitService');
-            $userSplit = $userSplitService->getUserSplit(USER_ID);
+            $uId              = self::getUserId();
+            LocalCache::setData('uId', $uId);
+            $userSplit = $userSplitService->getUserSplit($uId);
             LocalCache::setData('userSplit', $userSplit);
         }
 
@@ -107,9 +109,25 @@ class Dispatcher
      */
     private static function setRuntimeConst()
     {
-        if (!defined('USER_ID')) {
-            define('USER_ID', 1);//TODO 怎么获得uid
+    }
+
+    /**
+     * todo 是否还有其他方法获取uId
+     * @return int
+     */
+    private static function getUserId()
+    {
+        if (isset($_SESSION['uId'])) {
+            $uId = $_SESSION['uId'];
+        } else if (isset($_REQUEST['uId'])) {
+            $uId = $_REQUEST['uId'];
+        } else if (isset($_COOKIE['uId'])) {
+            $uId = $_COOKIE['uId'];
+        } else {
+            $uId = 0;
         }
+
+        return $uId;
     }
 
 
