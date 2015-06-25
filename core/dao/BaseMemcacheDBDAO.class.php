@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class BaseRedisDBDAO Redis DB 数据存储类   (redis作为db的缓存)
+ * Class BaseMemcacheDBDAO Memcache DB 数据存储类   (Memcache作为db的缓存)
  * @author  Jeff Liu
  * @version 0.1
  */
-abstract class BaseRedisDBDAO extends BaseDBDAO
+abstract class BaseMemcacheDBDAO extends BaseDBDAO
 {
     /**
      * @var LocalCache
@@ -14,12 +14,10 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
 
     protected $uId;
 
-    protected $defaultValue = array();
-
     /**
-     * @var Redis
+     * @var CoreMemcache
      */
-    protected $redis;
+    protected $memcached;
 
     /**
      * 构造函数
@@ -39,47 +37,33 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      * 初始化系统, 分表等
      *
      * @param number $uid
+     *
+     * @return mixed
+     * @throws Exception
      */
     protected function init($uid)
     {
         $this->uid = $uid;
 
-        if (empty($this->redis)) {
-            $redisConf = C('redis', array());
-            if (empty($redisConf)) {
-                $redisConf = array(
-                        'host'     => '127.0.0.1',
-                        'port'     => '3306',
-                        'pconnect' => false,
+        if (empty($this->memcached)) {
+            $memcacheConf = C('memcached', array());
+            if (empty($memcacheConf)) {
+                $memcacheConf = array(
+                        'server'   => C('MC_HOST', 'localhost'),
+                        'username' => C('MC_PORT', 11211),
+                        'password' => C('MC_WEIGHT', 100),
                 );
             }
-            $this->redis = new Redis();
-            if (isset($redisConf['pconnect']) && $redisConf['pconnect']) {
-                $this->redis->pconnect($redisConf['host'], $redisConf['port']);
-            } else {
-                $this->redis->connect($redisConf['host'], $redisConf['port']);
+            if (!class_exists('Memcached')) {
+                throw new Exception('Memcached sessions are configured, but your PHP installation doesn\'t have the Memcached extension loaded.');
             }
-        }
 
-        return $this->storager;
-    }
+            $this->memcached = new Memcached();
 
-    public function getStorageInstance()
-    {
-        if (empty($this->storager)) {
-            $redisConf = C('session.redis', array());
-            if (empty($redisConf)) {
-                $redisConf = array(
-                        'host'     => '127.0.0.1',
-                        'port'     => '3306',
-                        'pconnect' => false,
-                );
-            }
-            $this->storager = new Redis();
-            if (isset($redisConf['pconnect']) && $redisConf['pconnect']) {
-                $this->storager->pconnect($redisConf['host'], $redisConf['port']);
-            } else {
-                $this->storager->connect($redisConf['host'], $redisConf['port']);
+            $this->memcached->addServers($memcacheConf);
+
+            if ($this->memcached->getVersion() === false) {
+                throw new Exception('Memcached sessions are configured, but there is no connection possible. Check your configuration.');
             }
         }
 
@@ -100,10 +84,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      *
      * @param array $datas
      *
-     * @param bool  $getLastInsertId
-     *
      * @return mixed
-     * @throws Exception
      */
     public function add($datas, $getLastInsertId = false)
     {
@@ -138,16 +119,18 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
                         $this->localCache[$key] = $tem;
                     }
 
-                    if ($this->redis->exists($key)) {
-                        $this->redis->hMset($key, array($sk => $datas));
-                    }
+                    $originData = $this->memcached->get($key);
+
+                    $originData[$sk] = $datas;
+                    $this->memcached->set($key, $originData);
                 } else {
                     $this->localCache[$key] = $datas;
-                    $this->redis->hMset($key, $datas);
+                    $this->memcached->set($key, $datas);
                 }
             } else {
                 $this->errorInfo(__METHOD__, func_get_args());
             }
+
             return $ret;
         } else {
             throw new Exception('pk empty');
@@ -197,15 +180,19 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             $tmp[$sk]               = $currentData;
             $this->localCache[$key] = $tmp;
 
-            $this->redis->hMset($key, array($sk => $currentData));
+            $originData = $this->memcached->get($key);
+
+            $originData[$sk] = $currentData;
+            $this->memcached->set($key, $originData);
 
             unset($sk, $tmp);
         } else {
             $this->localCache[$key] = $currentData;
-            $this->redis->hMset($key, $currentData);
+            $this->memcached->set($key, $currentData);
         }
 
         unset($currentData, $key);
+
         return $ret;
     }
 
@@ -222,22 +209,18 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
     {
         if (is_array($pk)) {
             unset($pinfo);
+
             return $this->getBySk($pk);
         } else {
             $this->uid = $pk;
             $key       = $this->getPK();
             if (!isset($this->localCache[$key])) {
                 $this->init($pk);
-                if ($this->isMulit()) {
-                    $datas = $this->redis->hGetAll($key);
-                } else {
-                    $datas = $this->redis->hGets($key);
-                }
+                $datas = $this->memcached->get($key);
                 if (!$datas) {
                     $datas = parent::getByPk($pk, $pinfo);
-
                     if ($datas) {
-                        $this->redis->hMset($key, $datas);
+                        $this->memcached->set($key, $datas);
                     }
 
                     return $datas;
@@ -284,7 +267,13 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
 
             if ($ret > 0) {
                 //清除缓存
-                $this->redis->hdel($key, $sk);
+                $originData = $this->memcached->get($key);
+                unset($originData[$sk]);
+                if ($originData) {
+                    $this->memcached->set($key, $originData);
+                } else {
+                    $this->memcached->del($key);
+                }
 
                 if (isset($this->localCache[$key])) {   //清除本地缓存
                     $tem = $this->localCache[$key];
@@ -300,7 +289,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             $ret = parent::deleteByPk($condition, $pinfo);
 
             if ($ret > 0) {
-                $this->redis->delete($key);
+                $this->memcached->del($key);
                 unset($this->localCache[$key]);
             } else {
                 $this->errorInfo(__METHOD__, func_get_args());
@@ -356,12 +345,12 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             $key = $this->getPK();
 
             if (!isset($this->localCache[$key])) {
-                $datas = $this->redis->hGetAll($key);
+                $datas = $this->memcached->get($key);
 
                 if (!$datas) {
                     $datas = parent::getByPk($uid);
                     if ($datas) {   //fix local & redis cache
-                        $this->redis->hMset($key, $datas);
+                        $this->memcached->set($key, $datas);
                         $this->localCache[$key] = $datas;
                     }
                 } else {   //fix local cache
@@ -377,12 +366,12 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
 
             $key = $this->getPK();
             if (!isset($this->localCache[$key])) {
-                $datas = $this->redis->hGetAll($key);
+                $datas = $this->memcached->get($key);
 
                 if (!$datas) {
                     $datas = parent::getByPk($infos, array('mulit' => true));
                     if ($datas) {    //fix local & redis cache
-                        $this->redis->hMset($key, $datas);
+                        $this->memcached->set($key, $datas);
                         $this->localCache[$key] = $datas;
                     }
                 } else {    //fix local cache
@@ -393,6 +382,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             }
         }
         unset($infos);
+
         return $datas;
     }
 

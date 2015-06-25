@@ -3,7 +3,7 @@
  * 数据库相关配置项
  */
 return array(
-        'db' => array(
+        'db'        => array(
                 'split'  => array(//分库相关 todo 这个可以使用其他方法实现
                         array(
                                 'DB_HOST'   => 'localhost', //数据库HOST
@@ -78,5 +78,14 @@ return array(
                         ),
 
                 ),
-        )
+        ),
+        'redis'     => array(
+                'host'     => '127.0.0.1',
+                'port'     => '3306',
+                'pconnect' => false,
+        ),
+        'memcached' => array(
+                'host' => '127.0.0.1',
+                'port' => '11211',
+        ),
 );

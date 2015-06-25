@@ -72,30 +72,30 @@ class CoreMemcache
     {
         if ($changetype == 'in') {
             if ($value === array()) {
-                return 'J7PHPFCSxzpA2ucmu_array';
+                return 'SMVC_array';
             } elseif ($value === '') {
-                return 'J7PHPFCSxzpA2ucmu_string';
+                return 'SMVC_string';
             } elseif ($value === 0) {
-                return 'J7PHPFCSxzpA2ucmu_int';
+                return 'SMVC_int';
             } elseif ($value === null) {
-                return 'J7PHPFCSxzpA2ucmu_null';
+                return 'SMVC_null';
             } elseif ($value === false) {
-                return 'J7PHPFCSxzpA2ucmu_false';
+                return 'SMVC_false';
             } else {
                 return $value;
             }
         } elseif ($changetype == 'out') {
             if (is_string($value)) {
                 if (strlen($value) < 30) {
-                    if ($value === 'J7PHPFCSxzpA2ucmu_array') {
+                    if ($value === 'SMVC_array') {
                         return array();
-                    } elseif ($value === 'J7PHPFCSxzpA2ucmu_string') {
+                    } elseif ($value === 'SMVC_string') {
                         return '';
-                    } elseif ($value === 'J7PHPFCSxzpA2ucmu_int') {
+                    } elseif ($value === 'SMVC_int') {
                         return 0;
-                    } elseif ($value === 'J7PHPFCSxzpA2ucmu_null') {
+                    } elseif ($value === 'SMVC_null') {
                         return null;
-                    } elseif ($value === 'J7PHPFCSxzpA2ucmu_false') {
+                    } elseif ($value === 'SMVC_false') {
                         return false;
                     } else {
                         return $value;

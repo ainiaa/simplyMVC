@@ -56,7 +56,7 @@ class SimpleMVC
             if (!is_dir(dirname(self::$frameFileAllInOne))) {//如果 public/tmp目录不存在的会报warning错误
                 mkdir(dirname(self::$frameFileAllInOne) . '/', 0777, true);
             }
-            file_put_contents(self::$frameFileAllInOne, $content);
+            file_put_contents(self::$frameFileAllInOne, $content, LOCK_EX);//防止在并发的时候 出现内容写入错乱的问题
         }
     }
 

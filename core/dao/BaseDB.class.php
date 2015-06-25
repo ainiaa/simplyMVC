@@ -17,6 +17,8 @@ class BaseDBDAO extends SmvcObject
     protected $tableName = '';
     protected $realTableName = '';
 
+    protected $defaultValue = array();
+
     /**
      * @var medoo
      */
