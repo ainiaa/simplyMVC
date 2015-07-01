@@ -22,4 +22,5 @@ return array(
                 'right_delimiter' => '}>', // smarty右限定符
                 'auto_literal'    => true, // Smarty3新特性
         ),
+        'open_rw'           => true,//开启读写分离
 );
