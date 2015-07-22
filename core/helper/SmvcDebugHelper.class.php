@@ -78,12 +78,8 @@ class SmvcDebugHelper implements ArrayAccess
             $instance = new SmvcDebugHelper();
             $bool     = false;
             if (C('smvcDebug')) {
-                //                include ROOT_PATH . '/include/vendor/FirePHP.class.php'; //FireBug Firephp 调试类
-                //                echo 'get_include_path:', var_export(get_include_path(), 1), '   -- --- -- ', __METHOD__, '<br />';
                 $bool = true;
             }
-
-            echo '$bool:', var_export($bool, 1), '   -- --- -- ', __METHOD__, '<br />';
 
             $instance->_isdebug = $bool;
 
@@ -93,6 +89,7 @@ class SmvcDebugHelper implements ArrayAccess
             }
             self::$instance = $instance;
         }
+
         return self::$instance;
     }
 
@@ -101,7 +98,7 @@ class SmvcDebugHelper implements ArrayAccess
      *
      * @return bool
      */
-    public function debug($param = array( /*'info' => '', 'label' => '', 'level' => '', 'options' => ''*/))
+    public function debug2($param = array( /*'info' => '', 'label' => '', 'level' => '', 'options' => ''*/))
     {
         $info       = isset($param['info']) ? $param['info'] : ''; //这个可以为数组 也可以为字符串
         $label      = isset($param['label']) ? $param['label'] : '';
@@ -114,6 +111,29 @@ class SmvcDebugHelper implements ArrayAccess
         if (!in_array($debugLevel, array('log', 'info', 'error', 'warn'), true)) {
             $debugLevel = 'log';
         }
+
+        return $this->debugInstance->$debugLevel($info, $label, $options);
+    }
+
+    /**
+     * @author Jeff Liu
+     * @param string $info
+     * @param string $label
+     * @param string $debugLevel
+     * @param array  $options
+     *
+     * @return bool
+     */
+    public function debug($info = '', $label = '', $debugLevel = '', $options = array())
+    {
+        if (!$this->_isdebug) {
+            return false;
+        }
+        $debugLevel = strtolower($debugLevel); //默认应该是log
+        if (!in_array($debugLevel, array('log', 'info', 'error', 'warn'), true)) {
+            $debugLevel = 'log';
+        }
+
         return $this->debugInstance->$debugLevel($info, $label, $options);
     }
 }

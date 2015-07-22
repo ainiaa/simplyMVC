@@ -20,22 +20,25 @@ class BaseDBDAO extends SmvcObject
     protected $defaultValue = array();
 
     /**
+     * 读操作对应的storage
      * @var medoo
      */
     protected $readerStorage = null;
 
     /**
+     * 写操作对应的storage
      * @var medoo
      */
     protected $writerStorage = null;
 
     /**
-     * 最后一次使用的
+     * 最后一次使用的storage
      * @var String
      */
     protected $latestStorageType = null;
 
     const WRITE_STORAGE = 1;
+
     const READ_STORAGE = 2;
 
     protected $pk = null;
@@ -148,6 +151,10 @@ class BaseDBDAO extends SmvcObject
     }
 
 
+    /**
+     * 初始化写
+     * @author Jeff Liu
+     */
     public function initWriteStorage()
     {
         $masterIndex    = $this->getDbMasterIndex();
@@ -276,6 +283,7 @@ class BaseDBDAO extends SmvcObject
         if (empty($this->writerStorage)) {
             $this->initWriteStorage();
         }
+
         return $this->writerStorage;
     }
 
@@ -287,6 +295,7 @@ class BaseDBDAO extends SmvcObject
         if (empty($this->readerStorage)) {
             $this->initReadStorage();
         }
+
         return $this->readerStorage;
     }
 
@@ -470,7 +479,7 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::LATEST_STORAGE_READER);
 
-        return $this->getReadStorage(self::WRITE_STORAGE)->delete($this->tableName, $where);
+        return $this->getStorage(self::WRITE_STORAGE)->delete($this->tableName, $where);
     }
 
     /**
