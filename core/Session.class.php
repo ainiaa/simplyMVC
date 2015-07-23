@@ -49,14 +49,6 @@ class Session
     {
         $config = C('session');
 
-        SmvcDebugHelper::getInstance()->debug(
-                array(
-                        'info'  => $config,
-                        'label' => '$config ' . __METHOD__,
-                        'level' => 'error',
-                )
-        );
-
         // When a string was passed it's just the driver type
         if ($custom && !is_array($custom)) {
             $custom = array('driver' => $custom);
@@ -75,30 +67,9 @@ class Session
         $driver = null;
 
         $driver = new $class($config);
-        SmvcDebugHelper::getInstance()->debug(
-                array(
-                        'info'  => $driver,
-                        'label' => '$driver ' . __METHOD__,
-                        'level' => 'error',
-                )
-        );
 
-        SmvcDebugHelper::getInstance()->debug(
-                array(
-                        'info'  => $config,
-                        'label' => '$config ' . __METHOD__,
-                        'level' => 'error',
-                )
-        );
         // get the driver's cookie name
         $cookieName = isset($config['cookie_name']) ? $config['cookie_name'] : 'smvcid';
-        SmvcDebugHelper::getInstance()->debug(
-                array(
-                        'info'  => $cookieName,
-                        'label' => '$cookieName ' . __METHOD__,
-                        'level' => 'error',
-                )
-        );
         // do we already have a driver instance for this cookie?
         if (isset(self::$_instances[$cookieName])) {
             // if so, they must be using the same driver class!

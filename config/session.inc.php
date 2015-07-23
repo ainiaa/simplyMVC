@@ -2,7 +2,8 @@
 return array(
         'session' => array(
                 'auto_initialize'        => true, //获取方式  C('session.auto_initialize')
-                'driver'                 => 'cookie', //cookie database redis memcache
+                'driver'                 => 'file', //cookie database redis memcache
+                'enable_cookie'          => true,
                 'match_ip'               => false,
                 'match_ua'               => true,
                 'cookie_domain'          => '',
@@ -20,6 +21,9 @@ return array(
                         'host'     => '127.0.0.1',
                         'port'     => '3306',
                         'pconnect' => false,
+                ),
+                'file'                   => array(
+                        'path' => 'e:/tmp/',
                 ),
                 'memcached'              => array(
                         'host' => '127.0.0.1',

@@ -71,7 +71,7 @@ class SmvcRedisSession extends SmvcBaseSession
 
             if ($payload === false) {
                 // cookie present, but session record missing. force creation of a new session
-                return $this->read(true);
+                return parent::read($id);
             }
 
             // unpack the payload
@@ -82,7 +82,7 @@ class SmvcRedisSession extends SmvcBaseSession
                 $payload = $this->readRedis($payload['rotated_session_id']);
                 if ($payload === false) {
                     // cookie present, but session record missing. force creation of a new session
-                    return $this->read(true);
+                    return parent::read($id);
                 }
 
                 // unpack the payload

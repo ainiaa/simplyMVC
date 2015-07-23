@@ -21,9 +21,6 @@ class TestService extends BaseService
         );
 
         $return = $this->TestDBDAO->getAll('*', $where);
-        SmvcDebugHelper::getInstance()->debug(
-                array('info' => $return, 'label' => 'return ' . __METHOD__, 'level' => 'info')
-        );
         return $return;
     }
 

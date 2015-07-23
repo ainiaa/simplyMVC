@@ -51,23 +51,7 @@ class defaultController extends BackendController
 
         $ret = $this->TestService->add($add);
 
-        SmvcDebugHelper::getInstance()->debug(
-                array(
-                        'info'  => $ret,
-                        'label' => '$ret:' . __METHOD__,
-                        'level' => 'info',
-                )
-        );
-
         $this->assign('all', $all);
-
-        SmvcDebugHelper::getInstance()->debug(
-                array(
-                        'info'  => $all,
-                        'label' => '$all',
-                        'level' => 'error',
-                )
-        );
 
         //        echo '<pre>$all:', var_export($all, 1), '</pre>';
 

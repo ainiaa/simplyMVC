@@ -59,13 +59,6 @@ class SmvcDbSession extends SmvcBaseSession
 
         // get the session cookie
         $cookie = $this->getCookie();
-        //        SmvcDebugHelper::instance()->debug(
-        //                array(
-        //                        'info'  => $cookie,
-        //                        'label' => '$cookie ' . __METHOD__,
-        //                        'level' => 'info',
-        //                )
-        //        );
 
         // if a cookie was present, find the session record
         if ($cookie && isset($cookie[0])) {
@@ -76,13 +69,6 @@ class SmvcDbSession extends SmvcBaseSession
                     array('session_id' => $cookie[0])
 
             );
-            //            SmvcDebugHelper::instance()->debug(
-            //                    array(
-            //                            'info'  => $this->record,
-            //                            'label' => '$this->record ' . __METHOD__,
-            //                            'level' => 'info',
-            //                    )
-            //            );
 
             // record found?
             if (is_array($this->record) && count($this->record) > 0) {
@@ -103,7 +89,7 @@ class SmvcDbSession extends SmvcBaseSession
                     $payload = $this->unserialize($payload);
                 } else {
                     // cookie present, but session record missing. force creation of a new session
-                    return $this->read(true);
+                    return parent::read($id);
                 }
             }
 
@@ -128,15 +114,6 @@ class SmvcDbSession extends SmvcBaseSession
                 }
             }
         }
-
-        //        SmvcDebugHelper::instance()->debug(
-        //                array(
-        //                        'info'  => $this,
-        //                        'lable' => '$this ' . __METHOD__,
-        //                        'level' => 'info',
-        //                )
-        //        );
-
 
         return parent::read($id);
     }

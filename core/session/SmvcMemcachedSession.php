@@ -105,7 +105,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
 
             if ($payload === false) {
                 // cookie present, but session record missing. force creation of a new session
-                return $this->read(true);
+                return parent::read($id);
             }
 
             // unpack the payload
@@ -116,7 +116,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
                 $payload = $this->readMemcached($payload['rotated_session_id']);
                 if ($payload === false) {
                     // cookie present, but session record missing. force creation of a new session
-                    return $this->read(true);
+                    return parent::read($id);
                 } else {
                     // unpack the payload
                     $payload = $this->unserialize($payload);

@@ -67,10 +67,9 @@ class Cookie
             $http_only = null
     ) {
         // you can't set cookies in CLi mode
-        if (defined('IS_CGI') && IS_CGI) {
-            return false;
-        }
-
+//        if (defined('IS_CGI') && IS_CGI) {
+//            return false;
+//        }
         $value = SimpleMVC::value($value);
 
         // use the class defaults for the other parameters if not provided
@@ -82,7 +81,6 @@ class Cookie
 
         // add the current time so we have an offset
         $expiration = $expiration > 0 ? $expiration + time() : 0;
-
         return setcookie($name, $value, $expiration, $path, $domain, $secure, $http_only);
     }
 

@@ -16,8 +16,14 @@ class SmvcFileSession extends SmvcBaseSession
 
     public function __construct($config = array())
     {
+        parent::__construct($config);
         // merge the driver config with the global config
-        $this->config = array_merge($config, is_array($config['file']) ? $config['file'] : self::$_defaults);
+        if (is_array($config)) {
+            $file_config = isset($config['file']) && is_array($config['file']) ? $config['file'] : array();
+            $config      = array_merge(self::$_defaults, $config, $file_config);
+        }
+
+        $this->config = $config;
 
         $this->config = $this->validateConfig($this->config);
     }
@@ -50,7 +56,7 @@ class SmvcFileSession extends SmvcBaseSession
 
             if ($payload === false) {
                 // cookie present, but session record missing. force creation of a new session
-                return $this->read(true);
+                return parent::read($id);
             }
 
             // unpack the payload
@@ -61,7 +67,7 @@ class SmvcFileSession extends SmvcBaseSession
                 $payload = $this->readFile($payload['rotated_session_id']);
                 if ($payload === false) {
                     // cookie present, but session record missing. force creation of a new session
-                    return $this->read(true);
+                    return parent::read($id);
                 } else {
                     // unpack the payload
                     $payload = $this->unserialize($payload);
@@ -135,10 +141,8 @@ class SmvcFileSession extends SmvcBaseSession
                     $expire = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
 
                     while (($file = readdir($handle)) !== false) {
-                        if (filetype($this->config['path'] . $file) == 'file' and strpos(
-                                        $file,
-                                        $this->config['cookie_name'] . '_'
-                                ) === 0 and filemtime($this->config['path'] . $file) < $expire
+                        if (filetype($this->config['path'] . $file) == 'file' and strpos($file,
+                                        $this->config['cookie_name'] . '_') === 0 and filemtime($this->config['path'] . $file) < $expire
                         ) {
                             @unlink($this->config['path'] . $file);
                         }
@@ -258,6 +262,7 @@ class SmvcFileSession extends SmvcBaseSession
 
             }
         }
+
         return $payload;
     }
 
