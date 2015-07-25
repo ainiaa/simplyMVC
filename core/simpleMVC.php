@@ -22,6 +22,11 @@ class SimpleMVC
     {
         self::init();
 
+        /**
+         * 解析url
+         */
+        Router::parseUrl();
+
         Dispatcher::dispatch();
     }
 

@@ -15,11 +15,6 @@ class Dispatcher
      */
     public static function dispatch()
     {
-        /**
-         * 解析url
-         */
-        Router::parseUrl();
-
         $checkResult = Router::routerCheck();
 
         if (!$checkResult) {//路由检测失败

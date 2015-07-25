@@ -57,6 +57,7 @@ class Router
         } else {
             $value = stripslashes($value);
         }
+
         return $value;
     }
 
@@ -80,20 +81,13 @@ class Router
     public static function parseUrl()
     {
         self::removeMagicQuotes();
-
-        $g = self::getGroup($_REQUEST);
-
-        $m = self::getModule($_REQUEST);
-
-
-        echo '$g:', $g, '  $m:', $m, '<br />';
-
+        self::initEnv();
     }
 
 
     /**
      * 路由检测
-     *
+     * @author Jeff Liu
      * @access public
      * @return boolean
      */
@@ -101,7 +95,6 @@ class Router
     {
         $controller = self::getControllerName(null, false);
         $action     = self::getActionName(null, false);
-        echo $controller, ':', $action, '<br/>';
         if (C('routerFilterMode', 'none') === 'whiteList') {//白名单
             $return = self::routerCheckByWhiteList($controller, $action);
         } else if (C('routerFilterMode', 'none') === 'blacklist') {//黑名单
@@ -109,6 +102,7 @@ class Router
         } else {
             $return = true;
         }
+
         return $return;
     }
 
@@ -195,6 +189,73 @@ class Router
     }
 
     /**
+     * 初始化环境变量
+     * @author Jeff Liu
+     */
+    public static function initEnv()
+    {
+        self::initGroup();
+        self::initModule();
+        self::initController();
+        self::initAction();
+    }
+
+    /**
+     * 初始化分组
+     * @author Jeff Liu
+     */
+    private static function initGroup()
+    {
+        $groupParamName = C('groupParamName', 'g');
+        if (isset($_REQUEST[$groupParamName])) {
+            self::$group = $_REQUEST[$groupParamName];
+        } else {
+            self::$group = C('defaultGroup', 'frontend');
+        }
+    }
+
+
+    /**
+     * 初始化module
+     * @author Jeff Liu
+     */
+    private static function initModule()
+    {
+        $moduleParamName = C('moduleParamName', 'm');
+        if (isset($_REQUEST[$moduleParamName])) {
+            self::$module = $_REQUEST[$moduleParamName];
+        } else {
+            self::$module = C('defaultModule', 'default');
+        }
+    }
+
+    /**
+     * 初始化action
+     * @author Jeff Liu
+     */
+    private static function initController()
+    {
+        $controllerParamName = C('controllerParamName', 'c');
+
+        if (isset($_REQUEST[$controllerParamName])) {
+            self::$controller = $_REQUEST[$controllerParamName];
+        } else {
+            self::$controller = C('defaultController', 'default');
+        }
+    }
+
+    private static function initAction()
+    {
+        $actionParamName = C('actionParamName', 'a');
+
+        if (isset($_REQUEST[$actionParamName])) {
+            self::$action = $_REQUEST[$actionParamName];
+        } else {
+            self::$action = C('defaultAction', 'index');
+        }
+    }
+
+    /**
      * 获得实际的分组名称
      * @access private
      *
@@ -204,6 +265,7 @@ class Router
      */
     public static function getGroup($info = array())
     {
+        /*
         $groupParamName = C('groupParamName', 'g');
         if ($info) {
             self::$group = isset($info[$groupParamName]) ? $info[$groupParamName] : C('defaultGroup', 'frontend');
@@ -212,6 +274,7 @@ class Router
                 self::$group = C('defaultGroup', 'frontend');
             }
         }
+        */
         return self::$group;
     }
 
@@ -225,6 +288,7 @@ class Router
      */
     public static function getModule($info = array())
     {
+        /*
         $moduleParamName = C('moduleParamName', 'm');
         if ($info) {
             self::$module = isset($info[$moduleParamName]) ? $info[$moduleParamName] : C('defaultModule', 'default');
@@ -233,6 +297,7 @@ class Router
                 self::$module = C('defaultModule', 'default');
             }
         }
+        */
         return self::$module;
     }
 
@@ -249,14 +314,12 @@ class Router
      */
     public static function getControllerName($info = array(), $appendSuffer = true)
     {
-
+        /*
         if (empty(self::$controller)) {
             $controllerParamName = C('controllerParamName', 'c');
             if ($info) {
-                self::$controller = isset($info[$controllerParamName]) ? $info[$controllerParamName] : C(
-                        'defaultController',
-                        'default'
-                );
+                self::$controller = isset($info[$controllerParamName]) ? $info[$controllerParamName] : C('defaultController',
+                        'default');
             } else {
                 if (isset($_GET[$controllerParamName])) {
                     $controllerName = $_GET[$controllerParamName];
@@ -270,12 +333,13 @@ class Router
                 self::$controller = $controllerName;
             }
         }
-
+        */
         if ($appendSuffer) {
             $controllerName = self::$controller . C('controllerSuffix');
         } else {
             $controllerName = self::$controller;
         }
+
         return $controllerName;
     }
 
@@ -289,6 +353,7 @@ class Router
      */
     public static function getActionName($info = array(), $appendSuffer = true)
     {
+        /*
         if (empty(self::$action)) {
             $actionParamName = C('actionParamName', 'a');
             if ($info) {
@@ -306,7 +371,7 @@ class Router
                 self::$action = $actionName;
             }
         }
-
+        */
         if ($appendSuffer) {
             $actionName = self::$action . C('actionSuffix');
         } else {
@@ -349,6 +414,7 @@ class Router
                 }
             }
         }
+
         return $requestUri;
     }
 
@@ -363,6 +429,7 @@ class Router
         if (func_num_args() === 0) {
             return $_POST;
         }
+
         return SmvcArrayHelper::get($_POST, $key, $default);
     }
 
@@ -378,6 +445,7 @@ class Router
         if (func_num_args() === 0) {
             return $_GET;
         }
+
         return SmvcArrayHelper::get($_GET, $key, $default);
     }
 
@@ -392,6 +460,7 @@ class Router
         if (func_num_args() === 0) {
             return $_REQUEST;
         }
+
         return SmvcArrayHelper::get($_REQUEST, $key, $default);
     }
 
@@ -406,10 +475,7 @@ class Router
     public static function getHeader($key = '', $default = '')
     {
         static $headers = null;
-
-        // do we need to fetch the headers?
         if ($headers === null) {
-            // deal with fcgi or nginx installs
             if (!function_exists('getallheaders')) {
                 $server = SmvcArrayHelper::filterPrefixed(self::getServer(), 'HTTP_', true);
 
@@ -419,24 +485,17 @@ class Router
                     $headers[$k] = $value;
                 }
 
-                $value = self::getServer(
-                        'Content_Type',
-                        self::getServer('Content-Type')
-                ) and $headers['Content-Type'] = $value;
-                $value = self::getServer(
-                        'Content_Length',
-                        self::getServer('Content-Length')
-                ) and $headers['Content-Length'] = $value;
+                $value = self::getServer('Content_Type',
+                        self::getServer('Content-Type')) and $headers['Content-Type'] = $value;
+                $value = self::getServer('Content_Length',
+                        self::getServer('Content-Length')) and $headers['Content-Length'] = $value;
             } else {
                 $headers = getallheaders();
             }
         }
 
-        return empty($headers) ? $default : ((func_num_args() === 0) ? $headers : SmvcArrayHelper::get(
-                $headers,
-                $key,
-                $default
-        ));
+        return empty($headers) ? $default : ((func_num_args() === 0) ? $headers : SmvcArrayHelper::get($headers, $key,
+                $default));
     }
 
     /**
@@ -450,6 +509,7 @@ class Router
         if (func_num_args() === 0) {
             return $_SERVER;
         }
+
         return SmvcArrayHelper::get($_SERVER, $key, $default);
     }
 
@@ -472,6 +532,7 @@ class Router
         if (func_num_args() === 0) {
             return $_COOKIE;
         }
+
         return SmvcArrayHelper::get($_COOKIE, $key, $default);
     }
 
@@ -511,23 +572,14 @@ class Router
             }
 
             $ips = explode(',', self::getServer($key));
-            array_walk(
-                    $ips,
-                    function (&$ip) {
-                        $ip = trim($ip);
-                    }
-            );
+            array_walk($ips, function (&$ip) {
+                $ip = trim($ip);
+            });
 
-            $ips = array_filter(
-                    $ips,
-                    function ($ip) use ($exclude_reserved) {
-                        return filter_var(
-                                $ip,
-                                FILTER_VALIDATE_IP,
-                                $exclude_reserved ? FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE : null
-                        );
-                    }
-            );
+            $ips = array_filter($ips, function ($ip) use ($exclude_reserved) {
+                return filter_var($ip, FILTER_VALIDATE_IP,
+                        $exclude_reserved ? FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE : null);
+            });
 
             if ($ips) {
                 return reset($ips);
@@ -544,13 +596,9 @@ class Router
      */
     public static function getProtocol()
     {
-        if (self::getServer('HTTPS') == 'on' or self::getServer('HTTPS') == 1 or self::getServer(
-                        'SERVER_PORT'
-                ) == 443 or (C('security.allow_x_headers', false) and self::getServer(
-                                'HTTP_X_FORWARDED_PROTO'
-                        ) == 'https') or (C('security.allow_x_headers', false) and self::getServer(
-                                'HTTP_X_FORWARDED_PORT'
-                        ) == 443)
+        if (self::getServer('HTTPS') == 'on' or self::getServer('HTTPS') == 1 or self::getServer('SERVER_PORT') == 443 or (C('security.allow_x_headers',
+                                false) and self::getServer('HTTP_X_FORWARDED_PROTO') == 'https') or (C('security.allow_x_headers',
+                                false) and self::getServer('HTTP_X_FORWARDED_PORT') == 443)
         ) {
             return 'https';
         }

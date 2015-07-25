@@ -1,24 +1,32 @@
-<html>
-<head>
-    <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
-    <title>登录</title>
-</head>
-<body>
-<form method="post" action="?debug=1&b=2&m=default&c=default&g=backend&a=index">
-    <table>
-        <tr>
-            <th>用户名:</th>
-            <td><input type="text" name="username" value=""/></td>
-        </tr>
-        <tr>
-            <th>密码:</th>
-            <td><input type="text" name="password" value=""/></td>
-        </tr>
-        <tr>
-            <td><input type="submit" id="submit" name="submit" value="submit"/></td>
-            <td><input type="reset" id="reset" name="reset" value="reset"/></td>
-        </tr>
-    </table>
+<?php echo $this->fetch('header.html'); ?>
+<div id="top"> </div>
+<form id="login" name="login" action=?g=backend&a=login" method="post">
+    <div id="center">
+        <div id="center_left"></div>
+        <div id="center_middle">
+            <div class="user">
+                <label>用户名：
+                    <input type="text" name="username" id="user" />
+                </label>
+            </div>
+            <div class="user">
+                <label>密　码：
+                    <input type="password" name="password" id="pwd" />
+                </label>
+            </div>
+            <div class="chknumber">
+                <label>验证码：
+                    <input name="chknumber" type="text" id="chknumber" maxlength="4" class="chknumber_input" />
+                </label>
+                <img src="./public/assets/images/checkcode.png" id="safecode" />
+            </div>
+        </div>
+        <div id="center_middle_right"></div>
+        <div id="center_submit">
+            <div class="button"> <img src="./public/assets/images/dl.gif" width="57" height="20" onclick="form_submit()" > </div>
+            <div class="button"> <img src="./public/assets/images/cz.gif" width="57" height="20" onclick="form_reset()"> </div>
+        </div>
+        <div id="center_right"></div>
+    </div>
 </form>
-</body>
-</html>
+<?php echo $this->fetch('footer.html'); ?>
