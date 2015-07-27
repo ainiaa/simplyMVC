@@ -605,5 +605,4 @@ class Router
 
         return 'http';
     }
-
 }
