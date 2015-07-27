@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * http相关功能类
+ * @author Jeff Liu
+ * Class SmvcHttpHelper
+ */
 class SmvcHttpHelper
 {
     /**
@@ -8,7 +13,7 @@ class SmvcHttpHelper
      *
      * @param string $url
      * @param array  $data
-     * @param string $type
+     * @param string $type 请求类型(POST,GET)
      *
      * @return array
      */
@@ -24,7 +29,7 @@ class SmvcHttpHelper
                 $params = http_build_query($data);
             }
             curl_setopt($ch, CURLOPT_POST, 1); //启用POST提交
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params); //启用POST提交
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params); //POST数据
         }
 
         $lst['rst']  = curl_exec($ch);

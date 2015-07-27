@@ -1,5 +1,4 @@
 #todo list
-##todo
 1、router 的具体实现   `pending`  -- optional
 
 2、autoload 的具体实现   `doing`
@@ -42,7 +41,7 @@
   * firephp Debug   <font color="green">`done`</font>
   * 类似 thinkphp 的 debugbar  `pending`
 
-10、cache(redis memcache)处理   <font color="green">`done`</font>
+10、cache(redis memcache local)处理   <font color="green">`done`</font>
 
    * memcache <font color="green">`done`</font>
    * redis   <font color="green">`done`</font>

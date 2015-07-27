@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * 其他帮助类(比较杂的)
  * @author Jeff Liu
  */
 class SmvcUtilHelper

@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * 数组帮助类
  * @author Jeff Liu
  */
 class SmvcArrayHelper

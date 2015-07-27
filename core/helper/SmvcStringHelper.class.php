@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * ×Ö·û´®°ïÖúÀà
  * @author Jeff Liu
  */
 class SmvcStringHelper

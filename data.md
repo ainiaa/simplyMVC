@@ -49,10 +49,10 @@
 
 3、template 可以支持
 
-   * 使用 原生态的PHP 作为模板语言  `pending`
-   * 使用 smarty (太庞大了)  `pending`
-   * 使用 Twig  `pending`
-   * 使用 bootstrap  `pending`
+   * 使用 原生态的PHP 作为模板语言
+   * 使用 smarty (太庞大了)
+   * 使用 Twig
+   * 使用 bootstrap
 
 4、redis 相关
    * https://github.com/salimane/rediscluster-php/blob/master/src/RedisCluster/RedisCluster.php

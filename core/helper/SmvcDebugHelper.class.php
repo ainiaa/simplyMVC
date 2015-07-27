@@ -1,7 +1,8 @@
 <?php
 
 /**
- *
+ * 调试类
+ * todo 除了使用firephp 还可以使用socket file 等方式进行调试。 这个可以再进行扩展
  * @author Jeff Liu
  */
 class SmvcDebugHelper implements ArrayAccess
@@ -117,6 +118,7 @@ class SmvcDebugHelper implements ArrayAccess
 
     /**
      * @author Jeff Liu
+     *
      * @param string $info
      * @param string $label
      * @param string $debugLevel

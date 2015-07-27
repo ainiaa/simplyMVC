@@ -3,6 +3,7 @@
 /**
  * 直接使用 PHP 作为模板
  * Class SmvcPHPTemplate
+ * @author Jeff Liu
  */
 class SmvcPHPTemplate
 {
