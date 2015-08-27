@@ -68,6 +68,7 @@ class SmvcArrayHelper
             foreach ($key as $k) {
                 $return[$k] = self::get($array, $k, $default);
             }
+
             return $return;
         }
 
@@ -97,6 +98,7 @@ class SmvcArrayHelper
     {
         if (is_null($key)) {
             $array = $value;
+
             return;
         }
 
@@ -137,18 +139,14 @@ class SmvcArrayHelper
 
         if (!$index) {
             foreach ($array as $i => $a) {
-                $return[] = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$key} : ($get_deep ? self::get(
-                        $a,
-                        $key
-                ) : $a[$key]);
+                $return[] = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$key} : ($get_deep ? self::get($a,
+                        $key) : $a[$key]);
             }
         } else {
             foreach ($array as $i => $a) {
                 $index !== true and $i = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$index} : $a[$index];
-                $return[$i] = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$key} : ($get_deep ? self::get(
-                        $a,
-                        $key
-                ) : $a[$key]);
+                $return[$i] = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$key} : ($get_deep ? self::get($a,
+                        $key) : $a[$key]);
             }
         }
 
@@ -195,6 +193,7 @@ class SmvcArrayHelper
             foreach ($key as $k) {
                 $return[$k] = self::delete($array, $k);
             }
+
             return $return;
         }
 
@@ -208,6 +207,7 @@ class SmvcArrayHelper
 
         if (!empty($keyParts)) {
             $key = implode('.', $keyParts);
+
             return self::delete($array[$thisKey], $key);
         } else {
             unset($array[$thisKey]);
@@ -266,6 +266,7 @@ class SmvcArrayHelper
             $keys[] = array_shift($arr);
             $vals[] = array_shift($arr);
         }
+
         return array_combine($keys, $vals);
     }
 
@@ -289,6 +290,7 @@ class SmvcArrayHelper
                 return true;
             }
         }
+
         return false;
     }
 
@@ -322,6 +324,7 @@ class SmvcArrayHelper
             }
             array_pop($currKey);
         }
+
         return $return;
     }
 
@@ -397,6 +400,7 @@ class SmvcArrayHelper
                 $return[$key] = $val;
             }
         }
+
         return $return;
     }
 
@@ -412,10 +416,7 @@ class SmvcArrayHelper
     {
         foreach ($array as &$value) {
             if (is_array($value)) {
-                $value = $callback === null ? self::filterRecursive($value) : self::filterRecursive(
-                        $value,
-                        $callback
-                );
+                $value = $callback === null ? self::filterRecursive($value) : self::filterRecursive($value, $callback);
             }
         }
 
@@ -437,6 +438,7 @@ class SmvcArrayHelper
                 unset($array[$key]);
             }
         }
+
         return $array;
     }
 
@@ -460,6 +462,7 @@ class SmvcArrayHelper
                 $return[$key] = $val;
             }
         }
+
         return $return;
     }
 
@@ -478,6 +481,7 @@ class SmvcArrayHelper
                 unset($array[$key]);
             }
         }
+
         return $array;
     }
 
@@ -501,6 +505,7 @@ class SmvcArrayHelper
                 }
             }
         }
+
         return $remove ? $array : $return;
     }
 
@@ -593,11 +598,7 @@ class SmvcArrayHelper
             return false;
         }
 
-        return $isAssoc ? self::insertAssoc($original, $value, $pos + 1) : self::insert(
-                $original,
-                $value,
-                $pos + 1
-        );
+        return $isAssoc ? self::insertAssoc($original, $value, $pos + 1) : self::insert($original, $value, $pos + 1);
     }
 
     /**
@@ -702,7 +703,7 @@ class SmvcArrayHelper
      *
      * @return array
      */
-    public static function multisort($array, $conditions, $ignoreCase = false)
+    public static function multiSort($array, $conditions, $ignoreCase = false)
     {
         $temp = array();
         $keys = array_keys($conditions);
@@ -723,8 +724,59 @@ class SmvcArrayHelper
         $args[] = &$array;
 
         call_smv_func_array('array_multisort', $args);
+
         return $array;
     }
+
+    /**
+     * $companies = array(
+     * 0 => array(
+     * 'name' => 'Foo - Ltd.',
+     * 'phone' => 'XXX-YYY-ZZZ',
+     * 'category' => 'supplyment',
+     * ),
+     * 1 => array(
+     * 'name' => 'Bar - Ltd.',
+     * 'phone' => 'xxx-yyy-zzz',
+     * 'category' => 'supplyment',
+     * ),
+     * 2 => array(
+     * 'name' => 'Baz - Ltd.',
+     * 'phone' => 'AAA-BBB-CCC',
+     * 'category' => 'alcohol',
+     * ),
+     * );
+     * $companies = SmvcArrayHelper::multiUnquie(
+     * $companies,
+     * function ($company) {
+     * return $company['category'];
+     * }
+     * );
+     *
+     * print_r($companies);
+     * @author Jeff Liu
+     *
+     * @param      $originData
+     * @param      $callback
+     * @param bool $strict
+     *
+     * @return array
+     */
+    public static function multiUnquie($originData, $callback, $strict = false)
+    {
+        return array_filter($originData, function ($item) use ($strict, $callback) {
+            static $haystack = array();
+            $needle = $callback($item);
+            if (in_array($needle, $haystack, $strict)) {
+                return false;
+            } else {
+                $haystack[] = $needle;
+
+                return true;
+            }
+        });
+    }
+
 
     /**
      * Find the average of an array
@@ -761,9 +813,7 @@ class SmvcArrayHelper
         }
 
         if (!is_array($source) or !is_array($replace)) {
-            throw new Exception(
-                    'SmvcArrayHelper::replace_key() - $source must an array. $replace must be an array or string.'
-            );
+            throw new Exception('SmvcArrayHelper::replace_key() - $source must an array. $replace must be an array or string.');
         }
 
         $result = array();
@@ -906,6 +956,7 @@ class SmvcArrayHelper
     public static function isMulti($arr, $allKeys = false)
     {
         $values = array_filter($arr, 'is_array');
+
         return $allKeys ? count($arr) === count($values) : count($values) > 0;
     }
 
@@ -967,24 +1018,21 @@ class SmvcArrayHelper
     public static function unique($arr)
     {
         // filter out all duplicate values
-        return array_filter(
-                $arr,
-                function ($item) {
-                    // contrary to popular belief, this is not as static as you think...
-                    static $vars = array();
+        return array_filter($arr, function ($item) {
+            // contrary to popular belief, this is not as static as you think...
+            static $vars = array();
 
-                    if (in_array($item, $vars, true)) {
-                        // duplicate
-                        return false;
-                    } else {
-                        // record we've had this value
-                        $vars[] = $item;
+            if (in_array($item, $vars, true)) {
+                // duplicate
+                return false;
+            } else {
+                // record we've had this value
+                $vars[] = $item;
 
-                        // unique
-                        return true;
-                    }
-                }
-        );
+                // unique
+                return true;
+            }
+        });
     }
 
     /**
