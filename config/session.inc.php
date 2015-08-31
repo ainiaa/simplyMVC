@@ -2,7 +2,7 @@
 return array(
         'session' => array(
                 'auto_initialize'        => true, //获取方式  C('session.auto_initialize')
-                'driver'                 => 'file', //cookie database redis memcache
+                'driver'                 => 'cookie', //cookie database redis memcache
                 'enable_cookie'          => true,
                 'match_ip'               => false,
                 'match_ua'               => true,

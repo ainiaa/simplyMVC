@@ -21,7 +21,7 @@ class Dispatcher
             throw new Exception('route deny!!!');
         } else {
             //设置  usersplit
-            self::setRuntimeConst();
+            self::setRuntimeConst();  //todo 设置为 Const不太好。可以添加一个 request Context
 
             $uId = self::getUserId();
             LocalCache::setData('uId', $uId);

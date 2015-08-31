@@ -11,22 +11,25 @@ class BackendController extends BaseController
     public function __construct()
     {
         parent::__construct();
+    }
 
-        $this->AdminService = new AdminService();
-
+    /**
+     * 执行初始化操作
+     * @author Jeff Liu
+     */
+    protected function _initialize()
+    {
         $sessionInfo = Session::instance()->get('userInfo');
         if (empty($sessionInfo) && $_GET['a'] != 'login') {
             $this->loginAction();
             exit;
         }
-
     }
 
-    public function run()
-    {
-
-    }
-
+    /**
+     * 登录
+     * @author Jeff Liu
+     */
     public function loginAction()
     {
         if (IS_POST) {
@@ -47,4 +50,4 @@ class BackendController extends BaseController
         $this->display('login.tpl.html');
     }
 
-} 
+}

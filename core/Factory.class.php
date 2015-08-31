@@ -81,6 +81,7 @@ class Factory
                         }
                     }
                 }
+                self::callSpecialMethod($action, '_initialize', $name);
                 return $action;
             } else {
                 throw new Exception('Class: ' . $name . ' is not exists!');
@@ -101,6 +102,7 @@ class Factory
                     }
                 }
             }
+            self::callSpecialMethod($serviceObject, '_initialize', $name);
             return $serviceObject;
         } elseif (substr($name, -5) === 'DAODb' || substr($name, -8) === 'DAORedis') {
             $class = $name;
@@ -114,22 +116,50 @@ class Factory
         }
     }
 
+    /**
+     * @param      $obj
+     * @param null $className
+     *
+     * @return mixed
+     */
+    private static function callSpecialMethod($obj, $methodName, $className = null)
+    {
+        if (method_exists($obj, $methodName)) {
+            if (is_null($className)) {
+                $className = get_class($obj);
+            }
+            $reflectionMethod = new ReflectionMethod($className, $methodName);
+            $reflectionMethod->setAccessible(true);
+            return $reflectionMethod->invoke($obj);
+        }
+        return null;
+    }
+
+    /**
+     * @param $class
+     * @param $constructparams
+     *
+     * @return null|object
+     */
     private static function getRealObject($class, $constructparams)
     {
+        $realObject = null;
         if (!is_array($constructparams)) {
             $constructparams = array($constructparams);
         }
         if ($constructparams) {
             $classRef = new ReflectionClass($class);
             if ($classRef->hasMethod('__construct')) {
-                return $classRef->newInstanceArgs($constructparams);
+                $realObject = $classRef->newInstanceArgs($constructparams);
             } else {
-                return $classRef->newInstance();
+                $realObject = $classRef->newInstance();
             }
         } else {
-            $object = new $class();
-            return $object;
+            $realObject = new $class();
         }
+
+        self::callSpecialMethod($realObject, '_initialize', $class);
+        return $realObject;
     }
 
 }

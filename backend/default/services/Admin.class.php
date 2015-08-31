@@ -12,7 +12,7 @@ class AdminService extends BaseService
     public function __construct()
     {
         parent::__construct();
-        $this->AdminDAO = new AdminDAO();
+//        $this->AdminDAO = new AdminDAO();
     }
 
     /**
