@@ -1,43 +1,34 @@
 <?php
 
-class DefaultController extends BackendController
+/**
+ * 管理员
+ * Class AdminController
+ */
+class AdminController extends BackendController
 {
 
     /**
-     * @var TestService
+     * @var AdminService
      */
-    public $TestService;
+    public $AdminService;
 
     public function preIndexAction()
     {
     }
 
+    /**
+     * 管理员列表
+     * @author Jeff Liu
+     */
     public function indexAction()
     {
-        $this->assign('helloWorld', 'Hello World  xxxx  xx !');
+        $adminList = $this->AdminService->getAdminList();
 
-        $this->assign('helloWorld1', 'Hello World gggg !');
+        $this->assign('title', 'Simply MVC backend - table list');
 
-        $all = $this->TestService->getAll();
+        $this->assign('adminList', $adminList);
 
-        $add = array(
-                'name' => 'addName',
-                'desc' => 'addNameaddNameaddNameaddName',
-        );
-
-        $ret = $this->TestService->add($add);
-
-        $this->assign('all', $all);
-
-        $tpl = isset($_GET['tpl']) ? trim($_GET['tpl']) : 'index';
-
-        $this->display($tpl . '.tpl.html');
-    }
-
-    public function preTest()
-    {
-        echo __METHOD__, ' 在Test之前执行.... <br />';
-        //        tag('view_end');
+        $this->display('backend_layout.tpl.html');
     }
 
     /**

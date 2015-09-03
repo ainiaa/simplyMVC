@@ -12,7 +12,6 @@ class AdminService extends BaseService
     public function __construct()
     {
         parent::__construct();
-//        $this->AdminDAO = new AdminDAO();
     }
 
     /**
@@ -20,9 +19,26 @@ class AdminService extends BaseService
      */
     public $AdminDAO;
 
+    /**
+     * @author Jeff Liu
+     * @param $userName
+     *
+     * @return array
+     */
     public function getAdminInfoByUserName($userName)
     {
         $adminInfo = $this->AdminDAO->getOne(array('user_name', 'password', 'email'),array('user_name' => $userName));
+        return $adminInfo;
+    }
+
+
+    /**
+     * 管理员列表
+     * @author Jeff Liu
+     */
+    public function getAdminList()
+    {
+        $adminInfo = $this->AdminDAO->getAll();
         return $adminInfo;
     }
 

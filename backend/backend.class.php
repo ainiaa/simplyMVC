@@ -19,6 +19,7 @@ class BackendController extends BaseController
      */
     protected function _initialize()
     {
+        $this->assign('title', 'Simply MVC backend');
         $sessionInfo = Session::instance()->get('userInfo');
         if (empty($sessionInfo) && $_GET['a'] != 'login') {
             $this->loginAction();
