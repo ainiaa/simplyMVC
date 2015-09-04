@@ -33,12 +33,12 @@ class SmvcTemplate
 
     var $options = null;
 
-    function __construct()
+    public function __construct()
     {
         $this->SmvcTemplate();
     }
 
-    function SmvcTemplate()
+    public function SmvcTemplate()
     {
         $this->_errorlevel = error_reporting();
         $this->_nowtime    = time();
@@ -54,7 +54,7 @@ class SmvcTemplate
      *
      * @return  void
      */
-    function assign($tpl_var, $value = '')
+    public function assign($tpl_var, $value = '')
     {
         if (is_array($tpl_var)) {
             foreach ($tpl_var AS $key => $val) {
@@ -79,7 +79,7 @@ class SmvcTemplate
      *
      * @return  void
      */
-    function display($filename, $cache_id = '')
+    public function display($filename, $cache_id = '')
     {
         $this->_seterror++;
 
@@ -103,17 +103,6 @@ class SmvcTemplate
         restore_error_handler();
         $this->_seterror--;
 
-        /*
-        //GZIP已在控制器中控制
-        if ($this->gzip)
-        {
-            ob_start('ob_gzhandler');
-        }
-        else
-        {
-            ob_start();
-        }
-        */
         echo $out;
     }
 
@@ -121,7 +110,7 @@ class SmvcTemplate
      * 显示缓存数据
      *
      */
-    function display_cache()
+    public function display_cache()
     {
         restore_error_handler();
         error_reporting(E_ALL ^ E_NOTICE);
@@ -139,34 +128,19 @@ class SmvcTemplate
         error_reporting($this->_errorlevel);
         restore_error_handler();
 
-        /*
-        //GZIP已在控制器中控制
-        if ($this->gzip)
-        {
-            ob_start('ob_gzhandler');
-        }
-        else
-        {
-            ob_start();
-        }
-        */
-
         echo $out;
     }
 
     /**
      * 处理模板文件
-     *
      * @access   public
      *
      * @param   string $filename
      * @param   string $cache_id
      *
-     * @internal param string $target_dir
-     *
      * @return  string
      */
-    function fetch($filename, $cache_id = '')
+    public function fetch($filename, $cache_id = '')
     {
         if (!$this->_seterror) {
             error_reporting(E_ALL ^ E_NOTICE);
@@ -204,24 +178,19 @@ class SmvcTemplate
                         } else {
                             $cachename = basename($filename, strrchr($filename, '.')) . '_' . $cache_id;
                         }
-                        $data = serialize(
-                                array(
-                                        'template' => $this->template,
-                                        'expires'  => $this->_nowtime + $this->cache_lifetime,
-                                        'maketime' => $this->_nowtime
-                                )
-                        );
+                        $data = serialize(array(
+                                'template' => $this->template,
+                                'expires'  => $this->_nowtime + $this->cache_lifetime,
+                                'maketime' => $this->_nowtime
+                        ));
                         $out  = str_replace("\r", '', $out);
 
                         while (strpos($out, "\n\n") !== false) {
                             $out = str_replace("\n\n", "\n", $out);
                         }
 
-                        if (file_put_contents(
-                                        $this->cache_dir . '/' . $cachename . '.php',
-                                        '<?php exit;?>' . $data . $out,
-                                        LOCK_EX
-                                ) === false
+                        if (file_put_contents($this->cache_dir . '/' . $cachename . '.php',
+                                        '<?php exit;?>' . $data . $out, LOCK_EX) === false
                         ) {
                             trigger_error('can\'t write:' . $this->cache_dir . '/' . $cachename . '.php');
                         }
@@ -248,7 +217,7 @@ class SmvcTemplate
      *
      * @return  string        编译后文件地址
      */
-    function make_compiled($filename)
+    public function make_compiled($filename)
     {
         $source = '';
         $name   = $this->compile_dir;
@@ -287,7 +256,7 @@ class SmvcTemplate
 
             $source = $this->fetch_str($content);
             if (!file_exists(dirname($name))) {
-                ecm_mkdir(dirname($name));
+                mkdir(dirname($name));
             }
             if (file_put_contents($name, $source, LOCK_EX) === false) {
                 trigger_error('can\'t write:' . $name);
@@ -308,20 +277,15 @@ class SmvcTemplate
      *
      * @return  string
      */
-    function fetch_str($source)
+    public function fetch_str($source)
     {
         if (!defined('IS_BACKEND')) {
             $source = $this->smarty_prefilter_preCompile($source);
         }
 
-        //        return preg_replace("/{([^\}\{\n]*)}/e", "\$this->select('\\1');", $source);
-        return preg_replace_callback(
-                "/{([^\}\{\n]*)}/",
-                function ($r) {
-                    return $this->select($r[1]);
-                },
-                $source
-        );
+        return preg_replace_callback("/{([^\}\{\n]*)}/", function ($r) {
+            return $this->select($r[1]);
+        }, $source);
     }
 
     /**
@@ -334,7 +298,7 @@ class SmvcTemplate
      *
      * @return  bool
      */
-    function is_cached($filename, $cache_id = '')
+    public function is_cached($filename, $cache_id = '')
     {
         if ($this->appoint_cache_id) {
             $cachename = $cache_id;
@@ -343,10 +307,7 @@ class SmvcTemplate
         }
 
         if (($this->caching == true || $this->appoint_cache_id) && $this->direct_output == false) {
-            if (is_file($this->cache_dir . '/' . $cachename . '.php') && ($data = @file_get_contents(
-                            $this->cache_dir . '/' . $cachename . '.php'
-                    ))
-            ) {
+            if (is_file($this->cache_dir . '/' . $cachename . '.php') && ($data = @file_get_contents($this->cache_dir . '/' . $cachename . '.php'))) {
                 $data     = substr($data, 13);
                 $pos      = strpos($data, '<');
                 $paradata = substr($data, 0, $pos);
@@ -359,20 +320,6 @@ class SmvcTemplate
                 $this->_expires = $para['expires'];
 
                 $this->template_out = substr($data, $pos);
-                /* do not check every item to save time , modify by wj */
-                /*
-                foreach ($para['template'] AS $val)
-                {
-                    $fp = fopen($val, 'rb');
-                    $stat = @fstat($fp);
-                    if ($para['maketime'] < $stat['mtime'])
-                    {
-                        $this->caching = false;
-
-                        return false;
-                    }
-                }
-                */
             } else {
                 $this->caching = false;
 
@@ -394,29 +341,25 @@ class SmvcTemplate
      *
      * @return  string
      */
-    function select($tag)
+    public function select($tag)
     {
         $tag = stripslashes(trim($tag));
 
         if (empty($tag)) {
             return '{}';
-        } elseif ($tag{0} == '*' && substr($tag, -1) == '*') // 注释部分
-        {
+        } elseif ($tag{0} == '*' && substr($tag, -1) == '*') {// 注释部分
             return '';
-        } elseif ($tag{0} == '$') // 变量
-        {
+        } elseif ($tag{0} == '$') {// 变量
             if ((strncmp($tag, '$lang.', 6) === 0) && strrpos($tag, '$') === 0) {
                 return $this->get_lang(substr($tag, 1));
             } else {
                 return '<?php echo ' . $this->get_val(substr($tag, 1)) . '; ?>';
             }
-        } elseif ($tag{0} == '/') // 结束 tag
-        {
+        } elseif ($tag{0} == '/') {// 结束 tag
             switch (substr($tag, 1)) {
                 case 'if':
                     return '<?php endif; ?>';
                     break;
-
                 case 'foreach':
                     if ($this->_foreachmark == 'foreachelse') {
                         $output = '<?php endif; unset($_from); ?>';
@@ -427,11 +370,9 @@ class SmvcTemplate
 
                     return $output;
                     break;
-
                 case 'literal':
                     return '';
                     break;
-
                 default:
                     return '{' . $tag . '}';
                     break;
@@ -441,32 +382,24 @@ class SmvcTemplate
             $tag_sel = array_shift($tag_all);
             switch ($tag_sel) {
                 case 'if':
-
                     return $this->_compile_if_tag(substr($tag, 3));
                     break;
-
                 case 'else':
-
                     return '<?php else: ?>';
                     break;
-
                 case 'elseif':
-
                     return $this->_compile_if_tag(substr($tag, 7), true);
                     break;
-
                 case 'foreachelse':
                     $this->_foreachmark = 'foreachelse';
 
                     return '<?php endforeach; else: ?>';
                     break;
-
                 case 'foreach':
                     $this->_foreachmark = 'foreach';
 
                     return $this->_compile_foreach_start(substr($tag, 8));
                     break;
-
                 case 'assign':
                     $t = $this->get_para(substr($tag, 7), 0);
 
@@ -476,17 +409,24 @@ class SmvcTemplate
                     } else {
                         $tmp = '$this->assign(\'' . $t['var'] . '\',\'' . addcslashes($t['value'], "'") . '\');';
                     }
-                    // $tmp = $this->assign($t['var'], $t['value']);
 
                     return '<?php ' . $tmp . ' ?>';
                     break;
 
                 case 'include':
-                    $t = $this->get_para(substr($tag, 8), 0);
+                    $t    = $this->get_para(substr($tag, 8), 0);
+                    $file = $t['file'];
+                    //                    error_log('SUB $file:' . var_export(substr($file, 0, 11), 1) . PHP_EOL, 3, 'e:/smvc.log');
+                    if (substr($file, 0, 11) === '$this->_var') { //变量
+                        $tplContent = '<?php echo $this->fetch(' . $file . '); ?>';
+                    } else { //字符串
+                        $tplContent = '<?php echo $this->fetch(\'' . $file . '\'); ?>';
+                    }
 
-                    return '<?php echo $this->fetch(' . "'$t[file]'" . '); ?>';
+                    return $tplContent;
                     break;
-                case 'res':
+                case
+                'res':
                     $t = $this->get_para(substr($tag, 4), 0);
 
                     return '<?php echo $this->res_base . "/" . ' . "'$t[file]'" . '; ?>';
@@ -503,11 +443,13 @@ class SmvcTemplate
                     break;
                 case 'script':
                     $t = $this->get_para(substr($tag, 7), 0);
+
                     return $this->java_script($t);
                     break;
 
                 case 'style':
                     $t = $this->get_para(substr($tag, 4), 0);
+
                     return $this->style($t, $this->template_dir);
                     break;
 
@@ -526,18 +468,9 @@ class SmvcTemplate
                         $t['_template'] = str_replace("\r", '', $this->fetch_str(base64_decode($_template)));
                     }
 
-                    //                    $out = "<?php \n" . '$k = ' . preg_replace(
-                    //                                    "/(\'\\$[^,]+)/e",
-                    //                                    "stripslashes(trim('\\1','\''));",
-                    //                                    var_export($t, true)
-                    //                            ) . ";\n";
-                    $out = "<?php \n" . '$k = ' . preg_replace_callback(
-                                    "/(\'\\$[^,]+)/",
-                                    function ($r) {
-                                        return stripslashes(trim($r[1], '\''));
-                                    },
-                                    var_export($t, true)
-                            ) . ";\n";
+                    $out = "<?php \n" . '$k = ' . preg_replace_callback("/(\'\\$[^,]+)/", function ($r) {
+                                return stripslashes(trim($r[1], '\''));
+                            }, var_export($t, true)) . ";\n";
                     $out .= 'echo $this->_echash . $k[\'name\'] . \'|\' . serialize($k) . $this->_echash;' . "\n?>";
 
                     return $out;
@@ -561,6 +494,7 @@ class SmvcTemplate
 
                 case 'html_options':
                     $t = $this->get_para(substr($tag, 13), 0);
+
                     return '<?php echo $this->html_options(' . $this->make_array($t) . '); ?>';
                     break;
                 case 'widgets':
@@ -583,26 +517,31 @@ class SmvcTemplate
 
                 case 'img_yesorno':
                     $t = $this->get_para(substr($tag, 11), 0);
+
                     return '<?php echo $this->html_img_yesorno(' . $this->make_array($t) . '); ?>';
                     break;
 
                 case 'page_links':
                     $t = $this->get_para(substr($tag, 10), 0);
+
                     return '<?php echo $this->html_page_links(' . $this->make_array($t) . '); ?>';
                     break;
 
                 case 'page_selector':
                     $t = $this->get_para(substr($tag, 13), 0);
+
                     return '<?php echo $this->html_page_selector(' . $this->make_array($t) . '); ?>';
                     break;
 
                 case 'page_simple':
                     $t = $this->get_para(substr($tag, 11), 0);
+
                     return '<?php echo $this->html_page_simple(' . $this->make_array($t) . '); ?>';
                     break;
 
                 case 'sort_link':
                     $t = $this->get_para(substr($tag, 9), 0);
+
                     return '<?php echo $this->html_sort_link(' . $this->make_array($t) . '); ?>';
                     break;
 
@@ -642,6 +581,7 @@ class SmvcTemplate
                     foreach ($t as $value) {
                         $str .= "if (!empty(" . $value . ")) array_push(\$tmp, " . $value . ");";
                     }
+
                     return "<?php " . $str . " echo join('$glue', \$tmp); ?>";
                     break;
                 case 'sprintf':
@@ -668,17 +608,13 @@ class SmvcTemplate
      *
      * @return  bool
      */
-    function get_val($val)
+    public function get_val($val)
     {
         if (strrpos($val, '[') !== false) {
             //            $val = preg_replace("/\[([^\[\]]*)\]/eis", "'.'.str_replace('$','\$','\\1')", $val);
-            $val = preg_replace_callback(
-                    "/\[([^\[\]]*)\]/is",
-                    function ($r) {
-                        return '.' . str_replace('$', '\$', $r[1]);
-                    },
-                    $val
-            );
+            $val = preg_replace_callback("/\[([^\[\]]*)\]/is", function ($r) {
+                return '.' . str_replace('$', '\$', $r[1]);
+            }, $val);
         }
 
         if (strrpos($val, '|') !== false) {
@@ -741,9 +677,6 @@ class SmvcTemplate
                         break;
 
                     case 'truncate':
-                        //Changed By ld 20100419 for 0000468 start
-                        //DEL--$p = 'sub_str(' . $p . ",$s[1])";
-
                         //取得参数数组
                         $ss = explode(',', $s[1]);
                         //取得当前文字长度[全角折算成2个]
@@ -755,8 +688,6 @@ class SmvcTemplate
                         //Changed By ld 20100419 for 0000468 end
                         break;
                     case 'truncatenodot':
-                        //add by zhoubin 20100817
-                        //省略及不附加逗号
                         //取得参数数组
                         $ss = explode(',', $s[1]);
                         //取得当前文字长度[全角折算成2个]
@@ -765,7 +696,6 @@ class SmvcTemplate
                         if (count($ss) < 2 || $p_len > $ss[1]) {
                             $p = 'sub_str(' . $p . ",$ss[0],false)";
                         }
-                        //Changed By ld 20100419 for 0000468 end
 
                         break;
                     case 'strip_tags':
@@ -834,7 +764,7 @@ class SmvcTemplate
      *
      * @return  bool
      */
-    function make_var($val)
+    public function make_var($val)
     {
         if (strrpos($val, '.') === false) {
             $p = '$this->_var[\'' . $val . '\']';
@@ -864,7 +794,7 @@ class SmvcTemplate
      *
      * @return  array
      */
-    function get_para($val, $type = 1) // 处理insert外部函数/需要include运行的函数的调用数据
+    public function get_para($val, $type = 1) // 处理insert外部函数/需要include运行的函数的调用数据
     {
         $para = array();
         $pa   = $this->str_trim($val);
@@ -895,7 +825,7 @@ class SmvcTemplate
      *
      * @return  mixed
      */
-    function &get_template_vars($name = null)
+    public function &get_template_vars($name = null)
     {
         if (empty($name)) {
             return $this->_var;
@@ -918,13 +848,10 @@ class SmvcTemplate
      *
      * @return  string
      */
-    function _compile_if_tag($tag_args, $elseif = false)
+    public function _compile_if_tag($tag_args, $elseif = false)
     {
-        preg_match_all(
-                '/\-?\d+[\.\d]+|\'[^\'|\s]*\'|"[^"|\s]*"|[\$\w\.]+|!==|===|==|!=|<>|<<|>>|<=|>=|&&|\|\||\(|\)|,|\!|\^|=|&|<|>|~|\||\%|\+|\-|\/|\*|\@|\S/',
-                $tag_args,
-                $match
-        );
+        preg_match_all('/\-?\d+[\.\d]+|\'[^\'|\s]*\'|"[^"|\s]*"|[\$\w\.]+|!==|===|==|!=|<>|<<|>>|<=|>=|&&|\|\||\(|\)|,|\!|\^|=|&|<|>|~|\||\%|\+|\-|\/|\*|\@|\S/',
+                $tag_args, $match);
 
         $tokens = $match[0];
         // make sure we have balanced parenthesis
@@ -934,7 +861,7 @@ class SmvcTemplate
         }
 
         for ($i = 0, $count = count($tokens); $i < $count; $i++) {
-            $token = & $tokens[$i];
+            $token = &$tokens[$i];
             switch (strtolower($token)) {
                 case 'eq':
                     $token = '==';
@@ -1003,7 +930,7 @@ class SmvcTemplate
      *
      * @return  string
      */
-    function _compile_foreach_start($tag_args)
+    public function _compile_foreach_start($tag_args)
     {
         $attrs = $this->get_para($tag_args, 0);
         $from  = $attrs['from'];
@@ -1054,7 +981,7 @@ class SmvcTemplate
      *
      * @return  void
      */
-    function push_vars($key, $val)
+    public function push_vars($key, $val)
     {
         if (!empty($key) && isset($this->_vars[$key])) {
             array_push($this->_temp_key, "\$this->_vars['$key']='" . $this->_vars[$key] . "';");
@@ -1069,7 +996,7 @@ class SmvcTemplate
      *
      * @return  void
      */
-    function pop_vars()
+    public function pop_vars()
     {
         $key = array_pop($this->_temp_key);
         array_pop($this->_temp_val);
@@ -1088,7 +1015,7 @@ class SmvcTemplate
      *
      * @return  string
      */
-    function _compile_smarty_ref(&$indexes)
+    public function _compile_smarty_ref(&$indexes)
     {
         /* Extract the reference name. */
         $_ref         = $indexes[0];
@@ -1176,7 +1103,7 @@ class SmvcTemplate
      *
      * @return string
      **/
-    function java_script($args)
+    public function java_script($args)
     {
         $arr = explode(',', $args['src']);
         $idx = array_search("ecmall", $arr);
@@ -1240,18 +1167,20 @@ class SmvcTemplate
      *
      * @return string
      **/
-    function style($args)
+    public function style($args)
     {
         $arr       = explode(',', $args['src']);
         $file_name = md5($this->_echash . strtolower(join('', $arr)));
         $file_path = SHARE_TEMP_PATH . "/temp/style/$file_name.css";
 
-        $str = "<link type='text/css' rel='stylesheet' href='temp/style/$file_name.css' />";
+        $str     = "<link type='text/css' rel='stylesheet' href='temp/style/$file_name.css' />";
+        $changed = false;
         if (is_file($file_path)) {
             $mtime   = filemtime($file_path);
             $changed = false;
             foreach ($arr AS $val) {
                 $org_file = SHARE_DATA_PATH . '/' . $val;
+                error_log(__METHOD__ . ':$org_file:' . $org_file, 3, 'e:/smvc.log');
                 if (filemtime($org_file) > $mtime) {
                     $changed = true;
                     break;
@@ -1290,7 +1219,7 @@ class SmvcTemplate
      *
      * @return string
      **/
-    function smarty_prefilter_preCompile($source)
+    public function smarty_prefilter_preCompile($source)
     {
 
         /* 替换文件编码头部 */
@@ -1299,26 +1228,6 @@ class SmvcTemplate
         }
 
         $tmp_dir = "themes/mall/skin/" . $this->skin . '/';
-
-        //        $pattern = array(
-        //            '/<!--[^>|\n|#]*?({.+?})[^<|{|\n]*?-->/', // 替换smarty注释
-        //            '/<!--[^<|>|{|\n|#]*?-->/',               // 替换不换行的html注释
-        //            '/(href=["|\'])\.\.\/(.*?)(["|\'])/i',  // 替换相对链接
-        //            '/((?:background|src)\s*=\s*["|\'])(?:\.\/|\.\.\/)?(images\/.*?["|\'])/is', // 在images前加上 $tmp_dir
-        //            '/((?:background|background-image):\s*?url\()(?:\.\/|\.\.\/)?(images\/)/is', // 在images前加上 $tmp_dir
-        //            '/{nocache}(.+?){\/nocache}/ise', //无缓存模块
-        //            );
-        //        $replace = array(
-        //            '\1',
-        //            '',
-        //            '\1\2\3',
-        //            '\1' . $tmp_dir . '\2',
-        //            '\1' . $tmp_dir . '\2',
-        //            "'{insert name=\"nocache\" ' . '" . $this->_echash . "' . base64_encode('\\1') . '}'",
-        //            );
-        //
-        //        return preg_replace($pattern, $replace, $source);
-        //        preg_replace_callback();
 
         $pattern = array(
                 '/<!--[^>|\n|#]*?({.+?})[^<|{|\n]*?-->/', // 替换smarty注释
@@ -1348,40 +1257,22 @@ class SmvcTemplate
      * @param   array       $arr    包含URL参数的数组
      * @return  string
      */
-    function url_rewrite($arr)
+    public function url_rewrite($arr)
     {
 
         $url        = '';
         $custom_url = '';
         $tmp        = array();
-        if (isset($arr['store_id']) && $arr['store_id'] > 0 && isset($arr['app']) && in_array(
-                        $arr['app'],
-                        array('store', 'goods')
-                )
-        ) {
-            $custom_url = get_store_custom_url($arr['store_id']);
-            if ($custom_url || $arr['app'] == 'goods') {
-                unset($arr['store_id']); //不在需要store_id
-            }
-        }
 
         if (defined('URL_REWRITE') && URL_REWRITE > 0) {
             foreach ($arr AS $key => $val) {
-                if ($key == 'app') {
-                    $url = $custom_url . $val . '_';
-                } else {
-                    $tmp[] = $key . chr(9) . $val;
-                }
+                $tmp[] = $key . chr(9) . $val;
             }
 
             $args = str_replace(array('+', '/'), array('.', '-'), base64_encode(join(chr(8), $tmp)));
 
             $url .= $args . '.html';
         } else {
-            if ($custom_url && $arr['app'] == 'store') {
-                unset($arr['app']); //使用指定义域名可以省略app
-            }
-
             foreach ($arr AS $key => $val) {
                 $tmp[] = "$key=" . urlencode($val);
             }
@@ -1391,7 +1282,6 @@ class SmvcTemplate
             } else {
                 $url = 'index.php?' . implode('&amp;', $tmp);
             }
-
         }
 
         return $url;
@@ -1404,20 +1294,20 @@ class SmvcTemplate
      *
      * @param  string $name 动态模块内容
      *
-     * @return stirng
+     * @return string
      */
-    function insert_mod($name) // 处理动态内容
+    public function insert_mod($name) // 处理动态内容
     {
         list($fun, $para) = explode('|', $name, 2);
         $para = unserialize($para);
 
-        $para['template'] = & $this;
+        $para['template'] = &$this;
         $fun              = 'insert_' . $fun;
 
         return $fun($para);
     }
 
-    function str_trim($str)
+    public function str_trim($str)
     {
         /* 处理'a=b c=d k = f '类字符串，返回数组 */
         while (strpos($str, '= ') != 0) {
@@ -1430,10 +1320,9 @@ class SmvcTemplate
         return explode(' ', trim($str));
     }
 
-    function _eval($content)
+    public function _eval($content)
     {
         ob_start();
-        //        error_log(var_export($content,1),3, 'd:/smvc.log');
         eval('?' . '>' . trim($content));
 
         $content = ob_get_contents();
@@ -1442,7 +1331,7 @@ class SmvcTemplate
         return $content;
     }
 
-    function _require($filename)
+    public function _require($filename)
     {
         ob_start();
         include $filename;
@@ -1452,7 +1341,7 @@ class SmvcTemplate
         return $content;
     }
 
-    function html_options($arr)
+    public function html_options($arr)
     {
         $selected = $arr['selected'];
 
@@ -1478,14 +1367,14 @@ class SmvcTemplate
         return $out;
     }
 
-    function display_widgets($arr)
+    public function display_widgets($arr)
     {
         /* 请求控制器 */
         $controller =& cc();
         $controller->display_widgets($arr);
     }
 
-    function html_radios($arr)
+    public function html_radios($arr)
     {
         $name    = $arr['name'];
         $checked = $arr['checked'];
@@ -1499,7 +1388,7 @@ class SmvcTemplate
         return $out;
     }
 
-    function html_checkbox($arr)
+    public function html_checkbox($arr)
     {
         $name      = $arr['name'];
         $checked   = empty($arr['checked']) ? array() : $arr['checked'];
@@ -1512,25 +1401,21 @@ class SmvcTemplate
 
         $out = '';
         foreach ($options AS $key => $val) {
-            $out .= in_array(
-                    $key,
-                    $checked
-            ) ? "<label><input type=\"checkbox\" name=\"$name\" value=\"$key\" checked>&nbsp;{$val}</label>$separator" : "<label><input type=\"checkbox\" name=\"$name\" value=\"$key\">&nbsp;{$val}</label>$separator";
+            $out .= in_array($key,
+                    $checked) ? "<label><input type=\"checkbox\" name=\"$name\" value=\"$key\" checked>&nbsp;{$val}</label>$separator" : "<label><input type=\"checkbox\" name=\"$name\" value=\"$key\">&nbsp;{$val}</label>$separator";
         }
 
         return $out;
     }
 
-    function html_page_links($arr)
+    public function html_page_links($arr)
     {
         $page = array();
         if (isset($arr['from'])) {
             $page = $arr['from'];
         } else {
-            trigger_error(
-                    "Function html_page_links missing \"From\" argument in " . $this->_current_file,
-                    E_USER_ERROR
-            );
+            trigger_error("Function html_page_links missing \"From\" argument in " . $this->_current_file,
+                    E_USER_ERROR);
         }
 
         $page = $this->_init_page_param($page);
@@ -1576,7 +1461,7 @@ class SmvcTemplate
         return $out;
     }
 
-    function _init_page_param($arr)
+    public function _init_page_param($arr)
     {
         if (!isset($arr['page_count'])) {
             $arr['page_count'] = ceil($arr['item_count'] / $arr['pageper']);
@@ -1594,7 +1479,7 @@ class SmvcTemplate
      *
      * @return string
      **/
-    function html_page_selector($arr)
+    public function html_page_selector($arr)
     {
         $page = array();
 
@@ -1623,16 +1508,14 @@ class SmvcTemplate
         return $out;
     }
 
-    function html_page_simple($arr)
+    public function html_page_simple($arr)
     {
         $page = array();
         if (isset($arr['from'])) {
             $page = $arr['from'];
         } else {
-            trigger_error(
-                    "Function html_page_simple missing \"From\" argument in " . $this->_current_file,
-                    E_USER_ERROR
-            );
+            trigger_error("Function html_page_simple missing \"From\" argument in " . $this->_current_file,
+                    E_USER_ERROR);
         }
         if (preg_match('/[&|\?]?page=\w+/i', $_SERVER['REQUEST_URI']) > 0) {
             $url_format = preg_replace('/[&|\?]?page=\w+/i', '', $_SERVER['REQUEST_URI']);
@@ -1654,7 +1537,7 @@ class SmvcTemplate
         return $out;
     }
 
-    function html_img_yesorno($arr)
+    public function html_img_yesorno($arr)
     {
         $val = intval($arr['value']);
         $src = $arr['dir'] . "/" . (($val != 0) ? 'yes.gif' : 'no.gif');
@@ -1663,7 +1546,7 @@ class SmvcTemplate
         return $out;
     }
 
-    function html_sort_link($arr)
+    public function html_sort_link($arr)
     {
         $url = parse_url($_SERVER['REQUEST_URI']);
         $arg = array();
@@ -1696,7 +1579,7 @@ class SmvcTemplate
         return $out;
     }
 
-    function cycle($arr)
+    public function cycle($arr)
     {
         static $k, $old;
 
@@ -1714,7 +1597,7 @@ class SmvcTemplate
         echo $old[$k];
     }
 
-    function image($arr)
+    public function image($arr)
     {
         $uri        = '';
         $hash_path  = md5(ECM_KEY . $arr['file'] . $arr['width'] . $arr['height']);
@@ -1734,6 +1617,7 @@ class SmvcTemplate
             if (isset($arr['absolute_path'])) {
                 $uri = site_url() . "/$uri";
             }
+
             return $uri;
         } else {
             if (isset($arr['absolute_path'])) {
@@ -1744,7 +1628,7 @@ class SmvcTemplate
         }
     }
 
-    function make_array($arr)
+    public function make_array($arr)
     {
         $out = '';
         foreach ($arr AS $key => $val) {
@@ -1758,7 +1642,7 @@ class SmvcTemplate
         return $out . ')';
     }
 
-    function smarty_create_pages($params)
+    public function smarty_create_pages($params)
     {
         extract($params);
 
@@ -1799,7 +1683,7 @@ class SmvcTemplate
      *
      * @return  string
      */
-    function get_custom_module($id, $dir)
+    public function get_custom_module($id, $dir)
     {
         $filename = ROOT_PATH . "/themes/$dir/resource/custom_module.html";
         $html     = file_get_contents($filename);
@@ -1817,7 +1701,7 @@ class SmvcTemplate
      *
      * @return string
      */
-    function get_lang($key)
+    public function get_lang($key)
     {
         $val  = $this->make_var($key);
         $lang = eval('return isset(' . $val . ') ? ' . $val . ': null;');
@@ -1834,7 +1718,7 @@ class SmvcTemplate
      *
      * @return string
      */
-    function _sprintf($arr)
+    public function _sprintf($arr)
     {
         $lang = $this->get_lang('lang.' . $arr['lang']);
         unset($arr['lang']);
@@ -1844,4 +1728,5 @@ class SmvcTemplate
 
         return 'sprintf(\'' . $lang . '\', ' . implode(',', $arr) . ')';
     }
+
 }

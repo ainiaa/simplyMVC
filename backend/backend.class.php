@@ -8,9 +8,138 @@ class BackendController extends BaseController
      */
     public $AdminService;
 
+    protected $headerTpl;
+    protected $topbarTpl;
+    protected $leftMenuTpl;
+    protected $mainTpl;
+    protected $footerTpl;
+
+    protected $defaultTplComponent = array(
+            'headerTpl'   => 'header.tpl.html',
+            'topbarTpl'   => 'topbar.tpl.html',
+            'leftMenuTpl' => 'left_menu.tpl.html',
+            'mainTpl'     => 'main.tpl.html',
+    );
+
+
     public function __construct()
     {
         parent::__construct();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHeaderTpl()
+    {
+        return $this->headerTpl;
+    }
+
+    /**
+     * @param mixed $headerTpl
+     *
+     * @return BackendController
+     */
+    public function setHeaderTpl($headerTpl)
+    {
+        $this->headerTpl = $headerTpl;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTopbarTpl()
+    {
+        return $this->topbarTpl;
+    }
+
+    /**
+     * @param mixed $topbarTpl
+     *
+     * @return BackendController
+     */
+    public function setTopbarTpl($topbarTpl)
+    {
+        $this->topbarTpl = $topbarTpl;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLeftMenuTpl()
+    {
+        return $this->leftMenuTpl;
+    }
+
+    /**
+     * @param mixed $leftMenuTpl
+     *
+     * @return BackendController
+     */
+    public function setLeftMenuTpl($leftMenuTpl)
+    {
+        $this->leftMenuTpl = $leftMenuTpl;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMainTpl()
+    {
+        return $this->mainTpl;
+    }
+
+    /**
+     * @param mixed $mainTpl
+     *
+     * @return BackendController
+     */
+    public function setMainTpl($mainTpl)
+    {
+        $this->mainTpl = $mainTpl;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFooterTpl()
+    {
+        return $this->footerTpl;
+    }
+
+    /**
+     * @param mixed $footerTpl
+     *
+     * @return BackendController
+     */
+    public function setFooterTpl($footerTpl)
+    {
+        $this->footerTpl = $footerTpl;
+
+        return $this;
+    }
+
+    protected function initTplComponent($tplComponent = array())
+    {
+        if (!is_array($tplComponent) || empty($tplComponent)) {
+            $tplComponent = $this->defaultTplComponent;
+        } else {
+            $tplComponent = array_merge($this->defaultTplComponent, $tplComponent);
+        }
+
+        foreach ($tplComponent as $componentName => $componentValue) {
+            if (is_string($componentValue)) {
+                $this->assign($componentName, $componentValue);
+            }
+        }
     }
 
     /**
@@ -19,7 +148,14 @@ class BackendController extends BaseController
      */
     protected function _initialize()
     {
+
         $this->assign('title', 'Simply MVC backend');
+        $this->initTplComponent();
+
+//        $this->assign('headerTpl', 'header.tpl.html');
+//        $this->assign('topbarTpl', 'topbar.tpl.html');
+//        $this->assign('leftMenuTpl', 'left_menu.tpl.html');
+//        $this->assign('mainTpl', 'main.tpl.html');
         $sessionInfo = Session::instance()->get('userInfo');
         if (empty($sessionInfo) && $_GET['a'] != 'login') {
             $this->loginAction();
@@ -43,6 +179,7 @@ class BackendController extends BaseController
                 if ($md5Password == $adminInfo['password']) { //登录成功
                     Session::instance()->set('userInfo', array('userName' => $userName, 'password' => md5($password)));
                     header('Location:/?debug=1&b=2&m=default&c=default&g=backend&a=index');
+
                     return;
                 }
             }

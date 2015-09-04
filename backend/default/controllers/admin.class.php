@@ -22,7 +22,10 @@ class AdminController extends BackendController
      */
     public function indexAction()
     {
+
         $adminList = $this->AdminService->getAdminList();
+
+
 
         $this->assign('title', 'Simply MVC backend - table list');
 
