@@ -33,15 +33,9 @@ if (!function_exists('LCL')) {
 function parse_name($name, $type = 0)
 {
     if ($type) {
-        return ucfirst(
-                preg_replace_callback(
-                        '/_([a-zA-Z])/',
-                        function ($match) {
-                            return strtoupper($match[1]);
-                        },
-                        $name
-                )
-        );
+        return ucfirst(preg_replace_callback('/_([a-zA-Z])/', function ($match) {
+            return strtoupper($match[1]);
+        }, $name));
     } else {
         return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
     }
@@ -62,8 +56,10 @@ function file_exists_case($filename)
                 return false;
             }
         }
+
         return true;
     }
+
     return false;
 }
 
@@ -94,6 +90,7 @@ function xml_encode($data, $root = 'think', $item = 'item', $attr = '', $id = 'i
     $xml .= "<{$root}{$attr}>";
     $xml .= data_to_xml($data, $item, $id);
     $xml .= "</{$root}>";
+
     return $xml;
 }
 
@@ -118,6 +115,7 @@ function data_to_xml($data, $item = 'item', $id = 'id')
         $xml .= (is_array($val) || is_object($val)) ? data_to_xml($val, $item, $id) : $val;
         $xml .= "</{$key}>";
     }
+
     return $xml;
 }
 
@@ -125,4 +123,86 @@ function data_to_xml($data, $item = 'item', $id = 'id')
 function in_array_case($value, $array)
 {
     return in_array(strtolower($value), array_map('strtolower', $array));
+}
+
+
+/**
+ * 从文件或数组中定义常量
+ *
+ * @author Jeff Liu
+ *
+ * @param     mixed $source
+ *
+ * @return    mixed
+ */
+function smvc_define($source)
+{
+    static $defined = array();
+    if (is_string($source)) { //导入数组
+        $source = include($source);
+    }
+    if (!is_array($source)) { //不是数组，无法定义
+        return false;
+    }
+
+    foreach ($source as $key => $value) {
+        $finalKey = strtoupper($key);
+        if (!isset($defined[$finalKey])) {
+            if (is_scalar($value)) {
+                define($finalKey, $value);
+                $defined[$finalKey] = 1;
+            }
+        }
+    }
+
+    return true;
+}
+
+
+/**
+ * 获得当前的域名
+ *
+ * @return  string
+ */
+function get_domain()
+{
+    /* 协议 */
+    $protocol = (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) != 'off')) ? 'https://' : 'http://';
+
+    $host = '';
+    /* 域名或IP地址 */
+    if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+        $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
+    } elseif (isset($_SERVER['HTTP_HOST'])) {
+        $host = $_SERVER['HTTP_HOST'];
+    } else {
+        /* 端口 */
+        if (isset($_SERVER['SERVER_PORT'])) {
+            $port = ':' . $_SERVER['SERVER_PORT'];
+
+            if ((':80' == $port && 'http://' == $protocol) || (':443' == $port && 'https://' == $protocol)) {
+                $port = '';
+            }
+        } else {
+            $port = '';
+        }
+
+        if (isset($_SERVER['SERVER_NAME'])) {
+            $host = $_SERVER['SERVER_NAME'] . $port;
+        } elseif (isset($_SERVER['SERVER_ADDR'])) {
+            $host = $_SERVER['SERVER_ADDR'] . $port;
+        }
+    }
+
+    return $protocol . $host;
+}
+
+/**
+ * 获得网站的URL地址
+ *
+ * @return  string
+ */
+function site_url()
+{
+    return get_domain() . substr(PHP_SELF, 0, strrpos(PHP_SELF, '/'));
 }

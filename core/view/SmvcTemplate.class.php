@@ -450,7 +450,7 @@ class SmvcTemplate
                 case 'style':
                     $t = $this->get_para(substr($tag, 4), 0);
 
-                    return $this->style($t, $this->template_dir);
+                    return $this->style($t, $this->compile_dir);
                     break;
 
                 case 'create_pages':
@@ -650,19 +650,14 @@ class SmvcTemplate
                         } elseif ($s[1] == 'quotes') {
                             $p = 'addslashes(' . $p . ')';
                         } elseif ($s[1] == 'input') {
-                            //Added By lhb 20100317 for 查询条件滤除"\" Begin
                             $p = 'stripslashes(' . $p . ')';
-                            //End
-
                             $p = 'str_replace(\'"\', \'&quot;\',' . $p . ')';
                         } elseif ($s[1] == 'editor') {
                             $p = 'html_filter(' . $p . ')';
                         } else {
                             $p = 'htmlspecialchars(' . $p . ')';
                         }
-                        $test1 = true;
                         break;
-
                     case 'nl2br':
                         $p = 'nl2br(' . $p . ')';
                         break;
@@ -680,6 +675,7 @@ class SmvcTemplate
                         //取得参数数组
                         $ss = explode(',', $s[1]);
                         //取得当前文字长度[全角折算成2个]
+                        $p_len = 0;
                         eval('$p_len = str_len(' . $p . ');');
                         //若没有设定"可显示长度"，或当前文字长度超过了"可显示长度"，则按照"截取长度"进行截取
                         if (count($ss) < 2 || $p_len > $ss[1]) {
@@ -691,6 +687,7 @@ class SmvcTemplate
                         //取得参数数组
                         $ss = explode(',', $s[1]);
                         //取得当前文字长度[全角折算成2个]
+                        $p_len = 0;
                         eval('$p_len = str_len(' . $p . ');');
                         //若没有设定"可显示长度"，或当前文字长度超过了"可显示长度"，则按照"截取长度"进行截取
                         if (count($ss) < 2 || $p_len > $ss[1]) {
@@ -710,11 +707,11 @@ class SmvcTemplate
                     case 'date':
                         if (empty($s[1])) {
                             /* 默认是简单格式 */
-                            $date_format = Conf::get('time_format_simple');
+                            $date_format = C('time_format_simple');
                         } else {
                             if (in_array($s[1], array('simple', 'complete'))) {
                                 /* 允许使用简单和完整格式，从配置项中取 */
-                                $date_format = Conf::get("time_format_{$s[1]}");
+                                $date_format = C("time_format_{$s[1]}");
                             } else {
                                 /* 也可以自定义 */
                                 unset($s[0]); //date格式中可能含有':',所以实际参数要还原下
@@ -1115,7 +1112,7 @@ class SmvcTemplate
         $file_name = md5($this->_echash . strtolower(join('', $arr)));
         $file_path = SHARE_TEMP_PATH . "/temp/js/$file_name.js";
 
-        $str     = "<script type='text/javascript' src='temp/js/$file_name.js'></script>";
+        $str     = "<script type='text/javascript' src='./temp/js/$file_name.js'></script>";
         $changed = false;
 
         if (is_file($file_path)) {
@@ -1167,20 +1164,19 @@ class SmvcTemplate
      *
      * @return string
      **/
-    public function style($args)
+    public function style($args, $tmpPath)
     {
         $arr       = explode(',', $args['src']);
         $file_name = md5($this->_echash . strtolower(join('', $arr)));
-        $file_path = SHARE_TEMP_PATH . "/temp/style/$file_name.css";
+        $file_path = $tmpPath . "/temp/style/$file_name.css";
 
-        $str     = "<link type='text/css' rel='stylesheet' href='temp/style/$file_name.css' />";
+        $str     = "<link type='text/css' rel='stylesheet' href='./temp/style/$file_name.css' />";
         $changed = false;
         if (is_file($file_path)) {
             $mtime   = filemtime($file_path);
             $changed = false;
             foreach ($arr AS $val) {
                 $org_file = SHARE_DATA_PATH . '/' . $val;
-                error_log(__METHOD__ . ':$org_file:' . $org_file, 3, 'e:/smvc.log');
                 if (filemtime($org_file) > $mtime) {
                     $changed = true;
                     break;
@@ -1192,7 +1188,7 @@ class SmvcTemplate
             $js_code = '';
             foreach ($arr AS $file) {
                 $content  = file_get_contents(SHARE_DATA_PATH . '/' . $file);
-                $skin_img = dirname(ROOT_DIR . '/' . $file) . '/images';
+                $skin_img = dirname(ROOT_PATH . '/' . $file) . '/images';
 
                 $patterns[]    = '/\s+\/\/.*+\n/';
                 $replacement[] = '';
@@ -1345,17 +1341,19 @@ class SmvcTemplate
     {
         $selected = $arr['selected'];
 
+        $options = null;
         if ($arr['options']) {
             $options = (array)$arr['options'];
-        } elseif ($arr['output']) {
+        } else if ($arr['output']) {
             if ($arr['values']) {
                 foreach ($arr['output'] AS $key => $val) {
-                    $options["{$arr[values][$key]}"] = $val;
+                    $options["{$arr['values'][$key]}"] = $val;
                 }
             } else {
                 $options = array_values((array)$arr['output']);
             }
         }
+        $out = '';
         if ($options) {
             foreach ($options AS $key => $val) {
                 $key = htmlspecialchars($key);
@@ -1517,11 +1515,6 @@ class SmvcTemplate
             trigger_error("Function html_page_simple missing \"From\" argument in " . $this->_current_file,
                     E_USER_ERROR);
         }
-        if (preg_match('/[&|\?]?page=\w+/i', $_SERVER['REQUEST_URI']) > 0) {
-            $url_format = preg_replace('/[&|\?]?page=\w+/i', '', $_SERVER['REQUEST_URI']);
-        } else {
-            $url_format = $_SERVER['REQUEST_URI'] . '';
-        }
 
         $out          = '';
         $prve_page    = $page['curr_page'] - 1;
@@ -1553,7 +1546,7 @@ class SmvcTemplate
         $out = '';
 
         parse_str($url['query'], $arg);
-
+        $flag = '';
         if (isset($arg['sort'])) {
             $order = (empty($arg['order']) || strcasecmp($arg['order'], 'desc') == 0) ? 'asc' : 'desc';
 
@@ -1562,7 +1555,6 @@ class SmvcTemplate
             }
         } else {
             $order = 'asc';
-            $flag  = '';
         }
 
         $arg['sort']  = $arr['by'];
@@ -1600,14 +1592,14 @@ class SmvcTemplate
     public function image($arr)
     {
         $uri        = '';
-        $hash_path  = md5(ECM_KEY . $arr['file'] . $arr['width'] . $arr['height']);
+        $hash_path  = md5(SMVC_KEY . $arr['file'] . $arr['width'] . $arr['height']);
         $thumb_path = './temp/thumb/' . $hash_path{0} . $hash_path{1} . '/' . $hash_path{2} . $hash_path{3} . '/' . $hash_path . $arr['file'] . '.jpg';
         if (!is_file($thumb_path)) {
             $width  = isset($arr['width']) ? intval($arr['width']) : 0;
             $height = isset($arr['height']) ? intval($arr['height']) : 0;
             $file   = empty($arr['file']) ? 0 : intval($arr['file']);
 
-            $uri = 'image.php?file_id=' . $file . '&amp;hash_path=' . md5(ECM_KEY . $file . $width . $height);
+            $uri = 'image.php?file_id=' . $file . '&amp;hash_path=' . md5(SMVC_KEY . $file . $width . $height);
             if (isset($arr['width'])) {
                 $uri .= '&amp;width=' . $arr['width'];
             }

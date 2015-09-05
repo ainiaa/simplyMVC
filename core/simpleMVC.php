@@ -9,6 +9,9 @@ header('Content-Type:text/html;charset=utf-8');
 
 include dirname(__FILE__) . '/config/runtimeConst.inc.php';
 include CORE_PATH . '/Importer.class.php';
+define('PHP_SELF', htmlentities(isset($_SERVER['PHP_SELF']) ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME']));
+define('SHARE_TEMP_PATH', ROOT_PATH . '/temp/');
+define('SHARE_DATA_PATH', ROOT_PATH . '/data/');
 
 class SimpleMVC
 {
