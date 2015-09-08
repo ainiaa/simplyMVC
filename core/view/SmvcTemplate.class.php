@@ -1,5 +1,7 @@
 <?php
 
+!defined('SMVC_KEY') && define('SMVC_KEY', 'asdf3rtghnm,-0oikjnhbdfghjkl');
+
 class SmvcTemplate
 {
     var $template_dir = '';
@@ -1363,13 +1365,6 @@ class SmvcTemplate
         }
 
         return $out;
-    }
-
-    public function display_widgets($arr)
-    {
-        /* 请求控制器 */
-        $controller =& cc();
-        $controller->display_widgets($arr);
     }
 
     public function html_radios($arr)
