@@ -16,6 +16,9 @@ local.properties
 .settings/
 .loadpath
 
+#template compile cache directory
+templates_c/
+
 # External tool builders
 .externalToolBuilders/
 

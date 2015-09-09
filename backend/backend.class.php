@@ -13,18 +13,39 @@ class BackendController extends BaseController
     protected $leftMenuTpl;
     protected $mainTpl;
     protected $footerTpl;
+    protected $layout;
 
     protected $defaultTplComponent = array(
             'headerTpl'   => 'header.tpl.html',
             'topbarTpl'   => 'topbar.tpl.html',
             'leftMenuTpl' => 'left_menu.tpl.html',
             'mainTpl'     => 'main.tpl.html',
+            'layout'      => 'backend_layout.tpl.html',
     );
 
 
     public function __construct()
     {
         parent::__construct();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLayout()
+    {
+        if (empty($this->layout) && isset($this->defaultTplComponent['layout'])) {
+            $this->layout = $this->defaultTplComponent['layout'];
+        }
+        return $this->layout;
+    }
+
+    /**
+     * @param mixed $layout
+     */
+    public function setLayout($layout)
+    {
+        $this->layout = $layout;
     }
 
     /**
@@ -142,6 +163,18 @@ class BackendController extends BaseController
         }
     }
 
+    public function display($tpl = '')
+    {
+        if (empty($tpl)) {
+            $tpl = $this->getLayout();
+            if (empty($tpl)) {
+                die('please set the template or the layout');
+            }
+        }
+
+        return parent::display($tpl);
+    }
+
     /**
      * 执行初始化操作
      * @author Jeff Liu
@@ -152,10 +185,10 @@ class BackendController extends BaseController
         $this->assign('title', 'Simply MVC backend');
         $this->initTplComponent();
 
-//        $this->assign('headerTpl', 'header.tpl.html');
-//        $this->assign('topbarTpl', 'topbar.tpl.html');
-//        $this->assign('leftMenuTpl', 'left_menu.tpl.html');
-//        $this->assign('mainTpl', 'main.tpl.html');
+        //        $this->assign('headerTpl', 'header.tpl.html');
+        //        $this->assign('topbarTpl', 'topbar.tpl.html');
+        //        $this->assign('leftMenuTpl', 'left_menu.tpl.html');
+        //        $this->assign('mainTpl', 'main.tpl.html');
         $sessionInfo = Session::instance()->get('userInfo');
         if (empty($sessionInfo) && $_GET['a'] != 'login') {
             $this->loginAction();
