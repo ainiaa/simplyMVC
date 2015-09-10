@@ -3,7 +3,7 @@
 
 <div class="ch-container">
     <div class="row">
-        {include file="left_menu.tpl.html"}
+        {include file=$leftMenuTpl}
         <noscript>
             <div class="alert alert-block col-md-12">
                 <h4 class="alert-heading">Warning!</h4>
@@ -15,7 +15,7 @@
 
         <div id="content" class="col-lg-10 col-sm-10">
             <!-- content starts -->
-            {include file="bread_crumb.tpl.html"}
+            {include file=$breadCrumbTpl}
             {include file=$mainTpl}
             <!-- content ends -->
         </div>

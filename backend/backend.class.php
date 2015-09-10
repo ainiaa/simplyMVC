@@ -17,19 +17,33 @@ class BackendController extends BaseController
     protected $mainTpl;
     protected $footerTpl;
     protected $layout;
-
+    protected $breadCrumbTpl;
     protected $defaultTplComponent = array(
             'headerTpl'   => 'header.tpl.html',
             'topbarTpl'   => 'topbar.tpl.html',
             'leftMenuTpl' => 'left_menu.tpl.html',
             'mainTpl'     => 'main.tpl.html',
-            'layout'      => 'backend_layout.tpl.html',
+            'breadCrumbTpl'  => 'bread_crumb.tpl.html',
+            'layout'      => 'layout.tpl.html',
     );
 
-
-    public function __construct()
+    /**
+     * @return mixed
+     */
+    public function getBreadCrumbTpl()
     {
-        parent::__construct();
+        return $this->breadCrumbTpl;
+    }
+
+    /**
+     * @param mixed $breadCrumbTpl
+     */
+    public function setBreadCrumbTpl($breadCrumbTpl)
+    {
+        $this->breadCrumbTpl = $breadCrumbTpl;
+        $this->assign('breadCrumbTpl', $breadCrumbTpl);
+
+        return $this;
     }
 
     /**
@@ -40,6 +54,7 @@ class BackendController extends BaseController
         if (empty($this->layout) && isset($this->defaultTplComponent['layout'])) {
             $this->layout = $this->defaultTplComponent['layout'];
         }
+
         return $this->layout;
     }
 
@@ -49,6 +64,9 @@ class BackendController extends BaseController
     public function setLayout($layout)
     {
         $this->layout = $layout;
+        $this->assign('layout', $layout);
+
+        return $this;
     }
 
     /**
@@ -67,6 +85,7 @@ class BackendController extends BaseController
     public function setHeaderTpl($headerTpl)
     {
         $this->headerTpl = $headerTpl;
+        $this->assign('headerTpl', $headerTpl);
 
         return $this;
     }
@@ -87,6 +106,7 @@ class BackendController extends BaseController
     public function setTopbarTpl($topbarTpl)
     {
         $this->topbarTpl = $topbarTpl;
+        $this->assign('topbarTpl', $topbarTpl);
 
         return $this;
     }
@@ -107,6 +127,7 @@ class BackendController extends BaseController
     public function setLeftMenuTpl($leftMenuTpl)
     {
         $this->leftMenuTpl = $leftMenuTpl;
+        $this->assign('leftMenuTpl', $leftMenuTpl);
 
         return $this;
     }
@@ -127,7 +148,8 @@ class BackendController extends BaseController
     public function setMainTpl($mainTpl)
     {
         $this->mainTpl = $mainTpl;
-        $this->assign('mainTpl', $this->mainTpl);
+        $this->assign('mainTpl', $mainTpl);
+
         return $this;
     }
 
@@ -147,6 +169,7 @@ class BackendController extends BaseController
     public function setFooterTpl($footerTpl)
     {
         $this->footerTpl = $footerTpl;
+        $this->assign('footerTpl', $footerTpl);
 
         return $this;
     }
