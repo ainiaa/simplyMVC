@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class BackendController
+ */
 class BackendController extends BaseController
 {
 
@@ -124,7 +127,7 @@ class BackendController extends BaseController
     public function setMainTpl($mainTpl)
     {
         $this->mainTpl = $mainTpl;
-
+        $this->assign('mainTpl', $this->mainTpl);
         return $this;
     }
 
