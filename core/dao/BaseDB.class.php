@@ -36,22 +36,38 @@ class BaseDBDAO extends SmvcObject
      * @var String
      */
     protected $latestStorageType = null;
-
     const WRITE_STORAGE = 1;
-
     const READ_STORAGE = 2;
+    const LATEST_STORAGE_WRITER = 1;
+    const LATEST_STORAGE_READER = 2;
+    protected $storageType = null;
 
     protected $pk = null;
-
     protected $sk = null;
 
-    const LATEST_STORAGE_WRITER = 1;
+    /**
+     * 事务指令数
+     * @var int
+     */
+    protected $transTimes = 0;
 
-    const LATEST_STORAGE_READER = 2;
+    /**
+     * 数据库连接ID 支持多个连接
+     * @var array
+     */
+    protected $storageList = array();
 
+    /**
+     * 当前数据库连接
+     * @var mixed
+     */
+    protected $currentStorage = null;
 
-
-    protected $storageType = null;
+    /**
+     * 是否已经连接数据库
+     * @var bool
+     */
+    protected $connected = false;
 
     public function __construct()
     {
@@ -105,9 +121,8 @@ class BaseDBDAO extends SmvcObject
      * 通过主键获取数据。
      *
      * @param mixed $pk 主键信息。
-     * @param array $pinfo
      *
-     * @return  array
+     * @return array
      */
     public function getByPk($pk)
     {
@@ -161,16 +176,20 @@ class BaseDBDAO extends SmvcObject
         $dbMasterConfig = C(self::$writeKey);
         if (empty($this->writerStorage)) {
             $masterConifg        = $dbMasterConfig[$masterIndex];
-            $this->writerStorage = new medoo(array(
-                    'database_type' => $masterConifg['DB_TYPE'],
-                    'database_name' => $masterConifg['DB_NAME'],
-                    'server'        => $masterConifg['DB_HOST'],
-                    'username'      => $masterConifg['DB_USER'],
-                    'password'      => $masterConifg['DB_PASS'],
-            ));
+            $this->writerStorage = new medoo(
+                    array(
+                            'database_type' => $masterConifg['DB_TYPE'],
+                            'database_name' => $masterConifg['DB_NAME'],
+                            'server'        => $masterConifg['DB_HOST'],
+                            'username'      => $masterConifg['DB_USER'],
+                            'password'      => $masterConifg['DB_PASS'],
+                    )
+            );
 
             $this->setTableName($masterConifg);
         }
+
+        return $this->writerStorage;
     }
 
     public function getDbMasterIndex()
@@ -195,17 +214,21 @@ class BaseDBDAO extends SmvcObject
                 $dbSlaveConfig       = C(self::$readKey);
                 $slaveIndex          = array_rand($dbSlaveConfig[$masterIndex]);
                 $slaveConifg         = $dbSlaveConfig[$masterIndex][$slaveIndex];
-                $this->readerStorage = new medoo(array(
-                        'database_type' => $slaveConifg['DB_TYPE'],
-                        'database_name' => $slaveConifg['DB_NAME'],
-                        'server'        => $slaveConifg['DB_HOST'],
-                        'username'      => $slaveConifg['DB_USER'],
-                        'password'      => $slaveConifg['DB_PASS'],
-                ));
+                $this->readerStorage = new medoo(
+                        array(
+                                'database_type' => $slaveConifg['DB_TYPE'],
+                                'database_name' => $slaveConifg['DB_NAME'],
+                                'server'        => $slaveConifg['DB_HOST'],
+                                'username'      => $slaveConifg['DB_USER'],
+                                'password'      => $slaveConifg['DB_PASS'],
+                        )
+                );
             } else {
                 $this->readerStorage = $this->writerStorage;
             }
         }
+
+        $this->readerStorage;
     }
 
     /**
@@ -477,7 +500,7 @@ class BaseDBDAO extends SmvcObject
      */
     public function delete($where = array())
     {
-        $this->setLatestStorageType(self::LATEST_STORAGE_READER);
+        $this->setLatestStorageType(self::LATEST_STORAGE_WRITER);
 
         return $this->getStorage(self::WRITE_STORAGE)->delete($this->tableName, $where);
     }
@@ -658,6 +681,108 @@ class BaseDBDAO extends SmvcObject
         } else {
             return $this->getStorage(self::WRITE_STORAGE)->info();
         }
+    }
+
+    /**
+     * 初始化数据库连接
+     * @access protected
+     *
+     * @param boolean $master 主服务器
+     *
+     * @return void
+     */
+    protected function initConnect($master = true)
+    {
+        if (1 == C('DB_DEPLOY_TYPE')) { // 采用分布式数据库
+            $this->currentStorage = $this->multiConnect($master);
+        } else // 默认单数据库
+            if (!$this->connected) {
+                $this->currentStorage = $this->connect($master);
+            }
+    }
+
+    /**
+     * 连接分布式服务器
+     * @access protected
+     *
+     * @param boolean $master 主服务器
+     *
+     * @return mixed
+     */
+    protected function multiConnect($master = false)
+    {
+        return $this->connect($master);
+    }
+
+    /**
+     * 连接数据库方法
+     * @access public
+     * @return mixed
+     */
+    public function connect($master)
+    {
+        if ($master) {
+            $this->currentStorage = $this->initWriteStorage();
+        } else {
+            $this->currentStorage = $this->initWriteStorage();
+        }
+        $this->connected = true;
+        return $this->currentStorage;
+    }
+
+    /**
+     * 启动事务
+     * @access public
+     * @return mixed
+     */
+    public function startTrans()
+    {
+        $this->initConnect(true);
+        if (!$this->currentStorage) {
+            return false;
+        }
+        //数据rollback 支持
+        if ($this->transTimes == 0) {
+            $this->writerStorage->query('START TRANSACTION');
+        }
+        $this->transTimes++;
+        return true;
+    }
+
+    /**
+     * 用于非自动提交状态下面的查询提交
+     * @access public
+     * @return boolean
+     */
+    public function commit()
+    {
+        if ($this->transTimes > 0) {
+            $result           = $this->writerStorage->query('COMMIT');
+            $this->transTimes = 0;
+            if (!$result) {
+                $this->error();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 事务回滚
+     * @access public
+     * @return boolean
+     */
+    public function rollback()
+    {
+        if ($this->transTimes > 0) {
+            $result           = $this->writerStorage->query('ROLLBACK');
+            $this->transTimes = 0;
+            if (!$result) {
+                $this->error();
+                return false;
+            }
+        }
+        return true;
     }
 
 }
