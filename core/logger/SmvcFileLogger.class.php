@@ -47,6 +47,7 @@ class SmvcFileLogger extends SmvcBaseLogger
      */
     public function __construct($info = array( /*'logDir' => '', 'level' => 'debug'*/))
     {
+        parent::__construct($info);
         $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLogLevel;
         $logDir         = isset($info['logDir']) ? $info['logDir'] : '';
         $logDir         = rtrim($logDir, '\\/');

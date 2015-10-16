@@ -3,8 +3,6 @@
 class SmvcMemcachedSession extends SmvcBaseSession
 {
 
-
-
     /*
      * @var	storage for the memcached object
      */
@@ -127,7 +125,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
                 // not a valid cookie payload
             } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
-            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::ip() . Router::realIp())) {
+            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::getRemoteIp() . Router::clientIp())) {
                 // IP address doesn't match
             } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
                 // user agent doesn't match
@@ -187,8 +185,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
             // do some garbage collection
             if (mt_rand(0, 100) < $this->config['gc_probability']) {
                 $expired = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
-                $result  = $this->storager->delete($this->config['table'], array('updated[<]' => $expired));
-
+                $this->storager->delete($this->config['table'], array('updated[<]' => $expired));
             }
         }
 
@@ -285,8 +282,8 @@ class SmvcMemcachedSession extends SmvcBaseSession
 
         foreach ($config as $name => $item) {
             if ($name == 'memcached' and is_array($item)) {
-                foreach ($item as $name => $value) {
-                    switch ($name) {
+                foreach ($item as $k => $value) {
+                    switch ($k) {
                         case 'cookie_name':
                             if (empty($value) or !is_string($value)) {
                                 $value = 'fuelmid';

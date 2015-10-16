@@ -6,7 +6,7 @@ class Crypt
     /*
      * Crypto object used to encrypt/decrypt
      *
-     * @var	object
+     * @var	encrypt
      */
     private static $crypter = null;
 
@@ -54,13 +54,6 @@ class Crypt
             if ($update === true) {
                 try {
                     SC('crypt', self::$config);
-//                    SmvcDebugHelper::instance()->debug(
-//                            array(
-//                                    'info'  => var_export(self::$config,1),
-//                                    'label' => 'self::$config ' . __METHOD__,
-//                                    'level' => 'error',
-//                            )
-//                    );
                 } catch (Exception $e) {
                 }
             }

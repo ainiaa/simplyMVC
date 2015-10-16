@@ -118,6 +118,7 @@ class Factory
 
     /**
      * @param      $obj
+     * @param      $methodName
      * @param null $className
      *
      * @return mixed

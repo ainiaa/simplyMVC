@@ -14,6 +14,8 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
 
     protected $uId;
 
+    protected $storager;
+
     /**
      * @var CoreMemcache
      */
@@ -43,7 +45,7 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      */
     protected function init($uid)
     {
-        $this->uid = $uid;
+        $this->uId = $uid;
 
         if (empty($this->memcached)) {
             $memcacheConf = C('memcached', array());
@@ -55,7 +57,9 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
                 );
             }
             if (!class_exists('Memcached')) {
-                throw new Exception('Memcached sessions are configured, but your PHP installation doesn\'t have the Memcached extension loaded.');
+                throw new Exception(
+                        'Memcached sessions are configured, but your PHP installation doesn\'t have the Memcached extension loaded.'
+                );
             }
 
             $this->memcached = new Memcached();
@@ -63,7 +67,9 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
             $this->memcached->addServers($memcacheConf);
 
             if ($this->memcached->getVersion() === false) {
-                throw new Exception('Memcached sessions are configured, but there is no connection possible. Check your configuration.');
+                throw new Exception(
+                        'Memcached sessions are configured, but there is no connection possible. Check your configuration.'
+                );
             }
         }
 
@@ -84,7 +90,10 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      *
      * @param array $datas
      *
+     * @param bool  $getLastInsertId
+     *
      * @return mixed
+     * @throws Exception
      */
     public function add($datas, $getLastInsertId = false)
     {
@@ -212,13 +221,13 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
 
             return $this->getBySk($pk);
         } else {
-            $this->uid = $pk;
+            $this->uId = $pk;
             $key       = $this->getPK();
             if (!isset($this->localCache[$key])) {
                 $this->init($pk);
                 $datas = $this->memcached->get($key);
                 if (!$datas) {
-                    $datas = parent::getByPk($pk, $pinfo);
+                    $datas = parent::getByPk($pk);
                     if ($datas) {
                         $this->memcached->set($key, $datas);
                     }
@@ -262,8 +271,8 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
             $pk = $condition[$this->pk];
             $this->init($pk);
             $sk  = $condition[$this->sk];
-            $key = $this->getPK($pk);
-            $ret = parent::deleteByPk($condition, $pinfo);
+            $key = $this->getPK();
+            $ret = parent::deleteByPk($condition);
 
             if ($ret > 0) {
                 //清除缓存
@@ -285,8 +294,8 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
             }
         } else {
             $this->init($condition);
-            $key = $this->getPK($condition);
-            $ret = parent::deleteByPk($condition, $pinfo);
+            $key = $this->getPK();
+            $ret = parent::deleteByPk($condition);
 
             if ($ret > 0) {
                 $this->memcached->del($key);
@@ -301,6 +310,9 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
 
     /**
      * 错误信息记录
+     *
+     * @param $method
+     * @param $params
      */
     private function errorInfo($method, $params)
     {
@@ -369,7 +381,7 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
                 $datas = $this->memcached->get($key);
 
                 if (!$datas) {
-                    $datas = parent::getByPk($infos, array('mulit' => true));
+                    $datas = parent::getByPk($infos);
                     if ($datas) {    //fix local & redis cache
                         $this->memcached->set($key, $datas);
                         $this->localCache[$key] = $datas;
@@ -403,6 +415,6 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      */
     protected function setMainId($uid)
     {
-        $this->uid = $uid;
+        $this->uId = $uid;
     }
 }

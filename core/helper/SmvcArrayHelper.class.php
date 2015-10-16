@@ -46,7 +46,7 @@ class SmvcArrayHelper
      * Gets a dot-notated key from an array, with a default value if it does
      * not exist.
      *
-     * @param   array  $array   The search array
+     * @param   array|ArrayAccess  $array   The search array
      * @param   mixed  $key     The dot-notated key or array of keys
      * @param   string $default The default value
      *
@@ -126,9 +126,9 @@ class SmvcArrayHelper
     /**
      * Pluck an array of values from an array.
      *
-     * @param  array  $array collection of arrays to pluck from
-     * @param  string $key   key of the value to pluck
-     * @param  string $index optional return array index key, true for original index
+     * @param  array|ArrayAccess $array collection of arrays to pluck from
+     * @param  string            $key   key of the value to pluck
+     * @param  string            $index optional return array index key, true for original index
      *
      * @return array   array of plucked values
      */
@@ -139,14 +139,18 @@ class SmvcArrayHelper
 
         if (!$index) {
             foreach ($array as $i => $a) {
-                $return[] = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$key} : ($get_deep ? self::get($a,
-                        $key) : $a[$key]);
+                $return[] = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$key} : ($get_deep ? self::get(
+                        $a,
+                        $key
+                ) : $a[$key]);
             }
         } else {
             foreach ($array as $i => $a) {
                 $index !== true and $i = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$index} : $a[$index];
-                $return[$i] = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$key} : ($get_deep ? self::get($a,
-                        $key) : $a[$key]);
+                $return[$i] = (is_object($a) and !($a instanceof ArrayAccess)) ? $a->{$key} : ($get_deep ? self::get(
+                        $a,
+                        $key
+                ) : $a[$key]);
             }
         }
 
@@ -764,17 +768,20 @@ class SmvcArrayHelper
      */
     public static function multiUnquie($originData, $callback, $strict = false)
     {
-        return array_filter($originData, function ($item) use ($strict, $callback) {
-            static $haystack = array();
-            $needle = $callback($item);
-            if (in_array($needle, $haystack, $strict)) {
-                return false;
-            } else {
-                $haystack[] = $needle;
+        return array_filter(
+                $originData,
+                function ($item) use ($strict, $callback) {
+                    static $haystack = array();
+                    $needle = $callback($item);
+                    if (in_array($needle, $haystack, $strict)) {
+                        return false;
+                    } else {
+                        $haystack[] = $needle;
 
-                return true;
-            }
-        });
+                        return true;
+                    }
+                }
+        );
     }
 
 
@@ -813,7 +820,9 @@ class SmvcArrayHelper
         }
 
         if (!is_array($source) or !is_array($replace)) {
-            throw new Exception('SmvcArrayHelper::replace_key() - $source must an array. $replace must be an array or string.');
+            throw new Exception(
+                    'SmvcArrayHelper::replace_key() - $source must an array. $replace must be an array or string.'
+            );
         }
 
         $result = array();
@@ -1018,21 +1027,24 @@ class SmvcArrayHelper
     public static function unique($arr)
     {
         // filter out all duplicate values
-        return array_filter($arr, function ($item) {
-            // contrary to popular belief, this is not as static as you think...
-            static $vars = array();
+        return array_filter(
+                $arr,
+                function ($item) {
+                    // contrary to popular belief, this is not as static as you think...
+                    static $vars = array();
 
-            if (in_array($item, $vars, true)) {
-                // duplicate
-                return false;
-            } else {
-                // record we've had this value
-                $vars[] = $item;
+                    if (in_array($item, $vars, true)) {
+                        // duplicate
+                        return false;
+                    } else {
+                        // record we've had this value
+                        $vars[] = $item;
 
-                // unique
-                return true;
-            }
-        });
+                        // unique
+                        return true;
+                    }
+                }
+        );
     }
 
     /**

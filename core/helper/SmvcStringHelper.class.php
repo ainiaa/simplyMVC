@@ -541,6 +541,8 @@ class SmvcStringHelper
         if ($res) {
             return $m;
         }
+
+        return null;
     }
 
 

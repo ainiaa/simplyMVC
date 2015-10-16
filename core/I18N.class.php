@@ -72,6 +72,8 @@ abstract class I18N
 
     /**
      * Sets the current locale
+     *
+     * @param null $locale
      */
     protected function setLocale($locale = null)
     {
@@ -89,6 +91,10 @@ abstract class I18N
 
     /**
      * Translates given term
+     *
+     * @param $term
+     *
+     * @return string
      */
     public function _translate($term)
     {
@@ -144,8 +150,6 @@ abstract class I18N
      * @param null $locale
      * @param null $fileName
      *
-     * @internal     param $string , the translation term
-     * @internal     param $string , (optional) the language which the term
      *               should be translated into.
      *
      * @return string
@@ -176,6 +180,9 @@ abstract class I18N
 
     /**
      * Alias for @translate
+     *
+     * @param      $term
+     * @param null $locale
      */
     public static function t($term, $locale = null)
     {

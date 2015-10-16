@@ -286,7 +286,7 @@ class SmvcTemplate
         }
 
         return preg_replace_callback("/{([^\}\{\n]*)}/", function ($r) {
-            return $this->select($r[1]);
+            return SmvcTemplate::select($r[1]);
         }, $source);
     }
 
@@ -1586,7 +1586,6 @@ class SmvcTemplate
 
     public function image($arr)
     {
-        $uri        = '';
         $hash_path  = md5(SMVC_KEY . $arr['file'] . $arr['width'] . $arr['height']);
         $thumb_path = './temp/thumb/' . $hash_path{0} . $hash_path{1} . '/' . $hash_path{2} . $hash_path{3} . '/' . $hash_path . $arr['file'] . '.jpg';
         if (!is_file($thumb_path)) {

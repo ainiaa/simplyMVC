@@ -54,7 +54,7 @@ class SmvcCookieSession extends SmvcBaseSession
             // not a valid cookie payload
         } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
             // session has expired
-        } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::ip() . Router::realIp())) {
+        } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::getRemoteIp() . Router::clientIp())) {
             // IP address doesn't match
         } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
             // user agent doesn't match
@@ -80,7 +80,11 @@ class SmvcCookieSession extends SmvcBaseSession
      * write the current session
      *
      * @access    public
-     * @return    $this
+     *
+     * @param string $id
+     *
+     * @return $this
+     * @throws Exception
      */
     public function write($id)
     {
@@ -141,7 +145,10 @@ class SmvcCookieSession extends SmvcBaseSession
 
     /**
      * Garbage collection. Remove all expired entries atomically.
-     * @return boolean
+     *
+     * @param int $maxLifeTime
+     *
+     * @return bool
      */
     public function gc($maxLifeTime)
     {

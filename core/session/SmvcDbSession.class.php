@@ -97,7 +97,7 @@ class SmvcDbSession extends SmvcBaseSession
                 // not a valid cookie payload
             } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
-            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::ip() . Router::realIp())) {
+            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::getRemoteIp() . Router::clientIp())) {
                 // IP address doesn't match
             } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
                 // user agent doesn't match
@@ -169,8 +169,7 @@ class SmvcDbSession extends SmvcBaseSession
             // do some garbage collection
             if (mt_rand(0, 100) < $this->config['gc_probability']) {
                 $expired = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
-                $result  = $this->storager->delete($this->config['table'], array('updated[<]' => $expired));
-
+                $this->storager->delete($this->config['table'], array('updated[<]' => $expired));
             }
         }
 
@@ -192,7 +191,7 @@ class SmvcDbSession extends SmvcBaseSession
         // do we have something to destroy?
         if (!empty($this->keys) and !empty($this->record)) {
             // delete the session record
-            $result = $this->storager->delete(
+            $this->storager->delete(
                     $this->config['table'],
                     array('session_id[<]' => $this->keys['session_id'])
             );
@@ -238,7 +237,9 @@ class SmvcDbSession extends SmvcBaseSession
                     case 'table':
                         // and a table name?
                         if (empty($item) or !is_string($item)) {
-                            throw new Exception('You have specify a database table name to use database backed sessions.');
+                            throw new Exception(
+                                    'You have specify a database table name to use database backed sessions.'
+                            );
                         }
                         break;
 

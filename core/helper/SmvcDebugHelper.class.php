@@ -74,7 +74,7 @@ class SmvcDebugHelper implements ArrayAccess
      *
      * @param string $instanceName
      *
-     * @return DebugHelper
+     * @return
      */
     public static function getInstance($instanceName = 'firephp')
     {
@@ -154,6 +154,8 @@ class SmvcDebugHelper implements ArrayAccess
      * @param string $label
      * @param string $level
      * @param mixed  $options
+     *
+     * @param string $debugFile
      *
      * @return bool
      */

@@ -595,7 +595,6 @@ class BaseDBDAO extends SmvcObject
     }
 
     /**
-     * @param string $column The target column will be calculated.
      * @param array  $where
      *
      * @return int  The total number of the column.
@@ -710,6 +709,9 @@ class BaseDBDAO extends SmvcObject
     /**
      * 连接数据库方法
      * @access public
+     *
+     * @param $master
+     *
      * @return mixed
      */
     public function connect($master)

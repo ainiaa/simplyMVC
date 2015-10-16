@@ -64,7 +64,7 @@ class SmvcObject
      *
      * @author Jeff Liu
      *
-     * @param array $c 查找层级，不填为第一子方法
+     * @param int $c 查找层级，不填为第一子方法
      *
      * @return null|string
      */

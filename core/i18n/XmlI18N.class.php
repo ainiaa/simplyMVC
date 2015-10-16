@@ -94,6 +94,12 @@ class XmlI18N extends I18N
 
     /**
      * Alias for @translate
+     *
+     * @param      $term
+     * @param null $locale
+     * @param null $fileName
+     *
+     * @return string|void
      */
     public static function t($term, $locale = null, $fileName = null)
     {

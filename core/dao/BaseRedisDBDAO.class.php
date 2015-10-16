@@ -14,6 +14,8 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
 
     protected $uId;
 
+    protected $storager;
+
     protected $defaultValue = array();
 
     /**
@@ -39,10 +41,12 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      * 初始化系统, 分表等
      *
      * @param number $uid
+     *
+     * @return mixed
      */
     protected function init($uid)
     {
-        $this->uid = $uid;
+        $this->uId = $uid;
 
         if (empty($this->redis)) {
             $redisConf = C('redis', array());
@@ -224,7 +228,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             unset($pinfo);
             return $this->getBySk($pk);
         } else {
-            $this->uid = $pk;
+            $this->uId = $pk;
             $key       = $this->getPK();
             if (!isset($this->localCache[$key])) {
                 $this->init($pk);
@@ -234,7 +238,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
                     $datas = $this->redis->hGets($key);
                 }
                 if (!$datas) {
-                    $datas = parent::getByPk($pk, $pinfo);
+                    $datas = parent::getByPk($pk);
 
                     if ($datas) {
                         $this->redis->hMset($key, $datas);
@@ -279,8 +283,8 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             $pk = $condition[$this->pk];
             $this->init($pk);
             $sk  = $condition[$this->sk];
-            $key = $this->getPK($pk);
-            $ret = parent::deleteByPk($condition, $pinfo);
+            $key = $this->getPK();
+            $ret = parent::deleteByPk($condition);
 
             if ($ret > 0) {
                 //清除缓存
@@ -296,8 +300,8 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             }
         } else {
             $this->init($condition);
-            $key = $this->getPK($condition);
-            $ret = parent::deleteByPk($condition, $pinfo);
+            $key = $this->getPK();
+            $ret = parent::deleteByPk($condition);
 
             if ($ret > 0) {
                 $this->redis->delete($key);
@@ -312,6 +316,9 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
 
     /**
      * 错误信息记录
+     *
+     * @param $method
+     * @param $params
      */
     private function errorInfo($method, $params)
     {
@@ -380,7 +387,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
                 $datas = $this->redis->hGetAll($key);
 
                 if (!$datas) {
-                    $datas = parent::getByPk($infos, array('mulit' => true));
+                    $datas = parent::getByPk($infos);
                     if ($datas) {    //fix local & redis cache
                         $this->redis->hMset($key, $datas);
                         $this->localCache[$key] = $datas;
@@ -413,6 +420,6 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      */
     protected function setMainId($uid)
     {
-        $this->uid = $uid;
+        $this->uId = $uid;
     }
 }

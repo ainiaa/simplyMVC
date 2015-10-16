@@ -58,6 +58,8 @@ class SmvcSocketLogger extends SmvcBaseLogger
     public function __construct(
             $info = array( /*'host' => '127.0.0.1', 'port' => '6000', 'sendTimeout' => '5', 'connectTimeout' => 5, 'isCompress' => true*/)
     ) {
+        parent::__construct($info);
+
         $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLogLevel;
         if (!empty($info)) {
             $this->host           = empty($info["host"]) ? $this->host : $info["host"];
