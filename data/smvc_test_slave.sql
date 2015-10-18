@@ -1,6 +1,6 @@
 /*
 SQLyog Ultimate v11.11 (64 bit)
-MySQL - 5.5.40 : Database - smvc_test_master
+MySQL - 5.5.40 : Database - smvc_test_slave
 *********************************************************************
 */
 
@@ -12,9 +12,9 @@ MySQL - 5.5.40 : Database - smvc_test_master
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`smvc_test_master` /*!40100 DEFAULT CHARACTER SET gbk */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`smvc_test_slave` /*!40100 DEFAULT CHARACTER SET gbk */;
 
-USE `smvc_test_master`;
+USE `smvc_test_slave`;
 
 /*Table structure for table `smvc_admin` */
 
@@ -32,6 +32,60 @@ CREATE TABLE `smvc_admin` (
 
 insert  into `smvc_admin`(`id`,`user_name`,`password`,`email`) values (1,'admin','96e79218965eb72c92a549dd5a330112','admin@admin.com');
 
+/*Table structure for table `smvc_posts` */
+
+DROP TABLE IF EXISTS `smvc_posts`;
+
+CREATE TABLE `smvc_posts` (
+  `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `post_author` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `post_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `post_content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_title` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_excerpt` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'publish',
+  `comment_status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
+  `ping_status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
+  `post_password` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `post_name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `to_ping` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `pinged` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `post_modified_gmt` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `post_content_filtered` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_parent` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `guid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `menu_order` int(11) NOT NULL DEFAULT '0',
+  `post_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'post',
+  `post_mime_type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `comment_count` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  KEY `post_name` (`post_name`(191)),
+  KEY `type_status_date` (`post_type`,`post_status`,`post_date`,`ID`),
+  KEY `post_parent` (`post_parent`),
+  KEY `post_author` (`post_author`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `smvc_posts` */
+
+/*Table structure for table `smvc_terms` */
+
+DROP TABLE IF EXISTS `smvc_terms`;
+
+CREATE TABLE `smvc_terms` (
+  `term_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `slug` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `term_group` bigint(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`term_id`),
+  KEY `slug` (`slug`(191)),
+  KEY `name` (`name`(191))
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `smvc_terms` */
+
+insert  into `smvc_terms`(`term_id`,`name`,`slug`,`term_group`) values (1,'name1','slug1',0),(2,'name2','slug2',0),(3,'name3','slug3',0),(4,'name4','slug4',0);
+
 /*Table structure for table `smvc_test` */
 
 DROP TABLE IF EXISTS `smvc_test`;
@@ -41,11 +95,11 @@ CREATE TABLE `smvc_test` (
   `name` varchar(45) NOT NULL,
   `desc` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
 /*Data for the table `smvc_test` */
 
-insert  into `smvc_test`(`id`,`name`,`desc`) values (1,'a','aaaaaaa'),(2,'b','bbbbbbb'),(3,'c','ccccccc'),(4,'d','ddddddd'),(5,'e','eeeeeee'),(6,'addName','addNameaddNameaddNameaddName'),(7,'addName','addNameaddNameaddNameaddName'),(8,'addName','addNameaddNameaddNameaddName'),(9,'addName','addNameaddNameaddNameaddName'),(10,'addName','addNameaddNameaddNameaddName'),(11,'addName','addNameaddNameaddNameaddName'),(12,'addName','addNameaddNameaddNameaddName'),(13,'addName','addNameaddNameaddNameaddName'),(14,'addName','addNameaddNameaddNameaddName'),(15,'addName','addNameaddNameaddNameaddName'),(16,'addName','addNameaddNameaddNameaddName'),(17,'addName','addNameaddNameaddNameaddName'),(18,'addName','addNameaddNameaddNameaddName'),(19,'addName','addNameaddNameaddNameaddName'),(20,'addName','addNameaddNameaddNameaddName'),(21,'addName','addNameaddNameaddNameaddName'),(22,'addName','addNameaddNameaddNameaddName'),(23,'addName','addNameaddNameaddNameaddName'),(24,'addName','addNameaddNameaddNameaddName'),(25,'addName','addNameaddNameaddNameaddName'),(26,'addName','addNameaddNameaddNameaddName'),(27,'addName','addNameaddNameaddNameaddName'),(28,'addName','addNameaddNameaddNameaddName'),(29,'addName','addNameaddNameaddNameaddName'),(30,'addName','addNameaddNameaddNameaddName'),(31,'addName','addNameaddNameaddNameaddName'),(32,'addName','addNameaddNameaddNameaddName'),(33,'addName','addNameaddNameaddNameaddName'),(34,'addName','addNameaddNameaddNameaddName'),(35,'addName','addNameaddNameaddNameaddName'),(36,'addName','addNameaddNameaddNameaddName'),(37,'addName','addNameaddNameaddNameaddName'),(38,'addName','addNameaddNameaddNameaddName'),(39,'addName','addNameaddNameaddNameaddName'),(40,'addName','addNameaddNameaddNameaddName'),(41,'addName','addNameaddNameaddNameaddName'),(42,'addName','addNameaddNameaddNameaddName'),(43,'addName','addNameaddNameaddNameaddName'),(44,'addName','addNameaddNameaddNameaddName'),(45,'addName','addNameaddNameaddNameaddName'),(46,'addName','addNameaddNameaddNameaddName'),(47,'addName','addNameaddNameaddNameaddName'),(48,'addName','addNameaddNameaddNameaddName'),(49,'addName','addNameaddNameaddNameaddName'),(50,'addName','addNameaddNameaddNameaddName'),(51,'addName','addNameaddNameaddNameaddName'),(52,'addName','addNameaddNameaddNameaddName'),(53,'addName','addNameaddNameaddNameaddName'),(54,'addName','addNameaddNameaddNameaddName'),(55,'addName','addNameaddNameaddNameaddName'),(56,'addName','addNameaddNameaddNameaddName'),(57,'addName','addNameaddNameaddNameaddName'),(58,'addName','addNameaddNameaddNameaddName'),(59,'addName','addNameaddNameaddNameaddName'),(60,'addName','addNameaddNameaddNameaddName'),(61,'addName','addNameaddNameaddNameaddName'),(62,'addName','addNameaddNameaddNameaddName'),(63,'addName','addNameaddNameaddNameaddName'),(64,'addName','addNameaddNameaddNameaddName'),(65,'addName','addNameaddNameaddNameaddName'),(66,'addName','addNameaddNameaddNameaddName'),(67,'addName','addNameaddNameaddNameaddName'),(68,'addName','addNameaddNameaddNameaddName'),(69,'addName','addNameaddNameaddNameaddName'),(70,'addName','addNameaddNameaddNameaddName'),(71,'addName','addNameaddNameaddNameaddName'),(72,'addName','addNameaddNameaddNameaddName'),(73,'addName','addNameaddNameaddNameaddName'),(74,'addName','addNameaddNameaddNameaddName');
+insert  into `smvc_test`(`id`,`name`,`desc`) values (1,'slavea','slaveaslaveaslaveaslaveaslavea'),(2,'slaveb','slavebslavebslavebslavebslaveb'),(3,'slavec','slavecslavecslavecslavecslavec'),(4,'slaved','slavedslavedslavedslavedslaved'),(5,'slavee','slaveeslaveeslaveeslaveeslavee');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
