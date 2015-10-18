@@ -79,7 +79,7 @@ class BaseDBDAO extends SmvcObject
             self::$readKey = 'db.slave';
         }
 
-        $this->initDb();
+        //        $this->initDb(); //只在需要的时候 才初始化
     }
 
 
@@ -171,24 +171,44 @@ class BaseDBDAO extends SmvcObject
      */
     public function initWriteStorage()
     {
-        $masterIndex    = $this->getDbMasterIndex();
-        $dbMasterConfig = C(self::$writeKey);
         if (empty($this->writerStorage)) {
+            $masterIndex         = $this->getDbMasterIndex();
+            $dbMasterConfig      = C(self::$writeKey);
             $masterConifg        = $dbMasterConfig[$masterIndex];
-            $this->writerStorage = new medoo(
-                    array(
-                            'database_type' => $masterConifg['DB_TYPE'],
-                            'database_name' => $masterConifg['DB_NAME'],
-                            'server'        => $masterConifg['DB_HOST'],
-                            'username'      => $masterConifg['DB_USER'],
-                            'password'      => $masterConifg['DB_PASS'],
-                    )
-            );
-
+            $this->writerStorage = $this->getDbInstance($masterConifg);
             $this->setTableName($masterConifg);
         }
 
         return $this->writerStorage;
+    }
+
+    /**
+     * @var Medoo[]
+     */
+    private $dbInstance = array();
+
+    /**
+     * 获得 db实例
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
+     *
+     * @param $dbConfig
+     *
+     * @return Medoo
+     */
+    public function getDbInstance($dbConfig)
+    {
+        $configSha = md5(json_encode($dbConfig));
+        if (!isset($this->dbInstance[$configSha])) {
+            $this->dbInstance[$configSha] = new medoo(array(
+                    'database_type' => $dbConfig['DB_TYPE'],
+                    'database_name' => $dbConfig['DB_NAME'],
+                    'server'        => $dbConfig['DB_HOST'],
+                    'username'      => $dbConfig['DB_USER'],
+                    'password'      => $dbConfig['DB_PASS'],
+            ));
+        }
+
+        return $this->dbInstance[$configSha];
     }
 
     /**
@@ -212,24 +232,15 @@ class BaseDBDAO extends SmvcObject
      */
     public function initReadStorage()
     {
-        $masterIndex = $this->getDbMasterIndex();
-
         if (empty($this->readerStorage)) {
             if (C('open_rw')) {
+                $masterIndex         = $this->getDbMasterIndex();
                 $dbSlaveConfig       = C(self::$readKey);
                 $slaveIndex          = array_rand($dbSlaveConfig[$masterIndex]);
                 $slaveConifg         = $dbSlaveConfig[$masterIndex][$slaveIndex];
-                $this->readerStorage = new medoo(
-                        array(
-                                'database_type' => $slaveConifg['DB_TYPE'],
-                                'database_name' => $slaveConifg['DB_NAME'],
-                                'server'        => $slaveConifg['DB_HOST'],
-                                'username'      => $slaveConifg['DB_USER'],
-                                'password'      => $slaveConifg['DB_PASS'],
-                        )
-                );
+                $this->readerStorage = $this->getDbInstance($slaveConifg);
             } else {
-                $this->readerStorage = $this->writerStorage;
+                $this->readerStorage = $this->initWriteStorage();
             }
         }
 
@@ -595,7 +606,7 @@ class BaseDBDAO extends SmvcObject
     }
 
     /**
-     * @param array  $where
+     * @param array $where
      *
      * @return int  The total number of the column.
      */
@@ -717,11 +728,14 @@ class BaseDBDAO extends SmvcObject
     public function connect($master)
     {
         if ($master) {
-            $this->currentStorage = $this->initWriteStorage();
+            $this->setLatestStorageType(self::WRITE_STORAGE);
+
         } else {
-            $this->currentStorage = $this->initReadStorage();
+            $this->setLatestStorageType(self::READ_STORAGE);
         }
-        $this->connected = true;
+        $this->currentStorage = $this->getStorage();
+        $this->connected      = true;
+
         return $this->currentStorage;
     }
 
@@ -741,6 +755,7 @@ class BaseDBDAO extends SmvcObject
             $this->currentStorage->query('START TRANSACTION');
         }
         $this->transTimes++;
+
         return true;
     }
 
@@ -757,9 +772,11 @@ class BaseDBDAO extends SmvcObject
             $this->transTimes = 0;
             if (!$result) {
                 $this->error();
+
                 return false;
             }
         }
+
         return true;
     }
 
@@ -776,9 +793,11 @@ class BaseDBDAO extends SmvcObject
             $this->transTimes = 0;
             if (!$result) {
                 $this->error();
+
                 return false;
             }
         }
+
         return true;
     }
 
