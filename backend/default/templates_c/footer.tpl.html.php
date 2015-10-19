@@ -33,6 +33,9 @@
 
 <script src="./public/assets/js/charisma.js"></script>
 
+<script src="./public/assets/js/bootbox.js"></script>
+<script src="./public/assets/js/bootbox-demo.js"></script>
+<script src="./public/assets/js/bootbox-example.js"></script>
 
 </body>
 </html>

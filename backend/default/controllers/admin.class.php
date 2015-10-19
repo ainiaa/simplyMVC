@@ -25,8 +25,8 @@ class AdminController extends BackendController
         $adminList = $this->AdminService->getAdminList();
 
         $this->assign('title', 'Simply MVC backend - table list');
-        $this->assign('tableHeaderList', array('userName', 'email'));
-        $this->assign('adminList', $adminList);
+        $this->assign('tableHeaderList', array('id','userName', 'password','email'));
+        $this->assign('list', $adminList);
         $this->display();
     }
 
@@ -35,6 +35,9 @@ class AdminController extends BackendController
      * http://local.cmvc.com/index.php/default-default-test-id-2-name-namx
      * http://local.cmvc.com/index.php/default-default-test-id-2-name-namx.html
      * 2个url参数是一样的。
+     *
+     * @param int    $id
+     * @param string $name
      */
     public function testAction($id = 0, $name = '')
     {

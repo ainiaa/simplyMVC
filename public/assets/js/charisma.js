@@ -295,6 +295,11 @@ function docReady() {
         $('#myModal').modal('show');
     });
 
+    //$('.btn-danger').click(function (e) {
+    //    e.preventDefault();
+    //    $('#confirmDailog').modal('show');
+    //});
+
 
     $('#calendar').fullCalendar({
         header: {

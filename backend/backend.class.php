@@ -19,12 +19,12 @@ class BackendController extends BaseController
     protected $layout;
     protected $breadCrumbTpl;
     protected $defaultTplComponent = array(
-            'headerTpl'   => 'header.tpl.html',
-            'topbarTpl'   => 'topbar.tpl.html',
-            'leftMenuTpl' => 'left_menu.tpl.html',
-            'mainTpl'     => 'main.tpl.html',
-            'breadCrumbTpl'  => 'bread_crumb.tpl.html',
-            'layout'      => 'layout.tpl.html',
+            'headerTpl'     => 'header.tpl.html',
+            'topbarTpl'     => 'topbar.tpl.html',
+            'leftMenuTpl'   => 'left_menu.tpl.html',
+            'mainTpl'       => 'main.tpl.html',
+            'breadCrumbTpl' => 'bread_crumb.tpl.html',
+            'layout'        => 'layout.tpl.html',
     );
 
     /**
@@ -216,7 +216,7 @@ class BackendController extends BaseController
         //        $this->assign('leftMenuTpl', 'left_menu.tpl.html');
         //        $this->assign('mainTpl', 'main.tpl.html');
         $sessionInfo = Session::instance()->get('userInfo');
-        if (empty($sessionInfo) && $_GET['a'] != 'login') {
+        if (empty($sessionInfo) && (!isset($_GET['a']) || $_GET['a'] != 'login')) {
             $this->loginAction();
             exit;
         }
@@ -232,13 +232,11 @@ class BackendController extends BaseController
             $userName  = $_POST['userName'];
             $password  = $_POST['password'];
             $adminInfo = $this->AdminService->getAdminInfoByUserName($userName);
-
             if ($adminInfo) {
                 $md5Password = md5($password);
                 if ($md5Password == $adminInfo['password']) { //登录成功
                     Session::instance()->set('userInfo', array('userName' => $userName, 'password' => md5($password)));
                     header('Location:/?debug=1&b=2&m=default&c=default&g=backend&a=index');
-
                     return;
                 }
             }

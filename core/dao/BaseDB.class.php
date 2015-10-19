@@ -79,7 +79,7 @@ class BaseDBDAO extends SmvcObject
             self::$readKey = 'db.slave';
         }
 
-        //        $this->initDb(); //只在需要的时候 才初始化
+        $this->connect(false); //先初始化一个读取db实例  todo 真的有这个必要吗？？
     }
 
 
@@ -199,13 +199,15 @@ class BaseDBDAO extends SmvcObject
     {
         $configSha = md5(json_encode($dbConfig));
         if (!isset($this->dbInstance[$configSha])) {
-            $this->dbInstance[$configSha] = new medoo(array(
-                    'database_type' => $dbConfig['DB_TYPE'],
-                    'database_name' => $dbConfig['DB_NAME'],
-                    'server'        => $dbConfig['DB_HOST'],
-                    'username'      => $dbConfig['DB_USER'],
-                    'password'      => $dbConfig['DB_PASS'],
-            ));
+            $this->dbInstance[$configSha] = new medoo(
+                    array(
+                            'database_type' => $dbConfig['DB_TYPE'],
+                            'database_name' => $dbConfig['DB_NAME'],
+                            'server'        => $dbConfig['DB_HOST'],
+                            'username'      => $dbConfig['DB_USER'],
+                            'password'      => $dbConfig['DB_PASS'],
+                    )
+            );
         }
 
         return $this->dbInstance[$configSha];
@@ -239,6 +241,7 @@ class BaseDBDAO extends SmvcObject
                 $slaveIndex          = array_rand($dbSlaveConfig[$masterIndex]);
                 $slaveConifg         = $dbSlaveConfig[$masterIndex][$slaveIndex];
                 $this->readerStorage = $this->getDbInstance($slaveConifg);
+                $this->setTableName($slaveConifg);
             } else {
                 $this->readerStorage = $this->initWriteStorage();
             }
@@ -442,7 +445,6 @@ class BaseDBDAO extends SmvcObject
     public function getOne($columns, $where = array())
     {
         $this->setLatestStorageType(self::READ_STORAGE);
-
         return $this->getStorage()->get($this->tableName, $columns, $where);
     }
 
