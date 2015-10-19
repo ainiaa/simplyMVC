@@ -3,6 +3,7 @@
         <div class="box-inner">
             <div class="box-header well" data-original-title="">
                 <h2><i class="glyphicon glyphicon-user"></i> Datatable + Responsive</h2>
+
                 <div class="box-icon">
                     <a href="#" class="btn btn-setting btn-round btn-default"><i
                             class="glyphicon glyphicon-cog"></i></a>
@@ -30,7 +31,7 @@
                     <tr>
                         <td class="center">{$listKey}</td>
                         {foreach item=field name=fieldName from=$item key=itemKey}
-                            <td class="center">{$field}</td>
+                        <td class="center">{$field}</td>
                         {/foreach}
                         <td class="center">
                             <a class="btn btn-success" href="#">
@@ -41,7 +42,8 @@
                                 <i class="glyphicon glyphicon-edit icon-white"></i>
                                 Edit
                             </a>
-                            <a class="btn btn-danger" href="#" data-bb="confirm">
+                            <a class="btn btn-danger" href="#" data-bb="confirm" data-callback="delCallback"
+                               data-opurl="?/index.php?ds=aa&cc=gg&bb">
                                 <i class="glyphicon glyphicon-trash icon-white"></i>
                                 Delete
                             </a>
@@ -56,3 +58,54 @@
     <!--/span-->
 </div>
 <!--/row-->
+
+<script type="text/javascript">
+    function delCallback(result, _target) {
+        if (result) { //需要删除
+            var url = $(_target).data('opurl'); //this 有问题
+            $.ajax({
+                url: url,
+                data: [],
+                dataType: 'json',
+                success: function (data) { //请求成功
+                    var options = {};
+                    if (data.status == 0) { //失败
+                        //{"text":"This is a success information","layout":"top","type":"information"}
+                        //{"text":"This is an alert notification with fade effect","layout":"center","type":"alert","animateOpen": {"opacity": "show"}}
+                        options.layout = "center";
+                        options.type = "error";
+                        if (typeof data.msg != 'undefined') {
+                            options.text = data.msg;
+                        } else {
+                            options.text = "error!";
+                        }
+                        options.animateOpen = {"opacity": "show"};
+                    } else { //成功
+                        options.layout = "center";
+                        options.type = "success";
+                        if (typeof data.msg != 'undefined') {
+                            options.text = data.msg;
+                        } else {
+                            options.text = "error!";
+                        }
+                        options.animateOpen = {"opacity": "show"};
+                    }
+                    noty(options);
+                },
+                error: function (data) { //请求失败
+                    var options = {};
+                    options.layout = "center";
+                    options.type = "error";
+                    if (typeof data.msg != 'undefined') {
+                        options.text = data.msg;
+                    } else {
+                        options.text = "error!";
+                    }
+                    options.animateOpen = {"opacity": "show"};
+
+                    noty(options);
+                }
+            });
+        }
+    }
+</script>

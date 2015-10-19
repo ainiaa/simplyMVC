@@ -36,6 +36,7 @@
 <script src="./public/assets/js/bootbox.js"></script>
 <script src="./public/assets/js/bootbox-demo.js"></script>
 <script src="./public/assets/js/bootbox-example.js"></script>
+<script src="./public/assets/js/util.js"></script>
 
 </body>
 </html>
