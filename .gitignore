@@ -18,6 +18,7 @@ local.properties
 
 #template compile cache directory
 templates_c/
+templates_c/*.php
 
 # External tool builders
 .externalToolBuilders/

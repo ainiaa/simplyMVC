@@ -174,6 +174,11 @@ class BackendController extends BaseController
         return $this;
     }
 
+    /**
+     * 初始化模板组件
+     *
+     * @param array $tplComponent
+     */
     protected function initTplComponent($tplComponent = array())
     {
         if (!is_array($tplComponent) || empty($tplComponent)) {
@@ -189,6 +194,11 @@ class BackendController extends BaseController
         }
     }
 
+    /**
+     * @param string $tpl
+     *
+     * @return mixed
+     */
     public function display($tpl = '')
     {
         if (empty($tpl)) {
@@ -211,12 +221,8 @@ class BackendController extends BaseController
         $this->assign('title', 'Simply MVC backend');
         $this->initTplComponent();
 
-        //        $this->assign('headerTpl', 'header.tpl.html');
-        //        $this->assign('topbarTpl', 'topbar.tpl.html');
-        //        $this->assign('leftMenuTpl', 'left_menu.tpl.html');
-        //        $this->assign('mainTpl', 'main.tpl.html');
         $sessionInfo = Session::instance()->get('userInfo');
-        if (empty($sessionInfo) && (!isset($_GET['a']) || $_GET['a'] != 'login')) {
+        if (empty($sessionInfo) && (!isset($_GET['a']) || $_GET['a'] != 'login')) { //这个需要修改
             $this->loginAction();
             exit;
         }
@@ -249,7 +255,7 @@ class BackendController extends BaseController
     /**
      *
      */
-    public function loginoutAction()
+    public function logoutAction()
     {
         Session::instance()->delete('userInfo');
         $this->display('login.tpl.html');
