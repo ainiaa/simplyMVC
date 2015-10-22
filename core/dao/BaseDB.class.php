@@ -655,6 +655,15 @@ class BaseDBDAO extends SmvcObject
     }
 
     /**
+     * 获得所有执行的sql （包含sql语句和执行该sql所用时间）
+     * @return array
+     */
+    public function getSqlList()
+    {
+        return $this->getStorage()->getSqlList();
+    }
+
+    /**
      * @param $string
      *
      * @return string

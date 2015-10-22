@@ -30,6 +30,9 @@ class medoo
     protected $logs = array();
     protected $debug_mode = false;
 
+    protected $get_sql_list = false;
+    protected $sql_list = array();
+
     public function __construct($options = null)
     {
         try {
@@ -95,9 +98,20 @@ class medoo
             foreach ($commands as $value) {
                 $this->pdo->exec($value);
             }
+
+            if (!isset($option['get_sql_list'])) {
+                $option['get_sql_list'] = true;
+            }
+            $this->get_sql_list = $option['get_sql_list'];
+
         } catch (PDOException $e) {
             throw new Exception($e->getMessage());
         }
+    }
+
+    public function getSqlList()
+    {
+        return $this->sql_list;
     }
 
     public function query($query)
@@ -108,7 +122,21 @@ class medoo
             return false;
         }
         array_push($this->logs, $query);
-        return $this->pdo->query($query);
+        if ($this->get_sql_list) {
+            $start            = microtime(true);
+            $result           = $this->pdo->query($query);
+            $this->sql_list[] = $query;
+            $end              = microtime(true);
+
+            $this->sql_list[] = array(
+                    'sql'      => $query,
+                    'use_time' => $end - $start,
+            );
+        } else {
+            $result = $this->pdo->query($query);
+        }
+
+        return $result;
     }
 
     public function exec($query)
@@ -119,7 +147,22 @@ class medoo
             return false;
         }
         array_push($this->logs, $query);
-        return $this->pdo->exec($query);
+
+        if ($this->get_sql_list) {
+            $start            = microtime(true);
+            $result           = $this->pdo->exec($query);
+            $this->sql_list[] = $query;
+            $end              = microtime(true);
+
+            $this->sql_list[] = array(
+                    'sql'      => $query,
+                    'use_time' => $end - $start,
+            );
+        } else {
+            $result = $this->pdo->exec($query);
+        }
+
+        return $result;
     }
 
     public function quote($string)
