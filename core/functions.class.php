@@ -33,9 +33,15 @@ if (!function_exists('LCL')) {
 function parse_name($name, $type = 0)
 {
     if ($type) {
-        return ucfirst(preg_replace_callback('/_([a-zA-Z])/', function ($match) {
-            return strtoupper($match[1]);
-        }, $name));
+        return ucfirst(
+                preg_replace_callback(
+                        '/_([a-zA-Z])/',
+                        function ($match) {
+                            return strtoupper($match[1]);
+                        },
+                        $name
+                )
+        );
     } else {
         return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
     }
@@ -205,4 +211,38 @@ function get_domain()
 function site_url()
 {
     return get_domain() . substr(PHP_SELF, 0, strrpos(PHP_SELF, '/'));
+}
+
+
+/**
+ * 添加和获取页面Trace记录
+ *
+ * @param string  $value  变量
+ * @param string  $label  标签
+ * @param string  $level  日志级别
+ * @param boolean $record 是否记录日志
+ *
+ * @return mixed
+ */
+function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = false)
+{
+    static $_trace = array();
+    if ('[think]' === $value) { // 获取trace信息
+        return $_trace;
+    } else {
+        $info = ($label ? $label . ':' : '') . print_r($value, true);
+        if ('ERR' == $level && C('TRACE_EXCEPTION')) {// 抛出异常
+            new Exception($info);
+        }
+        $level = strtoupper($level);
+        if (!isset($_trace[$level])) {
+            $_trace[$level] = array();
+        }
+        $_trace[$level][] = $info;
+        if ((defined('IS_AJAX') && IS_AJAX) || !C('SHOW_PAGE_TRACE') || $record) {
+            Log::record($info, $level, $record);
+        }
+    }
+
+    return true;
 }
