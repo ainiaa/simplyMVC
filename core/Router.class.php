@@ -9,22 +9,27 @@ class Router
     /**
      * @var string 分组名称
      */
-    public static $group;
+    private static $group;
+
+    /**
+     * @var string 原始分组
+     */
+    private static $originGroup;
 
     /**
      * @var string module 名称
      */
-    public static $module;
+    private static $module;
 
     /**
      * @var string 控制器名称
      */
-    public static $controller;
+    private static $controller;
 
     /**
      * @var string action名称
      */
-    public static $action;
+    private static $action;
 
     /**
      * 除去魔术
@@ -36,6 +41,36 @@ class Router
             $_GET     = self::stripSlashesDeep($_GET);
             $_COOKIE  = self::stripSlashesDeep($_COOKIE);
             $_REQUEST = self::stripSlashesDeep($_REQUEST);
+        }
+    }
+
+    /**
+     * @author Jeff Liu
+     */
+    public static function doUrlMapping()
+    {
+        $urlMappingConf = C('URL_MAPPING', array());
+        if ($urlMappingConf) {
+            foreach ($urlMappingConf as $pattern => $mapping) {
+                list($group, $module, $controller, $action) = each(explode('/', $pattern));
+                list($mappingGroup, $mappingModule, $mappingController, $mappingAction) = each(explode('/', $pattern));
+                $originGroup = self::initGroup();
+                if ($group == '*' || $group == $originGroup) {
+                    self::mappingGroup($mappingGroup);
+                    $originModule = self::initModule();
+                    if ($module == '*' || $module == $originModule) {
+                        self::mappingModule($mappingModule);
+                        $originController = self::initController();
+                        if ($controller == '*' || $controller == $originController) {
+                            self::mappingController($mappingController);
+                            $originAction = self::initAction();
+                            if ($action == '*' || $action == $originAction) {
+                                self::mappingAction($mappingAction);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -194,6 +229,8 @@ class Router
      */
     public static function initEnv()
     {
+        self::doUrlMapping();
+
         self::initGroup();
         self::initModule();
         self::initController();
@@ -206,14 +243,119 @@ class Router
      */
     private static function initGroup()
     {
-        $groupParamName = C('groupParamName', 'g');
-        if (isset($_REQUEST[$groupParamName])) {
-            self::$group = $_REQUEST[$groupParamName];
-        } else {
-            self::$group = C('defaultGroup', 'frontend');
+        if (empty(self::$group)) {
+            $groupParamName = C('groupParamName', 'g');
+            if (isset($_REQUEST[$groupParamName])) {
+                self::$group = $_REQUEST[$groupParamName];
+            } else {
+                self::$group = C('defaultGroup', 'frontend');
+            }
+        }
+
+        return self::$group;
+    }
+
+    /**
+     *
+     * @author Jeff Liu
+     *
+     * @param string $module
+     */
+    private static function mappingModule($module = '')
+    {
+        if ($module) {
+            $moduleParamName = C('moduleParamName', 'm');
+            if (isset($_REQUEST[$moduleParamName])) {
+                $_REQUEST[$moduleParamName] = $module;
+            }
+            if (isset($_GET[$moduleParamName])) {
+                $_GET[$moduleParamName] = $module;
+            }
+            if (isset($_POST[$moduleParamName])) {
+                $_POST[$moduleParamName] = $module;
+            }
+            if (isset($_COOKIE[$moduleParamName])) {
+                $_COOKIE[$moduleParamName] = $module;
+            }
+            self::$module = $module;
         }
     }
 
+    /**
+     *
+     * @author Jeff Liu
+     *
+     * @param string $group
+     */
+    private static function mappingGroup($group = '')
+    {
+        if ($group) {
+            $groupParamName = C('groupParamName', 'g');
+            if (isset($_REQUEST[$groupParamName])) {
+                $_REQUEST[$groupParamName] = $group;
+            }
+            if (isset($_GET[$groupParamName])) {
+                $_GET[$groupParamName] = $group;
+            }
+            if (isset($_POST[$groupParamName])) {
+                $_POST[$groupParamName] = $group;
+            }
+            if (isset($_COOKIE[$groupParamName])) {
+                $_COOKIE[$groupParamName] = $group;
+            }
+            self::$group = $group;
+        }
+    }
+
+    /**
+     * @author Jeff Liu
+     *
+     * @param string $controller
+     */
+    private static function mappingController($controller = '')
+    {
+        if ($controller) {
+            $controllerParamName = C('controllerParamName', 'c');
+            if (isset($_REQUEST[$controllerParamName])) {
+                $_REQUEST[$controllerParamName] = $controller;
+            }
+            if (isset($_GET[$controllerParamName])) {
+                $_GET[$controllerParamName] = $controller;
+            }
+            if (isset($_POST[$controllerParamName])) {
+                $_POST[$controllerParamName] = $controller;
+            }
+            if (isset($_COOKIE[$controllerParamName])) {
+                $_COOKIE[$controllerParamName] = $controller;
+            }
+            self::$controller = $controller;
+        }
+    }
+
+    /**
+     * @author Jeff Liu
+     *
+     * @param string $action
+     */
+    private static function mappingAction($action = '')
+    {
+        if ($action) {
+            $actionParamName = C('actionParamName', 'a');
+            if (isset($_REQUEST[$actionParamName])) {
+                $_REQUEST[$actionParamName] = $action;
+            }
+            if (isset($_GET[$actionParamName])) {
+                $_GET[$actionParamName] = $action;
+            }
+            if (isset($_POST[$actionParamName])) {
+                $_POST[$actionParamName] = $action;
+            }
+            if (isset($_COOKIE[$actionParamName])) {
+                $_COOKIE[$actionParamName] = $action;
+            }
+            self::$action = $action;
+        }
+    }
 
     /**
      * 初始化module
@@ -221,12 +363,16 @@ class Router
      */
     private static function initModule()
     {
-        $moduleParamName = C('moduleParamName', 'm');
-        if (isset($_REQUEST[$moduleParamName])) {
-            self::$module = $_REQUEST[$moduleParamName];
-        } else {
-            self::$module = C('defaultModule', 'default');
+        if (empty(self::$module)) {
+            $moduleParamName = C('moduleParamName', 'm');
+            if (isset($_REQUEST[$moduleParamName])) {
+                self::$module = $_REQUEST[$moduleParamName];
+            } else {
+                self::$module = C('defaultModule', 'default');
+            }
         }
+
+        return self::$module;
     }
 
     /**
@@ -235,24 +381,32 @@ class Router
      */
     private static function initController()
     {
-        $controllerParamName = C('controllerParamName', 'c');
+        if (empty(self::$controller)) {
+            $controllerParamName = C('controllerParamName', 'c');
 
-        if (isset($_REQUEST[$controllerParamName])) {
-            self::$controller = $_REQUEST[$controllerParamName];
-        } else {
-            self::$controller = C('defaultController', 'default');
+            if (isset($_REQUEST[$controllerParamName])) {
+                self::$controller = $_REQUEST[$controllerParamName];
+            } else {
+                self::$controller = C('defaultController', 'default');
+            }
         }
+
+        return self::$controller;
     }
 
     private static function initAction()
     {
-        $actionParamName = C('actionParamName', 'a');
+        if (empty(self::$action)) {
+            $actionParamName = C('actionParamName', 'a');
 
-        if (isset($_REQUEST[$actionParamName])) {
-            self::$action = $_REQUEST[$actionParamName];
-        } else {
-            self::$action = C('defaultAction', 'index');
+            if (isset($_REQUEST[$actionParamName])) {
+                self::$action = $_REQUEST[$actionParamName];
+            } else {
+                self::$action = C('defaultAction', 'index');
+            }
         }
+
+        return self::$action;
     }
 
     /**

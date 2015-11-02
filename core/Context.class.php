@@ -10,7 +10,7 @@ class Context
 {
 
     /**
-     * µ±ÃæÇëÇóÌø×ª
+     * å½“é¢è¯·æ±‚è·³è½¬
      * @author Jeff Liu<jeff.liu.guo@gmail.com>
      *
      * @param $url
@@ -22,7 +22,7 @@ class Context
     }
 
     /**
-     * Ò³ÃæÌø×ª
+     * é¡µé¢è·³è½¬
      * @author Jeff Liu<jeff.liu.guo@gmail.com>
      *
      * @param $url
@@ -36,7 +36,7 @@ class Context
     }
 
     /**
-     * ½ûÓÃä¯ÀÀÆ÷»º´æ
+     * ç¦ç”¨æµè§ˆå™¨ç¼“å­˜
      * @author Jeff Liu<jeff.liu.guo@gmail.com>
      */
     public function closeCache()
