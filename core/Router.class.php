@@ -16,10 +16,17 @@ class Router
      */
     private static $originGroup;
 
+
+
     /**
      * @var string module 名称
      */
     private static $module;
+
+    /**
+     * @var string 原始moudle
+     */
+    private static $originModule;
 
     /**
      * @var string 控制器名称
@@ -27,9 +34,19 @@ class Router
     private static $controller;
 
     /**
+     * @var string 原始控制器
+     */
+    private static $originController;
+
+    /**
      * @var string action名称
      */
     private static $action;
+
+    /**
+     * @var string 原始action
+     */
+    private static $originAction;
 
     /**
      * 除去魔术
@@ -57,15 +74,19 @@ class Router
                 $originGroup = self::initGroup();
                 if ($group == '*' || $group == $originGroup) {
                     self::mappingGroup($mappingGroup);
+                    self::setOriginGroup($originGroup);
                     $originModule = self::initModule();
                     if ($module == '*' || $module == $originModule) {
                         self::mappingModule($mappingModule);
+                        self::setOriginModule($originModule);
                         $originController = self::initController();
                         if ($controller == '*' || $controller == $originController) {
                             self::mappingController($mappingController);
+                            self::setOriginController($originController);
                             $originAction = self::initAction();
                             if ($action == '*' || $action == $originAction) {
                                 self::mappingAction($mappingAction);
+                                self::setOriginAction($originAction);
                             }
                         }
                     }
@@ -128,8 +149,8 @@ class Router
      */
     public static function routerCheck()
     {
-        $controller = self::getControllerName(null, false);
-        $action     = self::getActionName(null, false);
+        $controller = self::getControllerName(false);
+        $action     = self::getActionName(false);
         if (C('routerFilterMode', 'none') === 'whiteList') {//白名单
             $return = self::routerCheckByWhiteList($controller, $action);
         } else if (C('routerFilterMode', 'none') === 'blacklist') {//黑名单
@@ -201,18 +222,18 @@ class Router
                 $return = false;
             } else {
                 foreach ($blacklist as $currentRoute) {
-                    $currentRouteController = isset($currentRoute['controller']) ? $currentRoute['controller'] : '*';
-                    $currentRouteAction     = isset($currentRoute['action']) ? $currentRoute['action'] : '*';
-                    if ($currentRouteController === '*' && $currentRouteAction === '*') {
+                    $currentController = isset($currentRoute['controller']) ? $currentRoute['controller'] : '*';
+                    $currentAction     = isset($currentRoute['action']) ? $currentRoute['action'] : '*';
+                    if ($currentController === '*' && $currentAction === '*') {
                         $return = false;
                         break;
-                    } else if ($currentRouteController === '*' && $action === $currentRouteAction) {
+                    } else if ($currentController === '*' && $action === $currentAction) {
                         $return = false;
                         break;
-                    } else if ($currentRouteAction === '*' && $controller === $currentRouteController) {
+                    } else if ($currentAction === '*' && $controller === $currentController) {
                         $return = false;
                         break;
-                    } else if ($currentRouteController === $controller && $action === $currentRouteAction) {
+                    } else if ($currentController === $controller && $action === $currentAction) {
                         $return = false;
                         break;
                     }
@@ -411,24 +432,10 @@ class Router
 
     /**
      * 获得实际的分组名称
-     * @access private
-     *
-     * @param array $info
-     *
      * @return string
      */
-    public static function getGroup($info = array())
+    public static function getGroup()
     {
-        /*
-        $groupParamName = C('groupParamName', 'g');
-        if ($info) {
-            self::$group = isset($info[$groupParamName]) ? $info[$groupParamName] : C('defaultGroup', 'frontend');
-        } else {
-            if (empty(self::$group)) {
-                self::$group = C('defaultGroup', 'frontend');
-            }
-        }
-        */
         return self::$group;
     }
 
@@ -436,58 +443,23 @@ class Router
      * 获得实际的模块名称
      * @access private
      *
-     * @param array $info
-     *
      * @return string
      */
-    public static function getModule($info = array())
+    public static function getModule()
     {
-        /*
-        $moduleParamName = C('moduleParamName', 'm');
-        if ($info) {
-            self::$module = isset($info[$moduleParamName]) ? $info[$moduleParamName] : C('defaultModule', 'default');
-        } else {
-            if (empty(self::$module)) {
-                self::$module = C('defaultModule', 'default');
-            }
-        }
-        */
         return self::$module;
     }
 
 
     /**
      * 获得实际的控制器名称
-     * @access public
      *
-     * @param array $info
-     *
-     * @param bool  $appendSuffer
+     * @param bool $appendSuffer
      *
      * @return string
      */
-    public static function getControllerName($info = array(), $appendSuffer = true)
+    public static function getControllerName($appendSuffer = true)
     {
-        /*
-        if (empty(self::$controller)) {
-            $controllerParamName = C('controllerParamName', 'c');
-            if ($info) {
-                self::$controller = isset($info[$controllerParamName]) ? $info[$controllerParamName] : C('defaultController',
-                        'default');
-            } else {
-                if (isset($_GET[$controllerParamName])) {
-                    $controllerName = $_GET[$controllerParamName];
-                } else if (isset($_POST[$controllerParamName])) {
-                    $controllerName = $_POST[$controllerParamName];
-                } else if (isset($_COOKIE[$controllerParamName])) {
-                    $controllerName = $_COOKIE[$controllerParamName];
-                } else {
-                    $controllerName = C('defaultController', 'default');
-                }
-                self::$controller = $controllerName;
-            }
-        }
-        */
         if ($appendSuffer) {
             $controllerName = self::$controller . C('controllerSuffix');
         } else {
@@ -501,31 +473,12 @@ class Router
      * 获得实际的操作名称
      * @access public
      *
-     * @param array $info
+     * @param bool $appendSuffer
      *
      * @return string
      */
-    public static function getActionName($info = array(), $appendSuffer = true)
+    public static function getActionName($appendSuffer = true)
     {
-        /*
-        if (empty(self::$action)) {
-            $actionParamName = C('actionParamName', 'a');
-            if ($info) {
-                self::$action = isset($info[$actionParamName]) ? $info[$actionParamName] : C('defaultAction', 'index');
-            } else {
-                if (isset($_GET[$actionParamName])) {
-                    $actionName = $_GET[$actionParamName];
-                } else if (isset($_POST[$actionParamName])) {
-                    $actionName = $_POST[$actionParamName];
-                } else if (isset($_COOKIE[$actionParamName])) {
-                    $actionName = $_COOKIE[$actionParamName];
-                } else {
-                    $actionName = C('defaultAction', 'default');
-                }
-                self::$action = $actionName;
-            }
-        }
-        */
         if ($appendSuffer) {
             $actionName = self::$action . C('actionSuffix');
         } else {
@@ -539,6 +492,7 @@ class Router
     /**
      * TODO
      *
+     * @param array $info
      */
     public static function getParams($info = array())
     {
@@ -639,17 +593,24 @@ class Router
                     $headers[$k] = $value;
                 }
 
-                $value = self::getServer('Content_Type',
-                        self::getServer('Content-Type')) and $headers['Content-Type'] = $value;
-                $value = self::getServer('Content_Length',
-                        self::getServer('Content-Length')) and $headers['Content-Length'] = $value;
+                $value = self::getServer(
+                        'Content_Type',
+                        self::getServer('Content-Type')
+                ) and $headers['Content-Type'] = $value;
+                $value = self::getServer(
+                        'Content_Length',
+                        self::getServer('Content-Length')
+                ) and $headers['Content-Length'] = $value;
             } else {
                 $headers = getallheaders();
             }
         }
 
-        return empty($headers) ? $default : ((func_num_args() === 0) ? $headers : SmvcArrayHelper::get($headers, $key,
-                $default));
+        return empty($headers) ? $default : ((func_num_args() === 0) ? $headers : SmvcArrayHelper::get(
+                $headers,
+                $key,
+                $default
+        ));
     }
 
     /**
@@ -681,6 +642,13 @@ class Router
     }
 
 
+    /**
+     * @param string $key
+     * @param string $default
+     *
+     * @return mixed
+     * @throws Exception
+     */
     public static function getCookie($key = '', $default = '')
     {
         if (func_num_args() === 0) {
@@ -726,14 +694,23 @@ class Router
             }
 
             $ips = explode(',', self::getServer($key));
-            array_walk($ips, function (&$ip) {
-                $ip = trim($ip);
-            });
+            array_walk(
+                    $ips,
+                    function (&$ip) {
+                        $ip = trim($ip);
+                    }
+            );
 
-            $ips = array_filter($ips, function ($ip) use ($exclude_reserved) {
-                return filter_var($ip, FILTER_VALIDATE_IP,
-                        $exclude_reserved ? FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE : null);
-            });
+            $ips = array_filter(
+                    $ips,
+                    function ($ip) use ($exclude_reserved) {
+                        return filter_var(
+                                $ip,
+                                FILTER_VALIDATE_IP,
+                                $exclude_reserved ? FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE : null
+                        );
+                    }
+            );
 
             if ($ips) {
                 return reset($ips);
@@ -750,13 +727,84 @@ class Router
      */
     public static function getProtocol()
     {
-        if (self::getServer('HTTPS') == 'on' or self::getServer('HTTPS') == 1 or self::getServer('SERVER_PORT') == 443 or (C('security.allow_x_headers',
-                                false) and self::getServer('HTTP_X_FORWARDED_PROTO') == 'https') or (C('security.allow_x_headers',
-                                false) and self::getServer('HTTP_X_FORWARDED_PORT') == 443)
+        if (self::getServer('HTTPS') == 'on' or self::getServer('HTTPS') == 1 or self::getServer(
+                        'SERVER_PORT'
+                ) == 443 or (C(
+                                'security.allow_x_headers',
+                                false
+                        ) and self::getServer('HTTP_X_FORWARDED_PROTO') == 'https') or (C(
+                                'security.allow_x_headers',
+                                false
+                        ) and self::getServer('HTTP_X_FORWARDED_PORT') == 443)
         ) {
             return 'https';
         }
 
         return 'http';
+    }
+
+
+    /**
+     * @return string
+     */
+    public static function getOriginGroup()
+    {
+        return self::$originGroup;
+    }
+
+    /**
+     * @param string $originGroup
+     */
+    public static function setOriginGroup($originGroup)
+    {
+        self::$originGroup = $originGroup;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getOriginModule()
+    {
+        return self::$originModule;
+    }
+
+    /**
+     * @param string $originModule
+     */
+    public static function setOriginModule($originModule)
+    {
+        self::$originModule = $originModule;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getOriginController()
+    {
+        return self::$originController;
+    }
+
+    /**
+     * @param string $originController
+     */
+    public static function setOriginController($originController)
+    {
+        self::$originController = $originController;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getOriginAction()
+    {
+        return self::$originAction;
+    }
+
+    /**
+     * @param string $originAction
+     */
+    public static function setOriginAction($originAction)
+    {
+        self::$originAction = $originAction;
     }
 }
