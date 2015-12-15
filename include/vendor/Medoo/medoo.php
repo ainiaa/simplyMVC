@@ -33,11 +33,19 @@ class medoo
     protected $get_sql_list = false;
     protected $sql_list = array();
 
+    /**
+     * medoo constructor.
+     *
+     * @param null $options
+     *
+     * @throws Exception
+     */
     public function __construct($options = null)
     {
         try {
             $commands = array();
             $dsn      = '';
+            $port     = '';
             if (is_array($options)) {
                 foreach ($options as $option => $value) {
                     $this->$option = $value;
@@ -99,14 +107,15 @@ class medoo
                 $this->pdo->exec($value);
             }
 
-            if (!isset($option['get_sql_list'])) {
-                $option['get_sql_list'] = true;
+            if (!isset($options['get_sql_list'])) {
+                $options['get_sql_list'] = true;
             }
-            $this->get_sql_list = $option['get_sql_list'];
+            $this->get_sql_list = $options['get_sql_list'];
 
         } catch (PDOException $e) {
             throw new Exception($e->getMessage());
         }
+        return true;
     }
 
     public function getSqlList()
@@ -220,7 +229,15 @@ class medoo
         );
     }
 
-    protected function data_implode($data, $conjunctor, $outer_conjunctor = null)
+    /**
+     * @param      $data
+     * @param      $conjunctor
+     *
+     * @return string
+     * @internal param null $outer_conjunctor
+     *
+     */
+    protected function data_implode($data, $conjunctor)
     {
         $wheres = array();
         foreach ($data as $key => $value) {
@@ -707,6 +724,7 @@ class medoo
         } else {
             return false;
         }
+        return true;
     }
 
     public function debug()
