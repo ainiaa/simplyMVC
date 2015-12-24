@@ -933,6 +933,9 @@ class SmvcTemplate
     {
         $attrs = $this->get_para($tag_args, 0);
         $from  = $attrs['from'];
+        if ($from === false) {
+            $from = array();
+        }
 
         $item = $this->get_val($attrs['item']);
 
@@ -951,10 +954,11 @@ class SmvcTemplate
         }
 
         $output = '<?php ';
+        $output .= "\$_from = {$from}; if (\$_from === false) {\$_from = array();}";
         if (isset($attrs["key"]) && isset($attrs["item"])) {
-            $output .= "\$_from = {$from}; if (!is_array(\$_from) && !is_object(\$_from)) { settype(\$_from, 'array'); }; \$this->push_vars('{$attrs["key"]}', '{$attrs["item"]}');";
+            $output .= "if (!is_array(\$_from) && !is_object(\$_from)) { settype(\$_from, 'array'); }; \$this->push_vars('{$attrs["key"]}', '{$attrs["item"]}');";
         } else {
-            $output .= "\$_from = {$from}; if (!is_array(\$_from) && !is_object(\$_from)) { settype(\$_from, 'array'); };";
+            $output .= "if (!is_array(\$_from) && !is_object(\$_from)) { settype(\$_from, 'array'); };";
         }
 
 

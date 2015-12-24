@@ -19,12 +19,20 @@ class PostController extends BackendController
     public function indexAction()
     {
         $postList = $this->PostService->getList();
-
         $this->setMainTpl('post_list.tpl.html');
 
         $this->assign('title', 'Simply MVC backend - table list');
         $this->assign('tableHeaderList', array('term_id', 'name', 'slug',));
         $this->assign('list', $postList);
+        $this->display();
+    }
+
+    /**
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
+     */
+    public function addAction()
+    {
+        $this->setMainTpl('post_add.tpl.html');
         $this->display();
     }
 }
