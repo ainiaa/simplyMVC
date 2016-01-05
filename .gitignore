@@ -221,3 +221,4 @@ pip-log.txt
 ## PHPStorm
 #################
 .idea
+frontend/default/templates_c/hello_world.tpl.html.php
