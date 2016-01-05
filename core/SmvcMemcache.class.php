@@ -245,7 +245,7 @@ class SmvcMemcache
         if (!isset(self::$instance[$instanceNameSet])) {
             $tmp                 = new $class();
             $tmp->memcacheserver = $serverGroup;
-            $tmp->getConn($serverGroup);
+            $tmp->memcacheserver->getConn($serverGroup);
             self::$instance[$instanceNameSet] = $tmp;
             $tmp                              = null;
         }

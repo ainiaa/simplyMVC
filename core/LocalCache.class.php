@@ -47,7 +47,7 @@ class LocalCache implements ArrayAccess
 
     /**
      * @param $name
-     * @param $data Array|Object
+     * @param $data Object
      *
      * @return array
      */

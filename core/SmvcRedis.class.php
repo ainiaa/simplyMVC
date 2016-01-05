@@ -44,7 +44,7 @@ class SmvcRedis
             if ($d) {
                 self::$instance[$instanceNameSet] = $tmp;
                 if (isset($config['database']) && is_int($config['database'])) {
-                    self::$instance[$instanceNameSet]->select($config['database']);
+                    self::$instance[$instanceNameSet]->redis->select($config['database']);
                 }
             }
         }
@@ -109,7 +109,7 @@ class SmvcRedis
     public function set($key, $value, $limit = 2592000)
     {
         if (is_null($value)) {
-            return $this->del($key);
+            return $this->redis->del($key);
         }
         if (is_array($value)) {
             $value = 'SC:ARR' . serialize($value);
@@ -148,7 +148,7 @@ class SmvcRedis
 
     public function delete($key, $perstring = '')
     {
-        return $this->del($key, $perstring);
+        $this->redis->delete($key, $perstring);
     }
 
     public function del($key, $perstring = '')
@@ -164,7 +164,7 @@ class SmvcRedis
             $key = $this->cachePrefix . $key;
         }
 
-        return ($this->redis->delete($key));
+        return $this->redis->del($key);
     }
 
     public function append($key, $value)
@@ -222,7 +222,7 @@ class SmvcRedis
                     $smarr    = array();
                 }
             }
-            $ret = $smarr = null;
+            $smarr = null;
             return $outret;
         } else {
             foreach ($ret as $knum => $eachret) {
@@ -264,7 +264,7 @@ class SmvcRedis
                     $i++;
                 }
             }
-            $ret = $smarr = null;
+            $smarr = null;
             return $outret;
         } else {
             foreach ($ret as $knum => $eachret) {
@@ -353,7 +353,7 @@ class SmvcRedis
     public function lSize($key)
     {
         $key = $this->cachePrefix . $key;
-        return $this->redis->lSize($key);
+        $this->redis->lSize($key);
     }
 
     public function lGet($key, $index)
@@ -650,32 +650,32 @@ class SmvcRedis
 
     public function zRemRangeByScore($key, $scorestart, $scoreend)
     {
-        return $this->zDeleteRangeByScore($key, $scorestart, $scoreend);
+        $this->redis->zDeleteRangeByScore($key, $scorestart, $scoreend);
     }
 
     public function zDeleteRangeByScore($key, $scorestart, $scoreend)
     {
-        return $this->redis->zDeleteRangeByScore($this->cachePrefix . $key, $scorestart, $scoreend);
+        $this->redis->zDeleteRangeByScore($this->cachePrefix . $key, $scorestart, $scoreend);
     }
 
     public function zRemRangeByRank($key, $start = 0, $end = -1)
     {
-        return $this->zDeleteRangeByRank($key, $start, $end);
+         $this->redis->zDeleteRangeByRank($key, $start, $end);
     }
 
     public function zDeleteRangeByRank($key, $start = 0, $end = -1)
     {
-        return $this->redis->zDeleteRangeByRank($this->cachePrefix . $key, $start, $end);
+         $this->redis->zDeleteRangeByRank($this->cachePrefix . $key, $start, $end);
     }
 
     public function zCard($key)
     {
-        return $this->zSize($key);
+        $this->redis->zSize($key);
     }
 
     public function zSize($key)
     {
-        return $this->redis->zSize($this->cachePrefix . $key);
+        $this->redis->zSize($this->cachePrefix . $key);
     }
 
     public function zScore($key, $value)
@@ -730,7 +730,7 @@ class SmvcRedis
 
     public function setTimeout($key, $time)
     {
-        return $this->redis->setTimeout($this->cachePrefix . $key, $time);
+        $this->redis->setTimeout($this->cachePrefix . $key, $time);
     }
 
     public function expireAt($key, $time)

@@ -54,7 +54,6 @@ class UserSplit
     {
         $dbConf        = C('db.split');
         $currentDbConf = $dbConf[array_rand($dbConf)];
-
     }
 
     private static function calcSplitLib($key)

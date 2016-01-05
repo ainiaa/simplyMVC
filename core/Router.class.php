@@ -49,19 +49,6 @@ class Router
     private static $originAction;
 
     /**
-     * 除去魔术
-     */
-    public static function removeMagicQuotes()
-    {
-        if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
-            $_POST    = self::stripSlashesDeep($_POST);
-            $_GET     = self::stripSlashesDeep($_GET);
-            $_COOKIE  = self::stripSlashesDeep($_COOKIE);
-            $_REQUEST = self::stripSlashesDeep($_REQUEST);
-        }
-    }
-
-    /**
      * @author Jeff Liu
      */
     public static function doUrlMapping()
@@ -136,7 +123,6 @@ class Router
      */
     public static function parseUrl()
     {
-        self::removeMagicQuotes();
         self::initEnv();
     }
 

@@ -63,7 +63,9 @@ class Session
         // determine the driver to load
         $class = 'Smvc' . ucfirst($config['driver']) . 'Session';
 
-        /**  @var SmvcBaseSession */
+        /**
+         * @var SmvcBaseSession
+         */
         $driver = null;
 
         $driver = new $class($config);
