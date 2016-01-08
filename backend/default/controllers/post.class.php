@@ -32,6 +32,9 @@ class PostController extends BackendController
      */
     public function addAction()
     {
+
+        $this->assign('postContent', "hello, world!!");
+
         $this->setMainTpl('post_add.tpl.html');
         $this->display();
     }

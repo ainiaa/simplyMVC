@@ -174,7 +174,7 @@ You should have received a copy of the GNU General Public License along with thi
 					})(f);
 					reader.readAsDataURL(f);					
 				}				
-			}
+			};
 			var chooseFromLocal = $('<input/>',{
 				type: "file",
 				class:"inline-form-control",
@@ -1563,18 +1563,31 @@ You should have received a copy of the GNU General Public License along with thi
 		
 		getText: function(){
 			//Function to get the source code.
-			if(!$(this).data("source-mode"))
-				return $(this).data("editor").html();
-			else
-				return $(this).data("editor").children().first().text();
-		},
+			if (typeof  $(this).data === 'function' && typeof $(this).data("editor") === 'object') {
+				if(!$(this).data("source-mode"))
+					return $(this).data("editor").html();
+				else
+					return $(this).data("editor").children().first().text();
+			} else {
+                alert('$(this).data("editor") is not a object');
+                return "";
+			}
 
+		},
 		setText: function(text){
 			//Function to set the source code
-			if(!$(this).data("source-mode"))
-				$(this).data("editor").html(text);
-			else
-				$(this).data("editor").children().first().text(text);
+			if (typeof  $(this).data === 'function' && typeof $(this).data("editor") === 'object') {
+				if(!$(this).data("source-mode"))
+					$(this).data("editor").html(text);
+				else
+					$(this).data("editor").children().first().text(text);
+			} else {
+                alert(JSON.stringify($(this).data));
+                //alert(JSON.stringify(arguments));
+                setTimeout(function(){
+                    //$(this).caller.apply(arguments);
+                }, 500);
+			}
 		},
 
 		setStyleWithCSS:function(){
@@ -1596,9 +1609,9 @@ You should have received a copy of the GNU General Public License along with thi
 			else{
 				document.execCommand("styleWithCSS", null, true);
 			}
-		},				
+		}
 
-	}
+	};
 
 	$.fn.Editor = function( method ){
 

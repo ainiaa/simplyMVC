@@ -1,3 +1,5 @@
+<link type="text/css" href="./public/assets/line-control/1.1.0/css/editor.css" rel="stylesheet"/>
+<link rel="stylesheet" href="./public/assets/font-awesome/4.5.0/css/font-awesome.min.css">
 <!--row-->
 <div class="row">
     <div class="box col-md-12">
@@ -14,7 +16,7 @@
                 </div>
             </div>
             <div class="box-content" style="display: block;">
-                <form role="form" class="form-inline" method="post" action="./?debug=1&b=2&m=default&c=post&g=backend&a=add">
+                <form role="form" class="form-inline" method="post" action="./?debug=1&b=2&m=default&c=post&g=backend&a=add" id="postAddForm">
                     <div class="form-group has-success col-xs-9">
                         <label for="inputSuccess1" class="control-label">Input with success</label>
                         <input type="text" name="title" id="inputSuccess1" class="form-control">
@@ -29,9 +31,9 @@
                     <br>
                     <br>
                     <br>
-                    <div class="form-group has-error col-xs-9">
-                        <label for="inputError1" class="control-label">Input with error</label>
-                        <input type="text"  name="info" id="inputError1" class="form-control">
+                    <div >
+                        <label for="txtEditor" class="control-label">txtEditor</label>
+                        <input type="text"  name="info" id="txtEditor">
                     </div>
                     <br>
                     <br>
@@ -49,3 +51,24 @@
     <!--/span-->
 </div>
 <!--/row-->
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#txtEditor").Editor(); //
+
+        $("#txtEditor").Editor('setText', "{$postContent} 1111");
+
+//        var editorInterval = setInterval(function(){
+//            if ($("#txtEditor").Editor().isReady()) {
+//                clearInterval(editorInterval);
+//                $("#txtEditor").Editor('setText', "{$postContent}");
+//            }
+//        }, 500);
+        $("#inputSuccess4").on('click', function(){
+            var txt = $("#txtEditor").Editor('getText');
+            $('#txtEditor').val(txt);
+            $('#postAddForm').submit();
+        });
+    });
+</script>
+<script src="./public/assets/line-control/1.1.0/js/editor.js"></script>
