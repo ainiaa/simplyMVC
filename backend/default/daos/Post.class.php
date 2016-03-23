@@ -5,5 +5,5 @@
  */
 class PostDAO extends BaseDBDAO
 {
-    protected $tableName = 'post';
+    protected $tableName = 'posts';
 }

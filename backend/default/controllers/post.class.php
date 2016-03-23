@@ -18,7 +18,7 @@ class PostController extends BackendController
      */
     public function indexAction()
     {
-        $postList = $this->PostService->getList();
+        $postList = $this->PostService->getPostList();
         $this->setMainTpl('post_list.tpl.html');
 
         $this->assign('title', 'Simply MVC backend - table list');
@@ -35,7 +35,23 @@ class PostController extends BackendController
 
         $this->assign('postContent', "hello, world!!");
 
-        $this->setMainTpl('post_add.tpl.html');
-        $this->display();
+        if (IS_POST) {
+            $postTitle = $_POST['post_title'];
+            $postContent = $_POST['post_content'];
+            $data = array('post_title' => $postTitle,'post_content' => $postContent);
+            $data = $this->PostService->buildPostData($data);
+            $id = $this->PostService->addPost($data);
+            if (empty($id)) {
+                $error = $this->PostService->getDbError();
+                $this->displayError($error);
+            } else {
+                $this->redirect('index.php?m=default&c=post&g=backend&a=index');
+            }
+        } else {
+            $this->setMainTpl('post_add.tpl.html');
+            $this->display();
+        }
+
+
     }
 }

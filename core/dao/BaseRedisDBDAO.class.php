@@ -96,7 +96,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      */
     private function getPK()
     {
-        return $this->tableName . ':' . $this->uId;
+        return $this->realTableName . ':' . $this->uId;
     }
 
     /**

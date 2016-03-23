@@ -18,22 +18,15 @@
             <div class="box-content" style="display: block;">
                 <form role="form" class="form-inline" method="post" action="./?debug=1&b=2&m=default&c=post&g=backend&a=add" id="postAddForm">
                     <div class="form-group has-success col-xs-9">
-                        <label for="inputSuccess1" class="control-label">Input with success</label>
-                        <input type="text" name="title" id="inputSuccess1" class="form-control">
-                    </div>
-                    <br>
-                    <br>
-                    <br>
-                    <div class="form-group has-warning col-xs-9">
-                        <label for="inputWarning1" class="control-label">Input with warning</label>
-                        <input type="text" name="desc" id="inputWarning1" class="form-control">
+                        <label for="inputSuccess1" class="control-label">标题：</label>
+                        <input type="text" name="post_title" id="inputSuccess1" class="form-control">
                     </div>
                     <br>
                     <br>
                     <br>
                     <div >
-                        <label for="txtEditor" class="control-label">txtEditor</label>
-                        <input type="text"  name="info" id="txtEditor">
+                        <label for="txtEditor" class="control-label">文章内容</label>
+                        <input type="text"  name="post_content" id="txtEditor">
                     </div>
                     <br>
                     <br>
@@ -54,16 +47,10 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $("#txtEditor").Editor(); //
+        $("#txtEditor").Editor(); //初始化
 
-        $("#txtEditor").Editor('setText', "{$postContent} 1111");
+        $("#txtEditor").Editor('setText', "{$postContent}");
 
-//        var editorInterval = setInterval(function(){
-//            if ($("#txtEditor").Editor().isReady()) {
-//                clearInterval(editorInterval);
-//                $("#txtEditor").Editor('setText', "{$postContent}");
-//            }
-//        }, 500);
         $("#inputSuccess4").on('click', function(){
             var txt = $("#txtEditor").Editor('getText');
             $('#txtEditor').val(txt);
