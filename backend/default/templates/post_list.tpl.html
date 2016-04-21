@@ -27,19 +27,19 @@
                     <tbody>
                     {foreach item=terms name=termsName from=$list key=termsKey}
                     <tr>
-                        <td class="center">{$terms.term_id}</td>
-                        <td class="center">{$terms.name}</td>
-                        <td class="center">{$terms.slug}</td>
+                        {foreach item=tableHeader name=tableHeaderNameNew from=$tableHeaderList key=tableHeaderKey}
+                        <td class="center">{$terms[$tableHeader]}</td>
+                        {/foreach}
                         <td class="center">
-                            <a class="btn btn-success" href="#">
+                            <a class="btn btn-success" href="{url uri_path='backend/default/post/detail' uri_params=array('id'=>$terms.id)}">
                                 <i class="glyphicon glyphicon-zoom-in icon-white"></i>
                                 View
                             </a>
-                            <a class="btn btn-info" href="#">
+                            <a class="btn btn-info" href="{url uri_path='backend/default/post/edit' uri_params=array('id'=>$terms.id)}">
                                 <i class="glyphicon glyphicon-edit icon-white"></i>
                                 Edit
                             </a>
-                            <a class="btn btn-danger" href="#">
+                            <a class="btn btn-danger" href="{url uri_path='backend/default/post/delete' uri_params=array('id'=>$terms.id)}">
                                 <i class="glyphicon glyphicon-trash icon-white"></i>
                                 Delete
                             </a>

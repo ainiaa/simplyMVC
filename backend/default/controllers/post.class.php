@@ -22,7 +22,7 @@ class PostController extends BackendController
         $this->setMainTpl('post_list.tpl.html');
 
         $this->assign('title', 'Simply MVC backend - table list');
-        $this->assign('tableHeaderList', array('term_id', 'name', 'slug',));
+        $this->assign('tableHeaderList', array('post_author', 'post_date', 'post_title', 'post_excerpt',));
         $this->assign('list', $postList);
         $this->display();
     }

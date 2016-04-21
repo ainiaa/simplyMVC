@@ -246,3 +246,22 @@ function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = fals
 
     return true;
 }
+
+function make_url($uri_path, $uri_params, $absolute = false)
+{
+    error_log(__METHOD__ .'$uri_params:'.var_export($uri_params,1).PHP_EOL,3,'d:/tpl.log');
+    $final_url    = '';
+    $uri_path_arr = explode('/', $uri_path);
+    $final_url .= sprintf(
+            'index.php?g=%s&m=%s&c=%s&a=%s',
+            $uri_path_arr[0],
+            $uri_path_arr[1],
+            $uri_path_arr[2],
+            $uri_path_arr[3]
+    );
+    $final_url .= '&'.http_build_query($uri_params);
+    if ($absolute) {
+        $final_url = get_domain() . $final_url;
+    }
+    return $final_url;
+}

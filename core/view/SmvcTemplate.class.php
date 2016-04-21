@@ -180,19 +180,24 @@ class SmvcTemplate
                         } else {
                             $cachename = basename($filename, strrchr($filename, '.')) . '_' . $cache_id;
                         }
-                        $data = serialize(array(
-                                'template' => $this->template,
-                                'expires'  => $this->_nowtime + $this->cache_lifetime,
-                                'maketime' => $this->_nowtime
-                        ));
+                        $data = serialize(
+                                array(
+                                        'template' => $this->template,
+                                        'expires'  => $this->_nowtime + $this->cache_lifetime,
+                                        'maketime' => $this->_nowtime
+                                )
+                        );
                         $out  = str_replace("\r", '', $out);
 
                         while (strpos($out, "\n\n") !== false) {
                             $out = str_replace("\n\n", "\n", $out);
                         }
 
-                        if (file_put_contents($this->cache_dir . '/' . $cachename . '.php',
-                                        '<?php exit;?>' . $data . $out, LOCK_EX) === false
+                        if (file_put_contents(
+                                        $this->cache_dir . '/' . $cachename . '.php',
+                                        '<?php exit;?>' . $data . $out,
+                                        LOCK_EX
+                                ) === false
                         ) {
                             trigger_error('can\'t write:' . $this->cache_dir . '/' . $cachename . '.php');
                         }
@@ -285,9 +290,13 @@ class SmvcTemplate
             $source = $this->smarty_prefilter_preCompile($source);
         }
 
-        return preg_replace_callback("/{([^\}\{\n]*)}/", function ($r) {
-            return SmvcTemplate::select($r[1]);
-        }, $source);
+        return preg_replace_callback(
+                "/{([^\}\{\n]*)}/",
+                function ($r) {
+                    return SmvcTemplate::select($r[1]);
+                },
+                $source
+        );
     }
 
     /**
@@ -309,7 +318,10 @@ class SmvcTemplate
         }
 
         if (($this->caching == true || $this->appoint_cache_id) && $this->direct_output == false) {
-            if (is_file($this->cache_dir . '/' . $cachename . '.php') && ($data = @file_get_contents($this->cache_dir . '/' . $cachename . '.php'))) {
+            if (is_file($this->cache_dir . '/' . $cachename . '.php') && ($data = @file_get_contents(
+                            $this->cache_dir . '/' . $cachename . '.php'
+                    ))
+            ) {
                 $data     = substr($data, 13);
                 $pos      = strpos($data, '<');
                 $paradata = substr($data, 0, $pos);
@@ -427,8 +439,7 @@ class SmvcTemplate
 
                     return $tplContent;
                     break;
-                case
-                'res':
+                case 'res':
                     $t = $this->get_para(substr($tag, 4), 0);
 
                     return '<?php echo $this->res_base . "/" . ' . "'$t[file]'" . '; ?>';
@@ -470,9 +481,13 @@ class SmvcTemplate
                         $t['_template'] = str_replace("\r", '', $this->fetch_str(base64_decode($_template)));
                     }
 
-                    $out = "<?php \n" . '$k = ' . preg_replace_callback("/(\'\\$[^,]+)/", function ($r) {
-                                return stripslashes(trim($r[1], '\''));
-                            }, var_export($t, true)) . ";\n";
+                    $out = "<?php \n" . '$k = ' . preg_replace_callback(
+                                    "/(\'\\$[^,]+)/",
+                                    function ($r) {
+                                        return stripslashes(trim($r[1], '\''));
+                                    },
+                                    var_export($t, true)
+                            ) . ";\n";
                     $out .= 'echo $this->_echash . $k[\'name\'] . \'|\' . serialize($k) . $this->_echash;' . "\n?>";
 
                     return $out;
@@ -554,21 +569,47 @@ class SmvcTemplate
                     break;
 
                 case 'url':
-                    $str = str_replace('index.php?', '', substr($tag, 4));
-                    $str = str_replace('&amp;', '&', $str);
-                    $tmp = explode('&', $str);
-                    $arr = array();
-
-                    foreach ($tmp as $val) {
-                        $a = explode('=', $val);
-                        if ((substr($a[1], 0, 1) == '$')) {
-                            $arr[] = "{$a[0]}=' . " . $this->get_val(substr($a[1], 1)) . ". '";
+                    $t = $this->get_para(substr($tag, 4), 0);
+                    $uri_path   = isset($t['uri_path']) ? $t['uri_path'] : '';
+                    $uri_params = isset($t['uri_params']) ? $t['uri_params'] : '';
+                    if ($uri_path) {
+                        if (strpos($uri_path, '$')===0) {
+                            $uri_path = substr($uri_path, 1);
+                            $uri_path = $this->make_var($uri_path);
                         } else {
-                            $arr[] = "{$a[0]}={$a[1]}";
+                            $uri_path = var_export($uri_path,1);
                         }
                     }
+                    $final = '[]';
+                    if ($uri_params) {
+                        $tmp = '';
+                        if (strpos($uri_params, '[') === 0) {
+                            $tmp = substr($uri_params, 1, -1);
+                        } elseif (stripos($uri_params, 'array(') === 0) {
+                            $tmp = substr($uri_params, 6, -1);
+                        }
+                        $tmp   = explode(',', $tmp);
+                        $final = '[';
+                        foreach ($tmp as $index => $item) {
+                            list($kk, $vv) = explode('=>', $item);
+                            if (strpos($kk, '$')===0) {
+                                $kk = substr($kk, 1);
+                                $kk = $this->make_var($kk);
+                            } else {
+                                $kk = var_export($kk,1);
+                            }
+                            if (strpos($vv, '$') ===0) {
+                                $vv = substr($vv, 1);
+                                $vv = $this->make_var($vv);
+                            } else {
+                                $vv = var_export($vv,1);
+                            }
+                            $final .= $kk .'=>'.$vv;
+                        }
+                        $final .= ']';
+                    }
 
-                    return '<?php echo url(\'' . implode('&', $arr) . '\'); ?>';
+                    return '<?php echo make_url(' . $uri_path . ', ' . $final. '); ?>';
                     break;
 
                 case 'ecjoin':
@@ -613,10 +654,14 @@ class SmvcTemplate
     public function get_val($val)
     {
         if (strrpos($val, '[') !== false) {
-            //            $val = preg_replace("/\[([^\[\]]*)\]/eis", "'.'.str_replace('$','\$','\\1')", $val);
-            $val = preg_replace_callback("/\[([^\[\]]*)\]/is", function ($r) {
-                return '.' . str_replace('$', '\$', $r[1]);
-            }, $val);
+            $val = preg_replace_callback(
+                    "/\[([^\[\]]*)\]/is",
+                    function ($r) {
+                        $varName = substr($r[1], 1);
+                        return '.$' . $varName;
+                    },
+                    $val
+            );
         }
 
         if (strrpos($val, '|') !== false) {
@@ -799,7 +844,8 @@ class SmvcTemplate
         $pa   = $this->str_trim($val);
         foreach ($pa AS $value) {
             if (strrpos($value, '=')) {
-                list($a, $b) = explode('=', str_replace(array(' ', '"', "'", '&quot;'), '', $value));
+                $tmp = str_replace(array(' ', '"', "'", '&quot;'), '', $value);
+                list($a, $b) = preg_split('|=(?!>)|', $tmp);//explode('=', $tmp);
                 if ($b{0} == '$') {
                     if ($type) {
                         eval('$para[\'' . $a . '\']=' . $this->get_val(substr($b, 1)) . ';');
@@ -849,8 +895,11 @@ class SmvcTemplate
      */
     public function _compile_if_tag($tag_args, $elseif = false)
     {
-        preg_match_all('/\-?\d+[\.\d]+|\'[^\'|\s]*\'|"[^"|\s]*"|[\$\w\.]+|!==|===|==|!=|<>|<<|>>|<=|>=|&&|\|\||\(|\)|,|\!|\^|=|&|<|>|~|\||\%|\+|\-|\/|\*|\@|\S/',
-                $tag_args, $match);
+        preg_match_all(
+                '/\-?\d+[\.\d]+|\'[^\'|\s]*\'|"[^"|\s]*"|[\$\w\.]+|!==|===|==|!=|<>|<<|>>|<=|>=|&&|\|\||\(|\)|,|\!|\^|=|&|<|>|~|\||\%|\+|\-|\/|\*|\@|\S/',
+                $tag_args,
+                $match
+        );
 
         $tokens = $match[0];
         // make sure we have balanced parenthesis
@@ -1398,8 +1447,10 @@ class SmvcTemplate
 
         $out = '';
         foreach ($options AS $key => $val) {
-            $out .= in_array($key,
-                    $checked) ? "<label><input type=\"checkbox\" name=\"$name\" value=\"$key\" checked>&nbsp;{$val}</label>$separator" : "<label><input type=\"checkbox\" name=\"$name\" value=\"$key\">&nbsp;{$val}</label>$separator";
+            $out .= in_array(
+                    $key,
+                    $checked
+            ) ? "<label><input type=\"checkbox\" name=\"$name\" value=\"$key\" checked>&nbsp;{$val}</label>$separator" : "<label><input type=\"checkbox\" name=\"$name\" value=\"$key\">&nbsp;{$val}</label>$separator";
         }
 
         return $out;
@@ -1411,8 +1462,10 @@ class SmvcTemplate
         if (isset($arr['from'])) {
             $page = $arr['from'];
         } else {
-            trigger_error("Function html_page_links missing \"From\" argument in " . $this->_current_file,
-                    E_USER_ERROR);
+            trigger_error(
+                    "Function html_page_links missing \"From\" argument in " . $this->_current_file,
+                    E_USER_ERROR
+            );
         }
 
         $page = $this->_init_page_param($page);
@@ -1511,8 +1564,10 @@ class SmvcTemplate
         if (isset($arr['from'])) {
             $page = $arr['from'];
         } else {
-            trigger_error("Function html_page_simple missing \"From\" argument in " . $this->_current_file,
-                    E_USER_ERROR);
+            trigger_error(
+                    "Function html_page_simple missing \"From\" argument in " . $this->_current_file,
+                    E_USER_ERROR
+            );
         }
 
         $out          = '';
