@@ -249,7 +249,6 @@ function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = fals
 
 function make_url($uri_path, $uri_params, $absolute = false)
 {
-    error_log(__METHOD__ .'$uri_params:'.var_export($uri_params,1).PHP_EOL,3,'d:/tpl.log');
     $final_url    = '';
     $uri_path_arr = explode('/', $uri_path);
     $final_url .= sprintf(
