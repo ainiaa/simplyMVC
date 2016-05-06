@@ -16,10 +16,11 @@
                 </div>
             </div>
             <div class="box-content" style="display: block;">
-                <form role="form" class="form-inline" method="post" action="./?debug=1&b=2&m=default&c=post&g=backend&a=add" id="postAddForm">
+                <form role="form" class="form-inline" method="post" action="{$action}" id="postAddForm">
+                    <input type="hidden"  name="id" id="id" value="{$id}">
                     <div class="form-group has-success col-xs-9">
                         <label for="inputSuccess1" class="control-label">标题：</label>
-                        <input type="text" name="post_title" id="inputSuccess1" class="form-control">
+                        <input type="text" name="post_title" id="inputSuccess1" class="form-control" value="{$post.post_title}">
                     </div>
                     <br>
                     <br>
@@ -49,7 +50,7 @@
     $(document).ready(function() {
         $("#txtEditor").Editor(); //初始化
 
-        $("#txtEditor").Editor('setText', "{$postContent}");
+        $("#txtEditor").Editor('setText', "{$post.post_content}");
 
         $("#inputSuccess4").on('click', function(){
             var txt = $("#txtEditor").Editor('getText');

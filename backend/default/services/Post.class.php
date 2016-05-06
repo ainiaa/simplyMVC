@@ -14,14 +14,28 @@ class PostService extends BaseService
      */
     public function getPostList()
     {
-        $PostList = $this->PostDAO->getAll();
+        return $this->PostDAO->getAll();
+    }
 
-        return $PostList;
+    public function getOnePost($where)
+    {
+        return $this->PostDAO->getOne('*', $where);
     }
 
     public function addPost($data)
     {
         return $this->PostDAO->add($data);
+    }
+
+    /**
+     * @param $data
+     * @param $where
+     *
+     * @return int
+     */
+    public function updatePost($data, $where)
+    {
+        return $this->PostDAO->update($data, $where);
     }
 
     public function getLastSql()

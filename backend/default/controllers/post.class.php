@@ -34,13 +34,13 @@ class PostController extends BackendController
     {
 
         $this->assign('postContent', "hello, world!!");
-
+        $this->assign('action', './?debug=1&b=2&m=default&c=post&g=backend&a=add');
         if (IS_POST) {
-            $postTitle = $_POST['post_title'];
+            $postTitle   = $_POST['post_title'];
             $postContent = $_POST['post_content'];
-            $data = array('post_title' => $postTitle,'post_content' => $postContent);
-            $data = $this->PostService->buildPostData($data);
-            $id = $this->PostService->addPost($data);
+            $data        = array('post_title' => $postTitle, 'post_content' => $postContent);
+            $data        = $this->PostService->buildPostData($data);
+            $id          = $this->PostService->addPost($data);
             if (empty($id)) {
                 $error = $this->PostService->getDbError();
                 $this->displayError($error);
@@ -51,7 +51,37 @@ class PostController extends BackendController
             $this->setMainTpl('post_add.tpl.html');
             $this->display();
         }
+    }
 
-
+    /**
+     *
+     */
+    public function editAction()
+    {
+        $this->assign('postContent', "hello, world!!");
+        $this->assign('action', './?debug=1&b=2&m=default&c=post&g=backend&a=edit');
+        if (IS_POST) {
+            $postTitle   = $_POST['post_title'];
+            $postContent = $_POST['post_content'];
+            $data        = array('post_title' => $postTitle, 'post_content' => $postContent);
+            $id          = $_REQUEST['id'];
+            $rs          = $this->PostService->updatePost($data, ['id' => $id]);
+            if (empty($rs)) {
+                $error = $this->PostService->getDbError();
+                $this->displayError($error);
+            } else {
+                $this->redirect('index.php?m=default&c=post&g=backend&a=index');
+            }
+        } else {
+            $id = $_REQUEST['id'];
+            if (empty($id)) {
+                $this->displayError("id is empty");
+            }
+            $post = $this->PostService->getOnePost(['id' => $id]);
+            $this->setMainTpl('post_add.tpl.html');
+            $this->assign('post', $post);
+            $this->assign('id', $id);
+            $this->display();
+        }
     }
 }
