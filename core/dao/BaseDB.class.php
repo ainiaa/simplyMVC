@@ -646,8 +646,8 @@ class BaseDBDAO extends SmvcObject
                 $type = self::WRITE_STORAGE;
             }
         }
-
-        return $this->getStorage($type)->query($query);
+        $return = $this->getStorage($type)->query($query);
+        return $return;
     }
 
     /**
@@ -806,6 +806,25 @@ class BaseDBDAO extends SmvcObject
         }
 
         return true;
+    }
+
+    /**
+     * @param     $query
+     * @param int $queryType
+     *
+     * @return $this
+     */
+    public function exec($query, $type = 1){
+        if ($this->transTimes > 0) { //事务
+            $type = self::WRITE_STORAGE;
+        } else if (is_null($type)) {
+            if ('SELECT' === strtoupper(substr($query, 0, 6))) {
+                $type = self::READ_STORAGE;
+            } else {
+                $type = self::WRITE_STORAGE;
+            }
+        }
+        return $this->getStorage($type)->exec($query);
     }
 
 }
