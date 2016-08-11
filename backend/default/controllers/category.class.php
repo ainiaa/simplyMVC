@@ -19,13 +19,12 @@ class CategoryController extends BackendController
     public function indexAction()
     {
         $categoryList = $this->CategoryService->getCategoryList();
-        $this->setMainTpl('category_list.tpl.html');
-
-        $s = $this->CategoryService->getValidParents(1);
-        var_export($s);exit;
-        $this->assign('title', 'Simply MVC backend - table list');
-        $this->assign('tableHeaderList', array('name', 'desc'));
         $this->assign('list', $categoryList);
+
+        $this->setMainTpl('category_list.tpl.html');
+        $this->assign('title', 'Simply MVC backend - table list');
+        $this->assign('tableHeaderList', ['name', 'desc', 'parent_id','path', 'depth']);
+
         $this->display();
     }
 
@@ -36,9 +35,18 @@ class CategoryController extends BackendController
     {
         $this->assign('action', './?debug=1&b=2&m=default&c=category&g=backend&a=add');
         if (IS_POST) {
-            $name = $_POST['name'];
-            $desc = $_POST['desc'];
-            $data = array('name' => $name, 'desc' => $desc);
+            $name           = $_POST['name'];
+            $desc           = $_POST['desc'];
+            $parentId       = $_POST['parentid'];
+            $parentCategory = $this->CategoryService->getCategoryInfo($parentId);
+            $data           = ['name' => $name, 'desc' => $desc, 'parent_id' => $parentId];
+            if ($parentCategory) {
+                $data['path']  = $parentCategory['path'] . $parentId . ',';
+                $data['depth'] = (int)$parentCategory['depth'] + 1;
+            } else {
+                $data['path']  = ',0,';;
+                $data['depth'] = 1;
+            }
             $data = $this->CategoryService->buildCategoryData($data);
             $id   = $this->CategoryService->addCategory($data);
             if (empty($id)) {
@@ -48,6 +56,11 @@ class CategoryController extends BackendController
                 $this->redirect('index.php?m=default&c=category&g=backend&a=index');
             }
         } else {
+            $categoryList          = $this->CategoryService->getCategoryList();
+            $parentCategorySelector = $this->CategoryService->generateParentsSelector(-1);
+            $this->assign('list', $categoryList);
+            $this->assign('parentCategorySelector', $parentCategorySelector);
+
             $this->setMainTpl('category_add.tpl.html');
             $this->display();
         }

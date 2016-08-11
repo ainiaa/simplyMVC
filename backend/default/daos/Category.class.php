@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class PostDAO
+ * Class CategoryDAO
  */
 class CategoryDAO extends BaseDBDAO
 {
@@ -10,12 +10,21 @@ class CategoryDAO extends BaseDBDAO
     public function getValidParents($id)
     {
         $currentInfo = $this->getOne('*', ['id' => $id]);
-        $query = sprintf('SELECT * FROM "%s" WHERE "path" NOT LIKE \'%s%%\' ', 'smvc_category', $currentInfo['path']);
-        $q =  $this->query($query, 1);
+        $query       = sprintf(
+                'SELECT * FROM `%s` WHERE`path` NOT LIKE \'%%,%s,%%\' ',
+                'smvc_category',
+                $currentInfo['path']
+        );
+        $q           = $this->query($query, 1);
         if ($q === false) {
             return $this->getError();
         } else {
             return $q->fetchAll(PDO::FETCH_ASSOC);
         }
+    }
+
+    public function getCategoryInfo($id)
+    {
+        return $this->getOne('*', ['id' => $id]);
     }
 }

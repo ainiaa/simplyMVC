@@ -28,10 +28,11 @@ class CategoryService
      */
     public function buildCategoryData($originData)
     {
-        $defaultData        = $this->getCategoryDefaultData();
-        $data               = array_merge($defaultData, $originData);
-        $data['created_at'] = time();
-        $data['created_by'] = '';//todo 获得当前用户信息
+        $defaultData = $this->getCategoryDefaultData();
+        $data        = array_merge($defaultData, $originData);
+        if (!isset($originData['created_at'])) {
+            $data['created_at'] = time();
+        }
         return $data;
     }
 
@@ -46,7 +47,7 @@ class CategoryService
      */
     public function getCategoryDefaultData()
     {
-        return array(
+        return [
                 'name'       => '',
                 'desc'       => '',
                 'parent_id'  => 0,
@@ -56,7 +57,7 @@ class CategoryService
                 'created_at' => '',
                 'updated_by' => '',
                 'updated_at' => '',
-        );
+        ];
     }
 
     /**
@@ -74,6 +75,50 @@ class CategoryService
     public function getValidParents($id)
     {
         return $this->CategoryDAO->getValidParents($id);
+    }
+
+    /**
+     * @param $id
+     *
+     * @return array|null
+     */
+    public function getCategoryInfo($id)
+    {
+        if (is_numeric($id) && $id > 0) {
+            return $this->CategoryDAO->getCategoryInfo($id);
+        }
+        return null;
+    }
+
+    public function generateParentsSelector($id)
+    {
+        $validParents = $this->getValidParents($id);
+        $selectorHtml = <<< HTML
+            <select name="parentid" id="parentid">
+                <option value="0">--请选择--</option> 
+HTML;
+
+        if ($validParents && is_array($validParents)) {
+            foreach ($validParents as $index => $validParent) {
+                if ($validParent['depth'] > 0) {
+                    $selectorHtml .= sprintf(
+                            '<option value="%s">%s</option>',
+                            $validParent['id'],
+                            '|' . str_repeat('-', $validParent['depth']) . $validParent['name']
+                    );
+                } else {
+                    $selectorHtml .= sprintf(
+                            '<option value="%s">%s</option>',
+                            $validParent['id'],
+                            $validParent['name']
+                    );
+                }
+
+            }
+        }
+        $selectorHtml .= '</select>';
+
+        return $selectorHtml;
     }
 }
 
