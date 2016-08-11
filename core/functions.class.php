@@ -247,6 +247,13 @@ function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = fals
     return true;
 }
 
+/**
+ * @param      $uri_path
+ * @param      $uri_params
+ * @param bool $absolute
+ *
+ * @return string
+ */
 function make_url($uri_path, $uri_params, $absolute = false)
 {
     $final_url    = '';
@@ -258,9 +265,27 @@ function make_url($uri_path, $uri_params, $absolute = false)
             $uri_path_arr[2],
             $uri_path_arr[3]
     );
-    $final_url .= '&'.http_build_query($uri_params);
+    $final_url .= '&' . http_build_query($uri_params);
     if ($absolute) {
         $final_url = get_domain() . $final_url;
     }
     return $final_url;
+}
+
+function I($name, $value = null)
+{
+    $name = explode('.', $name);
+    if (count($name) > 1) {
+        $type = array_shift($name);
+        $key  = implode('.', $name);
+    } else {
+        $type = 'request';
+        $key = $name;
+    }
+    if (is_null($value)) {
+        return Request::getParam($type, $key);
+    } else {
+        Request::setParam($type, $key);
+    }
+
 }
