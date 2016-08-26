@@ -21,6 +21,11 @@ class CategoryService
         return $this->CategoryDAO->getAll();
     }
 
+    public function deleteCategoryById($id)
+    {
+        return $this->CategoryDAO->delete(['id' => $id]);
+    }
+
     /**
      * @param $originData
      *

@@ -104,14 +104,21 @@ class BaseDBDAO extends SmvcObject
     public function deleteByPk($condition)
     {
         //若当前表有辅助主键，且传进来的参数是数组，数组长度大于1
+        if ($this->pk) {
+            if (is_scalar($condition)) {
+                $where = sprintf('%s=%s', $this->pk, $condition);
+            } else {
+                $where = sprintf('%s=%s', $this->pk, $condition[$this->pk]);
+            }
 
-        $where = sprintf('%s=%s', $this->pk, $condition[$this->pk]);
-        if ($this->isMulit() && isset($condition[$this->sk])) {
-            $where .= sprintf('AND %s="%s"', $this->sk, $condition[$this->sk]);
+            if ($this->isMulit() && isset($condition[$this->sk])) {
+                $where .= sprintf('AND %s="%s"', $this->sk, $condition[$this->sk]);
+            }
+            $ret = $this->delete($where);
+
+            return $ret;
         }
-        $ret = $this->delete($where);
-
-        return $ret;
+        return null;
     }
 
 

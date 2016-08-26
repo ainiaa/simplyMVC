@@ -1,8 +1,8 @@
 <?php
 
 /**
- * 分类 管理相关
- * Class AdminController
+ * 分类管理控制器
+ * Class CategoryController
  */
 class CategoryController extends BackendController
 {
@@ -29,6 +29,7 @@ class CategoryController extends BackendController
     }
 
     /**
+     * 新增
      * @author Jeff Liu<jeff.liu.guo@gmail.com>
      */
     public function addAction()
@@ -67,10 +68,21 @@ class CategoryController extends BackendController
     }
 
     /**
-     *
+     * 编辑
      */
     public function editAction()
     {
         //todo 还没有实现
+    }
+
+    /**
+     * 删除
+     */
+    public function deleteAction()
+    {
+        //todo 还没有实现
+        $id           = I('get.id');
+        $deleteStatus = $this->CategoryService->deleteCategoryById($id);
+        $this->redirect('index.php?m=default&c=category&g=backend&a=index');
     }
 }
