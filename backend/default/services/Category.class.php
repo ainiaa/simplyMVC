@@ -77,6 +77,22 @@ class CategoryService
         return $this->CategoryDAO->add($data);
     }
 
+    /**
+     * @param $data
+     * @param $where
+     *
+     * @return int
+     */
+    public function updateCategory($data, $where)
+    {
+        return $this->CategoryDAO->update($data, $where);
+    }
+
+    /**
+     * @param $id
+     *
+     * @return array
+     */
     public function getValidParents($id)
     {
         return $this->CategoryDAO->getValidParents($id);
@@ -95,7 +111,13 @@ class CategoryService
         return null;
     }
 
-    public function generateParentsSelector($id)
+    /**
+     * @param     $id
+     * @param int $parentId
+     *
+     * @return string
+     */
+    public function generateParentsSelector($id, $parentId = 0)
     {
         $validParents = $this->getValidParents($id);
         $selectorHtml = <<< HTML
@@ -105,20 +127,26 @@ HTML;
 
         if ($validParents && is_array($validParents)) {
             foreach ($validParents as $index => $validParent) {
+                if ($validParent['parent_id'] == $parentId) {
+                    $selected = 'selected';
+                } else {
+                    $selected = '';
+                }
                 if ($validParent['depth'] > 0) {
                     $selectorHtml .= sprintf(
-                            '<option value="%s">%s</option>',
+                            '<option value="%s" %s>%s</option>',
                             $validParent['id'],
+                            $selected,
                             '|' . str_repeat('-', $validParent['depth']) . $validParent['name']
                     );
                 } else {
                     $selectorHtml .= sprintf(
-                            '<option value="%s">%s</option>',
+                            '<option value="%s" %s>%s</option>',
                             $validParent['id'],
+                            $selected,
                             $validParent['name']
                     );
                 }
-
             }
         }
         $selectorHtml .= '</select>';

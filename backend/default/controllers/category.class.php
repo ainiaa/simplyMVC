@@ -72,7 +72,48 @@ class CategoryController extends BackendController
      */
     public function editAction()
     {
-        //todo 还没有实现
+        $this->assign('action', './?debug=1&b=2&m=default&c=category&g=backend&a=edit');
+        $id = I('id');
+        if ($id) {
+            if (IS_POST) {
+                $name           = I('post.name');
+                $desc           = I('post.desc');
+                $parentId       = I('post.parentid');
+                $parentCategory = $this->CategoryService->getCategoryInfo($parentId);
+                //todo 需要校验parentId的合法性
+                $data = ['name' => $name, 'desc' => $desc, 'parent_id' => $parentId];
+                if ($parentCategory) {
+                    $data['path']  = $parentCategory['path'] . $parentId . ',';
+                    $data['depth'] = (int)$parentCategory['depth'] + 1;
+                } else {
+                    $data['path']  = ',0,';
+                    $data['depth'] = 1;
+                }
+                $data = $this->CategoryService->buildCategoryData($data);
+                $id   = $this->CategoryService->updateCategory($data, ['id' => $id]);
+                if (empty($id)) {
+                    $error = $this->CategoryService->getDbError();
+                    $this->displayError($error);
+                } else {
+                    $this->redirect('index.php?m=default&c=category&g=backend&a=index');
+                }
+            } else {//显示
+                $categoryInfo = $this->CategoryService->getCategoryInfo($id);
+                if ($categoryInfo) {
+                    $categoryList           = $this->CategoryService->getCategoryList();
+                    $parentCategorySelector = $this->CategoryService->generateParentsSelector($id, $categoryInfo['parent_id']);
+                    $this->assign('list', $categoryList);
+                    $this->assign('parentCategorySelector', $parentCategorySelector);
+                    $this->assign('categoryInfo', $categoryInfo);
+                    $this->setMainTpl('category_add.tpl.html');
+                    $this->display();
+                } else {
+                    //todo 分类不存在
+                }
+            }
+        } else {
+            //todo id传递有问题
+        }
     }
 
     /**
@@ -80,9 +121,8 @@ class CategoryController extends BackendController
      */
     public function deleteAction()
     {
-        //todo 还没有实现
-        $id           = I('get.id');
-        $deleteStatus = $this->CategoryService->deleteCategoryById($id);
+        $id = I('get.id');
+        $this->CategoryService->deleteCategoryById($id);
         $this->redirect('index.php?m=default&c=category&g=backend&a=index');
     }
 }
