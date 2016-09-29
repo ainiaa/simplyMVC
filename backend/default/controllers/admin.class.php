@@ -12,10 +12,6 @@ class AdminController extends BackendController
      */
     public $AdminService;
 
-    public function preIndexAction()
-    {
-    }
-
     /**
      * 管理员列表
      * @author Jeff Liu

@@ -112,12 +112,14 @@ class CategoryService
     }
 
     /**
-     * @param     $id
-     * @param int $selectedId
+     * @param int    $id
+     * @param int    $selectedId
+     * @param string $labelName
+     * @param null   $labelId
      *
      * @return string
      */
-    public function generateCategorySelector($id = -1, $selectedId = 0, $labelName = "category_id", $labelId = null)
+    public function generateCategorySelector($id = -1, $selectedId = 0, $labelName = 'category_id', $labelId = null)
     {
         $validParents = $this->getValidParents($id);
         if (empty($labelId)) {

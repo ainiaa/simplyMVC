@@ -10,7 +10,6 @@ class TermsService extends BaseService
 
 
     /**
-     * 管理员列表
      * @author Jeff Liu
      */
     public function getList()
