@@ -78,7 +78,7 @@ class CategoryController extends BackendController
             if (IS_POST) {
                 $name           = I('post.name');
                 $desc           = I('post.desc');
-                $parentId       = I('post.parentid');
+                $parentId       = I('post.parent_id');
                 $parentCategory = $this->CategoryService->getCategoryInfo($parentId);
                 //todo 需要校验parentId的合法性
                 $data = ['name' => $name, 'desc' => $desc, 'parent_id' => $parentId];
@@ -106,6 +106,7 @@ class CategoryController extends BackendController
                     $this->assign('parentCategorySelector', $parentCategorySelector);
                     $this->assign('categoryInfo', $categoryInfo);
                     $this->setMainTpl('category_add.tpl.html');
+                    $this->assign('id', $id);
                     $this->display();
                 } else {
                     //todo 分类不存在

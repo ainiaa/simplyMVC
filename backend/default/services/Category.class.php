@@ -121,14 +121,14 @@ class CategoryService
     {
         $validParents = $this->getValidParents($id);
         $selectorHtml = <<< HTML
-            <select name="parentid" id="parentid">
+            <select name="parent_id" id="parent_id">
                 <option value="0">--请选择--</option> 
 HTML;
 
         if ($validParents && is_array($validParents)) {
             foreach ($validParents as $index => $validParent) {
-                if ($validParent['parent_id'] == $parentId) {
-                    $selected = 'selected';
+                if ($validParent['id'] == $parentId) {
+                    $selected = 'selected="selected"';
                 } else {
                     $selected = '';
                 }

@@ -272,7 +272,7 @@ function make_url($uri_path, $uri_params, $absolute = false)
     return $final_url;
 }
 
-function I($name, $value = null)
+function I($name, $defaultValue = null, $callback = null)
 {
     $name = explode('.', $name);
     if (count($name) > 1) {
@@ -280,12 +280,7 @@ function I($name, $value = null)
         $key  = implode('.', $name);
     } else {
         $type = 'request';
-        $key = $name;
+        $key = $name[0];
     }
-    if (is_null($value)) {
-        return Request::getParam($type, $key);
-    } else {
-        Request::setParam($type, $key);
-    }
-
+    return Request::getParam($type, $key, $defaultValue, $callback);
 }

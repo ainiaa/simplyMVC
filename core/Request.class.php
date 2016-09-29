@@ -25,59 +25,66 @@ class Request
     }
 
     /**
-     * @param $origin
-     * @param $key
+     * @param      $origin
+     * @param      $key
+     * @param null $defaultValue
      *
      * @return array|null
      */
-    private static function getParamBase($origin, $key)
+    private static function getParamBase($origin, $key, $defaultValue = null)
     {
         if ($key == '*') {
             return $origin;
         } else if (is_array($key)) {
             $final = [];
             foreach ($key as $k) {
-                $final[$k] = isset($origin[$key]) ? $origin[$key] : null;
+                $final[$k] = isset($origin[$k]) ? $origin[$k] : $defaultValue;
             }
             return $final;
         } else {
-            return isset($origin[$key]) ? $origin[$key] : null;
+            return isset($origin[$key]) ? $origin[$key] : $defaultValue;
         }
     }
 
     /**
-     * @param $type
-     * @param $key
+     * @param      $type
+     * @param      $key
+     * @param null $defaultValue
+     * @param null $callback
      *
      * @return array|null
      */
-    public static function getParam($type, $key)
+    public static function getParam($type, $key, $defaultValue = null, $callback = null)
     {
-        switch ($type) {
+        switch (strtolower($type)) {
             case 'get':
-                return self::getParamBase($_GET, $key);
+                $return = self::getParamBase($_GET, $key, $defaultValue);
                 break;
             case 'post':
-                return self::getParamBase($_POST, $key);
+                $return =  self::getParamBase($_POST, $key, $defaultValue);
                 break;
             case 'request':
-                return self::getParamBase($_REQUEST, $key);
+                $return =  self::getParamBase($_REQUEST, $key, $defaultValue);
                 break;
             case 'cookie':
-                return self::getParamBase($_COOKIE, $key);
+                $return =  self::getParamBase($_COOKIE, $key, $defaultValue);
                 break;
             case 'server':
-                return self::getParamBase($_SERVER, $key);
+                $return =  self::getParamBase($_SERVER, $key, $defaultValue);
                 break;
             case 'session':
-                return self::getParamBase($_SESSION, $key);
+                $return =  self::getParamBase($_SESSION, $key, $defaultValue);
                 break;
             case 'env':
-                return self::getParamBase($_ENV, $key);
+                $return =  self::getParamBase($_ENV, $key, $defaultValue);
                 break;
             default:
-                return null;
+                $return =  null;
         }
+        if ($callback && is_callable($callback)) {
+            return $callback($return);
+        }
+        return $return;
     }
 
     /**
@@ -105,7 +112,7 @@ class Request
      */
     public static function setParam($type, $key, $value = null)
     {
-        switch ($type) {
+        switch (strtolower($type)) {
             case 'get':
                 self::setParamBase($_GET, $key, $value);
                 break;
