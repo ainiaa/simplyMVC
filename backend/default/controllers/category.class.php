@@ -58,7 +58,7 @@ class CategoryController extends BackendController
             }
         } else {
             $categoryList           = $this->CategoryService->getCategoryList();
-            $parentCategorySelector = $this->CategoryService->generateParentsSelector(-1);
+            $parentCategorySelector = $this->CategoryService->generateCategorySelector(-1,0,'parent_id');
             $this->assign('list', $categoryList);
             $this->assign('parentCategorySelector', $parentCategorySelector);
 
@@ -101,7 +101,7 @@ class CategoryController extends BackendController
                 $categoryInfo = $this->CategoryService->getCategoryInfo($id);
                 if ($categoryInfo) {
                     $categoryList           = $this->CategoryService->getCategoryList();
-                    $parentCategorySelector = $this->CategoryService->generateParentsSelector($id, $categoryInfo['parent_id']);
+                    $parentCategorySelector = $this->CategoryService->generateCategorySelector($id, $categoryInfo['parent_id']);
                     $this->assign('list', $categoryList);
                     $this->assign('parentCategorySelector', $parentCategorySelector);
                     $this->assign('categoryInfo', $categoryInfo);

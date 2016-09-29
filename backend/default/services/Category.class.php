@@ -113,21 +113,24 @@ class CategoryService
 
     /**
      * @param     $id
-     * @param int $parentId
+     * @param int $selectedId
      *
      * @return string
      */
-    public function generateParentsSelector($id, $parentId = 0)
+    public function generateCategorySelector($id = -1, $selectedId = 0, $labelName = "category_id", $labelId = null)
     {
         $validParents = $this->getValidParents($id);
+        if (empty($labelId)) {
+            $labelId = $labelName;
+        }
         $selectorHtml = <<< HTML
-            <select name="parent_id" id="parent_id">
+            <select name="{$labelName}" id="{$labelId}">
                 <option value="0">--请选择--</option> 
 HTML;
 
         if ($validParents && is_array($validParents)) {
             foreach ($validParents as $index => $validParent) {
-                if ($validParent['id'] == $parentId) {
+                if ($validParent['id'] == $selectedId) {
                     $selected = 'selected="selected"';
                 } else {
                     $selected = '';

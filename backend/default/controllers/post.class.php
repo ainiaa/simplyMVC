@@ -13,6 +13,11 @@ class PostController extends BackendController
     public $PostService;
 
     /**
+     * @var CategoryService
+     */
+    public $CategoryService;
+
+    /**
      * terms列表
      * @author Jeff Liu
      */
@@ -32,8 +37,6 @@ class PostController extends BackendController
      */
     public function addAction()
     {
-
-        $this->assign('postContent', "hello, world!!");
         $this->assign('action', './?debug=1&b=2&m=default&c=post&g=backend&a=add');
         if (IS_POST) {
             $postTitle   = $_POST['post_title'];
@@ -48,6 +51,8 @@ class PostController extends BackendController
                 $this->redirect('index.php?m=default&c=post&g=backend&a=index');
             }
         } else {
+            $categorySelector = $this->CategoryService->generateCategorySelector();
+            $this->assign('categorySelector', $categorySelector);
             $this->setMainTpl('post_add.tpl.html');
             $this->display();
         }
