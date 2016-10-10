@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @author Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * 控制器基类 定义了 控制器的基本方法
  */
 class BaseController extends SmvcObject
@@ -42,7 +42,7 @@ class BaseController extends SmvcObject
 
     /**
      * 获得模版 替换之后的内容
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $file
      *
@@ -58,7 +58,7 @@ class BaseController extends SmvcObject
 
     /**
      * 获得 模版变量
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param mixed $var
      *
@@ -74,7 +74,7 @@ class BaseController extends SmvcObject
 
     /**
      * 显示模版信息
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $tpl
      *
@@ -120,7 +120,7 @@ class BaseController extends SmvcObject
 
     /**
      * 发送get请求
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $url
      * @param mixed  $data
@@ -134,7 +134,7 @@ class BaseController extends SmvcObject
 
     /**
      * 发送post请求
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $url
      * @param array  $data

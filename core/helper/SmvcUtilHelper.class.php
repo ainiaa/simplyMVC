@@ -2,7 +2,7 @@
 
 /**
  * 其他帮助类(比较杂的)
- * @author Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 class SmvcUtilHelper
 {
@@ -95,7 +95,7 @@ class SmvcUtilHelper
 
     /**
      * @see    php manual gettype
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $value
      *

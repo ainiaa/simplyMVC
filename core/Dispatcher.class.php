@@ -9,7 +9,7 @@ class Dispatcher
 
     /**
      * 任务派遣方法
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @return bool
      * @throws Exception
      */
@@ -26,9 +26,6 @@ class Dispatcher
             $uId = self::getUserId();
             LocalCache::setData('uId', $uId);
             if (C('useUserSplit', false) && $uId) {//是否使用分库功能 切 正确的获得了uid
-                /**
-                 * @var UserSplitService
-                 */
                 $userSplitService = Factory::getInstanceNow('UserSplitService');
                 $userSplit        = $userSplitService->getUserSplit($uId);
             } else {
@@ -51,13 +48,7 @@ class Dispatcher
         $params = self::getParams($controller, $actionName);
 
         //前置操作
-        self::preDispatch(
-                array(
-                        'controller' => $controller,
-                        'actionName' => $actionName,
-                        'params'     => $params
-                )
-        );
+        self::preDispatch(['controller' => $controller, 'actionName' => $actionName, 'params' => $params]);
 
         //这一块使用反射是不是太重了？？？
         try {
@@ -95,14 +86,8 @@ class Dispatcher
         }
 
         //前置操作
-        self::postDispatch(
-                array(
-                        'controller' => $controller,
-                        'action'     => $actionName,
-                        'params'     => $params
-                )
-        ); //todo 需要重新实现
-        return;
+        self::postDispatch(['controller' => $controller, 'action'     => $actionName, 'params'     => $params]); //todo 需要重新实现
+        return true;
     }
 
     /**
@@ -207,7 +192,7 @@ class Dispatcher
 
     /**
      * 派遣任务后需要执行的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param array $info
      */

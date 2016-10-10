@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * 配置存取
+ * Class SmvcConf
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+ */
 class SmvcConf implements ArrayAccess
 {
     private static $instance = null;
@@ -40,22 +45,22 @@ class SmvcConf implements ArrayAccess
     }
 
 
-    function offsetExists($index)
+    public function offsetExists($index)
     {
         return isset($this->configData[$index]);
     }
 
-    function offsetGet($index)
+    public function offsetGet($index)
     {
         return isset($this->configData[$index]) ? $this->configData[$index] : null;
     }
 
-    function offsetSet($index, $newValue)
+    public function offsetSet($index, $newValue)
     {
         $this->configData[$index] = $newValue;
     }
 
-    function offsetUnset($index)
+    public function offsetUnset($index)
     {
         unset($this->configData[$index]);
     }
@@ -88,7 +93,7 @@ class SmvcConf implements ArrayAccess
      * @param $configPath
      * @param $configFileExt
      */
-    public static function  init($configPath, $configFileExt)
+    public static function init($configPath, $configFileExt)
     {
         SmvcConf::instance()->loadConfigFileList($configPath, $configFileExt);
     }

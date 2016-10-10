@@ -2,7 +2,7 @@
 
 /**
  * Class BaseMemcacheDBDAO Memcache DB 数据存储类   (Memcache作为db的缓存)
- * @author  Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @version 0.1
  */
 abstract class BaseMemcacheDBDAO extends BaseDBDAO

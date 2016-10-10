@@ -3,7 +3,7 @@
 /**
  * 本地静态缓存
  *
- * @author  Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 class LocalCache implements ArrayAccess
 {
@@ -84,22 +84,38 @@ class LocalCache implements ArrayAccess
         return true;
     }
 
-
+    /**
+     * @param mixed $offset
+     *
+     * @return bool
+     */
     public function offsetExists($offset)
     {
         return isset(self::$cachedData[$offset]);
     }
 
+    /**
+     * @param mixed $offset
+     *
+     * @return mixed|null
+     */
     public function offsetGet($offset)
     {
         return isset(self::$cachedData[$offset]) ? self::$cachedData[$offset] : null;
     }
 
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     */
     public function offsetSet($offset, $value)
     {
         self::$cachedData[$offset] = $value;
     }
 
+    /**
+     * @param mixed $offset
+     */
     public function offsetUnset($offset)
     {
         unset(self::$cachedData[$offset]);

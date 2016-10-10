@@ -66,7 +66,6 @@ class Crypt
 
     }
 
-    // --------------------------------------------------------------------
 
     /*
      * encrypt a string value, optionally with a custom key
@@ -78,7 +77,6 @@ class Crypt
      */
     public static function encode($value, $key = false)
     {
-//        return $value;
         self::_init();
 
         $key ? self::$crypter->setKey($key) : self::$crypter->setKey(
@@ -111,20 +109,6 @@ class Crypt
         self::$crypter->setIV(self::safe_b64decode(self::$config['crypto_iv']));
 
         $value = self::safe_b64decode($value);
-//        SmvcDebugHelper::instance()->debug(
-//                array(
-//                        'info'  => $value,
-//                        'label' => '$value ' . __METHOD__,
-//                        'level' => 'error',
-//                )
-//        );
-//        SmvcDebugHelper::instance()->debug(
-//                array(
-//                        'info'  => self::$crypter->decrypt($value),
-//                        'label' => 'self::$crypter->decrypt($value) ' . __METHOD__,
-//                        'level' => 'error',
-//                )
-//        );
         if ($value = self::validate_hmac($value)) {
             return self::$crypter->decrypt($value);
         } else {

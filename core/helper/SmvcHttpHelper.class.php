@@ -2,14 +2,14 @@
 
 /**
  * http相关功能类
- * @author Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * Class SmvcHttpHelper
  */
 class SmvcHttpHelper
 {
     /**
      * 请求公共处理逻辑
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $url
      * @param array  $data

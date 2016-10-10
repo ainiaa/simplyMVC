@@ -2,7 +2,7 @@
 
 /**
  * 数据库相关 DAO
- * @author  Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  *
  * @version 0.1
  *

@@ -1,7 +1,6 @@
 <?php
 
 /**
- * ³£Á¿  ()
  * Class StaticConst
  */
 class StaticConst

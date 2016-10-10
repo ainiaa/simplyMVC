@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+ * Class ExceptionHandle
+ */
 class ExceptionHandle
 {
     /**
@@ -63,7 +67,9 @@ class ExceptionHandle
         }
     }
 
-    // 致命错误捕获
+    /**
+     * 致命错误捕获
+     */
     public static function fatalError()
     {
         if ($e = error_get_last()) {

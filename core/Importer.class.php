@@ -525,7 +525,7 @@ class Importer
 
     /**
      * 自动加载
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param String $className 需要加载的类名
      */
@@ -589,7 +589,7 @@ class Importer
 
     /**
      *
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $filePath
      *
@@ -616,7 +616,7 @@ class Importer
 
     /**
      * 设置加载路径（帮助自动加载）
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $path
      */
@@ -627,7 +627,7 @@ class Importer
 
     /**
      * 初始化autoload 配置项
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     public static function initAutoLoad()
     {
@@ -643,7 +643,7 @@ class Importer
     /**
      * 加载基础文件
      *
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2014-04-15
      */
     public static function loadFramewrok()
@@ -697,7 +697,7 @@ class Importer
     /**
      * @param $className
      *
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @return bool
      */

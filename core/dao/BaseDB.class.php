@@ -2,7 +2,7 @@
 
 /**
  * 数据库相关 DAO
- * @author  Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  *
  * @version 0.1
  *
@@ -161,8 +161,6 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * todo 数据库 原理上来说可以通用。可以提到一个公用的地方 统一处理
-     *
-     * @return medoo
      */
     public function initDb()
     {
@@ -196,7 +194,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 获得 db实例
-     * @author Jeff Liu<jeff.liu.guo@gmail.com>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $dbConfig
      *
@@ -292,7 +290,7 @@ class BaseDBDAO extends SmvcObject
     /**
      *
      * 创建一条新的记录
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * powered by jeff 2011-5-31
      * @see    http://medoo.in/api/insert
      *
@@ -350,7 +348,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 添加数据之前的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function preAdd()
     {
@@ -359,7 +357,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 添加数据之后的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function postAdd()
     {
@@ -368,7 +366,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * @see    http://medoo.in/api/insert
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $data
      *
@@ -385,7 +383,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 添加数据之前的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function preMultiAdd()
     {
@@ -393,7 +391,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 添加数据之后的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function postMultiAdd()
     {
@@ -401,7 +399,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 更新
-     * powered by jeff 2011-5-31
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param array        $data  The data that will be modified.
      * @param array|string $where The WHERE clause to filter records.
@@ -419,7 +417,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 更新数据之前的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function preUpdate()
     {
@@ -428,7 +426,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 更新数据之后的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function postUpdate()
     {
@@ -437,8 +435,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 获得数据
-     * @author Jeff Liu
-     * powered by jeff 2011-5-31
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param array|string $columns
      * @param              array
@@ -453,7 +450,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 获得数据之前的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function preGetOne()
     {
@@ -462,7 +459,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 获得数据之后的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function postGetOne()
     {
@@ -484,7 +481,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 获得数据之前的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function preGetAll()
     {
@@ -492,7 +489,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 获得数据之后的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function postGetAll()
     {
@@ -515,9 +512,8 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 删除数据
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @see    http://medoo.in/api/delete
-     * powered by jeff 2011-5-31
      *
      * @param array $where
      *
@@ -532,7 +528,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 删除数据之前的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function preDelete()
     {
@@ -540,7 +536,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 删除数据之后的动作
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     protected function postDelete()
     {

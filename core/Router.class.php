@@ -16,8 +16,6 @@ class Router
      */
     private static $originGroup;
 
-
-
     /**
      * @var string module 名称
      */
@@ -49,11 +47,11 @@ class Router
     private static $originAction;
 
     /**
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     public static function doUrlMapping()
     {
-        $urlMappingConf = C('URL_MAPPING', array());
+        $urlMappingConf = C('URL_MAPPING', []);
         if ($urlMappingConf) {
             foreach ($urlMappingConf as $pattern => $mapping) {
                 list($group, $module, $controller, $action) = each(explode('/', $pattern));
@@ -105,6 +103,7 @@ class Router
     }
 
     /**
+     * todo
      * URL组装 支持不同URL模式
      *
      * @param array $info
@@ -129,7 +128,7 @@ class Router
 
     /**
      * 路由检测
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @access public
      * @return boolean
      */
@@ -151,7 +150,7 @@ class Router
 
     /**
      * router检验白名单
-     *
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @param $controller
      * @param $action
      *
@@ -192,7 +191,7 @@ class Router
 
     /**
      * router检验黑名单
-     *
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @param $controller
      * @param $action
      *
@@ -232,7 +231,7 @@ class Router
 
     /**
      * 初始化环境变量
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     public static function initEnv()
     {
@@ -246,7 +245,7 @@ class Router
 
     /**
      * 初始化分组
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     private static function initGroup()
     {
@@ -264,7 +263,7 @@ class Router
 
     /**
      *
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $module
      */
@@ -290,7 +289,7 @@ class Router
 
     /**
      *
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $group
      */
@@ -315,7 +314,7 @@ class Router
     }
 
     /**
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $controller
      */
@@ -340,7 +339,7 @@ class Router
     }
 
     /**
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $action
      */
@@ -366,7 +365,7 @@ class Router
 
     /**
      * 初始化module
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     private static function initModule()
     {
@@ -384,7 +383,7 @@ class Router
 
     /**
      * 初始化action
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     private static function initController()
     {
@@ -401,6 +400,9 @@ class Router
         return self::$controller;
     }
 
+    /**
+     * @return mixed|string
+     */
     private static function initAction()
     {
         if (empty(self::$action)) {

@@ -3,7 +3,7 @@
 /**
  * 调试类
  * todo 除了使用firephp 还可以使用socket file 等方式进行调试。 这个可以再进行扩展
- * @author Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 class SmvcDebugHelper implements ArrayAccess
 {
@@ -16,17 +16,17 @@ class SmvcDebugHelper implements ArrayAccess
     {
     }
 
-    function offsetExists($index)
+    public function offsetExists($index)
     {
         return isset($this->debugInfo[$index]);
     }
 
-    function offsetGet($index)
+    public function offsetGet($index)
     {
         return isset($this->debugInfo[$index]) ? $this->debugInfo[$index] : null;
     }
 
-    function offsetShow($index = null)
+    public function offsetShow($index = null)
     {
         if ($index && isset($this->debugInfo[$index])) {
             foreach ($this->debugInfo[$index] as $ed) {
@@ -46,7 +46,7 @@ class SmvcDebugHelper implements ArrayAccess
         }
     }
 
-    function offsetCount($index = null)
+    public function offsetCount($index = null)
     {
         if ($index && isset($this->debugInfo[$index])) {
             return count($this->debugInfo[$index]);
@@ -55,7 +55,7 @@ class SmvcDebugHelper implements ArrayAccess
         }
     }
 
-    function offsetSet($index, $newValue)
+    public function offsetSet($index, $newValue)
     {
         if ($index != '') {
             $this->debugInfo[$index][] = $newValue;
@@ -64,7 +64,7 @@ class SmvcDebugHelper implements ArrayAccess
         }
     }
 
-    function offsetUnset($index)
+    public function offsetUnset($index)
     {
         unset($this->debugInfo[$index]);
     }

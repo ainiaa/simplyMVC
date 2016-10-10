@@ -23,6 +23,7 @@ class SimpleMVC
      */
     public static function startup()
     {
+        //初始化
         self::init();
 
         /**
@@ -97,7 +98,7 @@ class SimpleMVC
     }
 
     /**
-     *
+     * 设置异常处理
      */
     public static function initExceptionHandle()
     {
@@ -192,7 +193,7 @@ class SimpleMVC
     }
 
     /**
-     * 站内跳转
+     * 站内跳转 (不会重新发起一次新的请求.而是根据url 重新解析url，然后再次dispatch)
      *
      * @param $url
      */

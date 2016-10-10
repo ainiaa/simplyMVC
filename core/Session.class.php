@@ -43,7 +43,7 @@ class Session
      *
      * @throws SessionException
      * @throws Exception
-     * @return
+     * @return SmvcSessionInterface
      */
     public static function forge($custom = array())
     {
@@ -99,11 +99,7 @@ class Session
 
     /**
      * class constructor
-     *
-     * @internal  param $void
-     *
      * @access    private
-     * @return Session
      */
     final private function __construct()
     {
@@ -140,7 +136,7 @@ class Session
      * @param                 mixed $value
      *
      * @access    public
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public static function set($name, $value = null)
     {
@@ -170,7 +166,7 @@ class Session
      * @param    string $name of the variable to delete
      *
      * @access    public
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public static function delete($name)
     {
@@ -200,7 +196,7 @@ class Session
      * @param    mixed  $value
      *
      * @access    public
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public static function setFlash($name, $value = null)
     {
@@ -232,7 +228,7 @@ class Session
      *
      * @param    string $name of the variable to keep
      *
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public static function keepFlash($name = null)
     {
@@ -246,7 +242,7 @@ class Session
      * @param    string $name of the variable to delete
      *
      * @access    public
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public static function deleteFlash($name = null)
     {
@@ -258,7 +254,7 @@ class Session
      * create a new session
      *
      * @access    public
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public static function create()
     {
@@ -300,7 +296,7 @@ class Session
      * rotate the session id
      *
      * @access    public
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public static function rotate()
     {
@@ -315,7 +311,7 @@ class Session
      *
      * @param string $id
      *
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public static function destroy($id = '')
     {

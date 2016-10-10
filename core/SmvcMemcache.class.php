@@ -20,7 +20,12 @@ class SmvcMemcache
     private $group;
 
 
-    //此方法分段获取memcache值，防止memcache过载
+    /**
+     * 此方法分段获取memcache值，防止memcache过载
+     * @param string $key
+     *
+     * @return array|string
+     */
     private function mget($key)
     {
         $splitNum = 200;
@@ -37,6 +42,12 @@ class SmvcMemcache
         return $rtn;
     }
 
+    /**
+     * @param        $key
+     * @param string $perstring
+     *
+     * @return array|bool|null
+     */
     public function get($key, $perstring = '')
     {
         $perstring = $this->cachePrefix . $perstring;
@@ -75,6 +86,12 @@ class SmvcMemcache
         }
     }
 
+    /**
+     * @param $value
+     * @param $changetype
+     *
+     * @return bool|null|string
+     */
     public function changeout($value, $changetype)
     {
         if ($changetype == 'in') {
@@ -113,6 +130,13 @@ class SmvcMemcache
         return $value;
     }
 
+    /**
+     * @param     $key
+     * @param     $value
+     * @param int $limit
+     *
+     * @return bool
+     */
     public function set($key, $value, $limit = 2160000)
     {
         if (!$value) {
@@ -151,12 +175,19 @@ class SmvcMemcache
         }
     }
 
-
+    /**
+     * @param $key
+     *
+     * @return bool
+     */
     public function del($key)
     {
         return $this->memcache->delete($this->cachePrefix . $key);
     }
 
+    /**
+     *
+     */
     public function __destruct()
     {
         if (isset($this->memcache) && !is_null($this->memcache) && !$this->pconnect) {

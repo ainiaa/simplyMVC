@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class UserSplit
+ */
 class UserSplit
 {
     private static $userSplitLib;
@@ -43,19 +46,25 @@ class UserSplit
             return null;
         }
 
-        //
-
-
         return self::calcSplitLib($key);
 
     }
 
+    /**
+     * todo
+     * @param $key
+     */
     public static function getPersistUserSplit($key)
     {
         $dbConf        = C('db.split');
         $currentDbConf = $dbConf[array_rand($dbConf)];
     }
 
+    /**
+     * @param $key
+     *
+     * @return array
+     */
     private static function calcSplitLib($key)
     {
         $dbCount    = count(C('db.master'));
@@ -66,6 +75,12 @@ class UserSplit
         return array('db' => $dbNo, 'redis' => $redisNo);
     }
 
+    /**
+     * @param $key
+     * @param $num
+     *
+     * @return int
+     */
     private static function getIdByHash($key, $num)
     {
         $md5Id  = md5($key);

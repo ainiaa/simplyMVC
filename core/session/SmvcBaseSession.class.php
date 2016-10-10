@@ -156,7 +156,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      * @param null         $value
      *
      * @access    public
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public function set($name, $value = null)
     {
@@ -209,7 +209,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      * @param    string $name name of the variable to delete
      *
      * @access    public
-     * @return $this
+     * @return SmvcSessionInterface
      */
     public function delete($name)
     {

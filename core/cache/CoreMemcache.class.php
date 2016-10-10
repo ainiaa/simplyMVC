@@ -11,7 +11,12 @@ class CoreMemcache
     private static $_instance = null;
 
 
-    //此方法分段获取memcache值，防止memcache过载
+    /**
+     * 此方法分段获取memcache值，防止memcache过载
+     * @param $key
+     *
+     * @return array|string
+     */
     private function mget($key)
     {
         $splitnum = 200;
@@ -27,6 +32,12 @@ class CoreMemcache
         return $rtn;
     }
 
+    /**
+     * @param        $key
+     * @param string $perstring
+     *
+     * @return array|bool|null
+     */
     public function get($key, $perstring = '')
     {
         if (is_null($this->memcache)) {
@@ -68,6 +79,12 @@ class CoreMemcache
         }
     }
 
+    /**
+     * @param $value
+     * @param $changetype
+     *
+     * @return bool|null|string
+     */
     public function changeout($value, $changetype)
     {
         if ($changetype == 'in') {
@@ -155,7 +172,11 @@ class CoreMemcache
         }
     }
 
-
+    /**
+     * @param $key
+     *
+     * @return bool
+     */
     public function del($key)
     {
         if (is_null($this->memcache)) {
@@ -171,6 +192,15 @@ class CoreMemcache
     //            $this->memcache->close();
     //    }
 
+    /**
+     * @param int    $group
+     * @param string $memcacheCfg
+     * @param string $groupConfig
+     * @param string $cachePerfix
+     *
+     * @return int
+     * @throws Exception
+     */
     public function getConn($group = 0, $memcacheCfg = '', $groupConfig = '', $cachePerfix = '')
     {
         try {

@@ -11,8 +11,6 @@ class Persister
 
     /**
      * Singleton insurance.
-     *
-     * @return Persister
      */
     private function __construct()
     {
@@ -20,11 +18,9 @@ class Persister
 
     /**
      * Singleton insurance.
-     * @return Persister
      */
     private function __clone()
     {
-
     }
 
     /**

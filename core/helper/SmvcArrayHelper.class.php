@@ -2,7 +2,7 @@
 
 /**
  * 数组帮助类
- * @author Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 class SmvcArrayHelper
 {
@@ -758,7 +758,7 @@ class SmvcArrayHelper
      * );
      *
      * print_r($companies);
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param      $originData
      * @param      $callback
@@ -845,8 +845,6 @@ class SmvcArrayHelper
      * - Numeric keys that don't conflict aren't changed, only when a numeric key already exists is the
      *   value added using array_push()
      *
-     * @param   array  multiple variables all of which must be arrays
-     *
      * @return  array
      * @throws  Exception
      */
@@ -884,8 +882,6 @@ class SmvcArrayHelper
      * - When there's 2 different values and not both arrays, the latter value overwrites the earlier
      *   instead of merging both into an array
      * - Numeric keys are never changed
-     *
-     * @param   array  multiple variables all of which must be arrays
      *
      * @return  array
      * @throws  Exception
@@ -936,8 +932,9 @@ class SmvcArrayHelper
      *
      * @param   mixed $needle   what to search for
      * @param   array $haystack array to search in
+     * @param bool    $strict
      *
-     * @return  bool   wether the needle is found in the haystack.
+     * @return bool wether the needle is found in the haystack.
      */
     public static function inArrayRecursive($needle, $haystack, $strict = false)
     {

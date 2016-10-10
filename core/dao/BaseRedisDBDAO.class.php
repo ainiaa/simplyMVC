@@ -2,7 +2,7 @@
 
 /**
  * Class BaseRedisDBDAO Redis DB 数据存储类   (redis作为db的缓存)
- * @author  Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @version 0.1
  */
 abstract class BaseRedisDBDAO extends BaseDBDAO
@@ -51,11 +51,11 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
         if (empty($this->redis)) {
             $redisConf = C('redis', array());
             if (empty($redisConf)) {
-                $redisConf = array(
+                $redisConf = [
                         'host'     => '127.0.0.1',
                         'port'     => '3306',
                         'pconnect' => false,
-                );
+                ];
             }
             $this->redis = new Redis();
             if (isset($redisConf['pconnect']) && $redisConf['pconnect']) {
@@ -68,6 +68,9 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
         return $this->storager;
     }
 
+    /**
+     * @return Redis
+     */
     public function getStorageInstance()
     {
         if (empty($this->storager)) {

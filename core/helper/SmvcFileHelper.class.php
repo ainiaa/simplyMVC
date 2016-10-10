@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2015/9/5
- * Time: 0:05
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 class SmvcFileHelper
 {

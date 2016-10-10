@@ -3,7 +3,7 @@
 /**
  * 具有本地缓存的Memcache实现
  *
- * @author  Jeff Liu
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @package cache
  */
 class FastMemcache extends SmvcMemcache

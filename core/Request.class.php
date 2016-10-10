@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class Request
+ */
 class Request
 {
 
@@ -204,6 +207,7 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $value
      *
      * @return null|string
      */
@@ -214,6 +218,7 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $value
      *
      * @return null|string
      */
@@ -224,6 +229,7 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $value
      *
      * @return null|string
      */
@@ -234,6 +240,7 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $value
      *
      * @return null|string
      */
@@ -244,6 +251,7 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $value
      *
      * @return null|string
      */
@@ -254,6 +262,7 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $value
      *
      * @return null|string
      */
