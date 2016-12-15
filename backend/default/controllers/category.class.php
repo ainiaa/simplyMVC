@@ -58,12 +58,36 @@ class CategoryController extends BackendController
             }
         } else {
             $categoryList           = $this->CategoryService->getCategoryList();
-            $parentCategorySelector = $this->CategoryService->generateCategorySelector(-1,0,'parent_id');
+            $parentCategorySelector = $this->CategoryService->generateCategorySelector(-1, 0, 'parent_id');
             $this->assign('list', $categoryList);
             $this->assign('parentCategorySelector', $parentCategorySelector);
 
             $this->setMainTpl('category_add.tpl.html');
             $this->display();
+        }
+    }
+
+    /**
+     *
+     */
+    public function detailAction()
+    {
+        $id = I('id');
+        if ($id) {
+            $categoryInfo = $this->CategoryService->getCategoryInfo($id);
+            if ($categoryInfo) {
+                $parentId = isset($categoryInfo['parent_id']) ? $categoryInfo['parent_id'] : '';
+                $parentCategoryInfo = $this->CategoryService->getCategoryInfo($parentId);
+                $this->assign('parentCategoryInfo', $parentCategoryInfo);
+                $this->assign('categoryInfo', $categoryInfo);
+                $this->setMainTpl('category_detail.tpl.html');
+                $this->assign('id', $id);
+                $this->display();
+            } else {
+                //todo 分类不存在
+            }
+        } else {
+            //todo id传递有问题
         }
     }
 
@@ -101,7 +125,10 @@ class CategoryController extends BackendController
                 $categoryInfo = $this->CategoryService->getCategoryInfo($id);
                 if ($categoryInfo) {
                     $categoryList           = $this->CategoryService->getCategoryList();
-                    $parentCategorySelector = $this->CategoryService->generateCategorySelector($id, $categoryInfo['parent_id']);
+                    $parentCategorySelector = $this->CategoryService->generateCategorySelector(
+                            $id,
+                            $categoryInfo['parent_id']
+                    );
                     $this->assign('list', $categoryList);
                     $this->assign('parentCategorySelector', $parentCategorySelector);
                     $this->assign('categoryInfo', $categoryInfo);
