@@ -28,43 +28,43 @@ class Storage
         $param = $params[0];
         if (empty($param['key'])) {
             return Logger::getInstance()->error(
-                    array(
+                    [
                             'msg'   => 'SL001',
                             'no'    => 'SL001',
-                            'param' => array('paramString' => $method . '- :' . SmvcUtilHelper::encodeData($param))
-                    )
+                            'param' => ['paramString' => $method . '- :' . SmvcUtilHelper::encodeData($param)]
+                    ]
             );
         }
 
         $methodMap = self::getKeyMethod($method);
         if (empty($methodMap)) {
             return Logger::getInstance()->error(
-                    array(
+                    [
                             'msg'   => 'SL002',
                             'no'    => 'SL002',
-                            'param' => array('paramString' => $method . '- :' . SmvcUtilHelper::encodeData($param))
-                    )
+                            'param' => ['paramString' => $method . '- :' . SmvcUtilHelper::encodeData($param)]
+                    ]
             );
         }
 
         $splitKey = SC::splitMapKey($param['key']);
         if (empty($splitKey[0]) || !isset($splitKey[1])) {
             return Logger::getInstance()->error(
-                    array(
+                    [
                             'msg'   => 'SL003',
                             'no'    => 'SL003',
-                            'param' => array('paramString' => $method . '- :' . SmvcUtilHelper::encodeData($param))
-                    )
+                            'param' => ['paramString' => $method . '- :' . SmvcUtilHelper::encodeData($param)]
+                    ]
             );
         }
         $keyConfig = SC::getKeyMapStorage($splitKey[0]);
         if (empty($keyConfig) || empty($methodMap[$keyConfig])) {
             return Logger::getInstance()->error(
-                    array(
+                    [
                             'msg'   => 'SL004',
                             'no'    => 'SL004',
-                            'param' => array('paramString' => $method . '- :' . SmvcUtilHelper::encodeData($param))
-                    )
+                            'param' => ['paramString' => $method . '- :' . SmvcUtilHelper::encodeData($param)]
+                    ]
             );
         }
 
@@ -80,17 +80,17 @@ class Storage
     # Db operation
     private static function getDbData($param)
     {
-        return MapDbStorage::getOneResult($param);
+        return MapDbStorage::getOne($param);
     }
 
     private static function getManyDbData($param)
     {
-        return MapDbStorage::getManyResult($param);
+        return MapDbStorage::getAll($param);
     }
 
     private static function getMcManyDbData($param)
     {
-        return MapDbStorage::getManyResult($param);
+        return MapDbStorage::getAll($param);
     }
 
     private static function getManyDbDataToManyMc($param)
@@ -102,7 +102,7 @@ class Storage
             );
         }
 
-        $result = MapDbStorage::getManyResult($param);
+        $result = MapDbStorage::getAll($param);
         if (empty($result)) {
             return Logger::getInstance()->error(
                     array('msg' => 'SL007', 'no' => 'SL007', 'param' => array('paramString' => 'SL007'))
@@ -112,7 +112,7 @@ class Storage
         $mapPrefix  = $dbConfig['mapPrefix'];
         $primaryKey = $dbConfig['uuidName'];
 
-        $tmp = array();
+        $tmp = [];
         foreach ($result as $data) {
             $key       = $mapPrefix . '/' . $data[$primaryKey];
             $tmp[$key] = $data;
@@ -126,7 +126,7 @@ class Storage
         $dbConfig = SC::getDbConfig($param['key']);
         if (!empty(AC::$errorNo)) {
             return Logger::getInstance()->error(
-                    array('msg' => 'SL010', 'no' => 'SL010', 'param' => array('paramString' => 'SL010'))
+                    ['msg' => 'SL010', 'no' => 'SL010', 'param' => ['paramString' => 'SL010']]
             );
         }
 
@@ -159,7 +159,7 @@ class Storage
     {
         if (empty($param['key']) || !is_array($param['value'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'SL008', 'no' => 'SL008', 'param' => array('paramString' => 'SL008'))
+                    ['msg' => 'SL008', 'no' => 'SL008', 'param' => ['paramString' => 'SL008']]
             );
         }
 
@@ -185,7 +185,7 @@ class Storage
     {
         if (empty($param['key']) || !is_array($param['value'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'SL009', 'no' => 'SL009', 'param' => array('paramString' => 'SL009'))
+                    ['msg' => 'SL009', 'no' => 'SL009', 'param' => ['paramString' => 'SL009']]
             );
         }
 
@@ -366,7 +366,7 @@ class Storage
             return MapMemcacheStorage::remove($param);
         }
         if ('getDb' == $param['doType']) {
-            return MapDbStorage::getOneResult($param);
+            return MapDbStorage::getOne($param);
         }
 
         return null;
@@ -388,7 +388,7 @@ class Storage
             return MapMemcacheStorage::remove($param);
         }
         if ('getDb' == $param['doType']) {
-            return MapDbStorage::getManyResult($param);
+            return MapDbStorage::getAll($param);
         }
 
         #   doType is other or NULL  default = update
@@ -585,7 +585,7 @@ class Storage
 
         if (empty($methodArray[0])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'SL005', 'no' => 'SL005', 'param' => array('paramString' => 'SL005'))
+                    ['msg' => 'SL005', 'no' => 'SL005', 'param' => ['paramString' => 'SL005']]
             );
         }
 
@@ -625,7 +625,7 @@ class Storage
 
         if (empty($methodArray[0])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'SL005', 'no' => 'SL005', 'param' => array('paramString' => 'SL005'))
+                    ['msg' => 'SL005', 'no' => 'SL005', 'param' => ['paramString' => 'SL005']]
             );
         }
         $loopArray = $methodArray[0];
@@ -673,7 +673,7 @@ class Storage
                 $loop = $loopArray[1];
             }
         } else {
-            $loop = array($loopArray[1]);
+            $loop = [$loopArray[1]];
         }
 
         if (!empty($loop)) {
@@ -834,7 +834,7 @@ class Storage
         }
 
         $primary     = $mcConfig['primary'];
-        $resultValue = array();
+        $resultValue = [];
         if (empty($newValue)) {
             foreach ($value as $v) {
                 if (empty($v[$primary])) {
@@ -871,7 +871,7 @@ class Storage
         }
 
         $primary     = $mcConfig['primary'];
-        $resultValue = array();
+        $resultValue = [];
         if (empty($newValue) || !is_array($newValue)) {
             foreach ($value as $v) {
                 if (empty($v[$primary])) {
@@ -903,91 +903,91 @@ class Storage
     private static function getKeyMethod($method)
     {
         #   Key Map Method
-        $keyMapMethod = array(
-                'getData'           => array(
-                        'DB'      => array('getDbData'),
-                        'MC'      => array('getMcData'),
-                        'REDIS'   => array('getRedisData'),
-                        'DB-MC'   => array('getMcData', 'getDbData, setMcData'),
-                        'MC-M-DB' => array(
+        $keyMapMethod = [
+                'getData'           => [
+                        'DB'      => ['getDbData'],
+                        'MC'      => ['getMcData'],
+                        'REDIS'   => ['getRedisData'],
+                        'DB-MC'   => ['getMcData', 'getDbData, setMcData'],
+                        'MC-M-DB' => [
                                 'getMcKeyData',
-                                array('db' => 'getMcManyDbData', 'format' => 'formatMcData', 'set' => 'setMcData')
-                        ),   # DB 多条，MC存一个KEY的情况
-                ),
-                'setData'           => array(
-                        'DB'      => array('setDbData'),
-                        'MC'      => array('setMcData'),
-                        'REDIS'   => array('setRedisData'),
-                        'DB-MC'   => array('setDbData, rebuildMcData'),
-                        'MC-M-DB' => array('setDbData, updateMcForSetDb'),
+                                ['db' => 'getMcManyDbData', 'format' => 'formatMcData', 'set' => 'setMcData']
+                        ],   # DB 多条，MC存一个KEY的情况
+                ],
+                'setData'           => [
+                        'DB'      => ['setDbData'],
+                        'MC'      => ['setMcData'],
+                        'REDIS'   => ['setRedisData'],
+                        'DB-MC'   => ['setDbData, rebuildMcData'],
+                        'MC-M-DB' => ['setDbData, updateMcForSetDb'],
                     # 'MC-M-DB'   =>  array(array('setDbData', array('mctr' => 'setMcTransRegional', 'mc' => 'getMcData', 'db' => 'getMcManyDbData', 'format' => 'formatMcData', 'set' => 'setMcData'))),
-                ),
-                'countData'         => array(
-                        'DB'    => array('countDbData'),
-                        'REDIS' => array('countRedisData'),
-                ),
-                'addData'           => array(
-                        'DB'      => array('addDbData'),
-                        'MC'      => array('setMcData'),
-                        'REDIS'   => array('setRedisData'),
-                        'DB-MC'   => array('addDbData, setMcData'),
-                        'MC-M-DB' => array('addDbData, updateMcForAddDb'),
+                ],
+                'countData'         => [
+                        'DB'    => ['countDbData'],
+                        'REDIS' => ['countRedisData'],
+                ],
+                'addData'           => [
+                        'DB'      => ['addDbData'],
+                        'MC'      => ['setMcData'],
+                        'REDIS'   => ['setRedisData'],
+                        'DB-MC'   => ['addDbData, setMcData'],
+                        'MC-M-DB' => ['addDbData, updateMcForAddDb'],
                     #   'MC-M-DB'   =>  array(array('addDbData', array('db' => 'getMcManyDbData', 'format' => 'formatMcData', 'set' => 'setMcData'))),
-                ),
-                'delData'           => array(
-                        'DB'      => array('delDbData'),
-                        'MC'      => array('delMcData'),
-                        'REDIS'   => array('delRedisData'),
-                        'DB-MC'   => array('delDbData, delMcData'),
-                        'MC-M-DB' => array(array('delDbData', array('getMcDelData'))),
-                ),
-                'rankData'          => array(
-                        'REDIS' => array('rankRedisData'),
-                ),
-                'limitUpdate'       => array(
-                        'DB'      => array('limitDbUpdate'),
-                        'DB-MC'   => array('limitDbUpdate, rebuildMcLimit'),
-                        'MC-M-DB' => array('limitDbUpdate'),
+                ],
+                'delData'           => [
+                        'DB'      => ['delDbData'],
+                        'MC'      => ['delMcData'],
+                        'REDIS'   => ['delRedisData'],
+                        'DB-MC'   => ['delDbData, delMcData'],
+                        'MC-M-DB' => [['delDbData', ['getMcDelData']]],
+                ],
+                'rankData'          => [
+                        'REDIS' => ['rankRedisData'],
+                ],
+                'limitUpdate'       => [
+                        'DB'      => ['limitDbUpdate'],
+                        'DB-MC'   => ['limitDbUpdate, rebuildMcLimit'],
+                        'MC-M-DB' => ['limitDbUpdate'],
                     #   model 自行使用onlyUpdateMc 更新缓存 目前只有PackageModel 2个方法
                     # 'MC-M-DB'   =>  array(array('limitDbUpdate', array('db' => 'getMcManyDbData', 'format' => 'formatMcData', 'set' => 'setMcData'))),
-                ),
-                'incrDecr'          => array(
-                        'REDIS' => array('incrDecrRedisData'),
-                ),
-                'complexUpdate'     => array(
-                        'DB'    => array('complexDbUpdate'),
-                        'DB-MC' => array('complexDbUpdate, rebuildMcComplex'),
-                ),
-                'addManyData'       => array(
-                        'DB'      => array('addManyDbData'),
-                        'MC-M-DB' => array('addManyDbData, updateMcForAddManyDb'),
-                        'REDIS'   => array('setManyRedisData'),
-                ),
-                'getManyData'       => array(
-                        'DB'      => array('getManyDbData'),
-                        'REDIS'   => array('getManyRedisData'),
+                ],
+                'incrDecr'          => [
+                        'REDIS' => ['incrDecrRedisData'],
+                ],
+                'complexUpdate'     => [
+                        'DB'    => ['complexDbUpdate'],
+                        'DB-MC' => ['complexDbUpdate, rebuildMcComplex'],
+                ],
+                'addManyData'       => [
+                        'DB'      => ['addManyDbData'],
+                        'MC-M-DB' => ['addManyDbData, updateMcForAddManyDb'],
+                        'REDIS'   => ['setManyRedisData'],
+                ],
+                'getManyData'       => [
+                        'DB'      => ['getManyDbData'],
+                        'REDIS'   => ['getManyRedisData'],
                     # 'DB-MC'     =>  array('getManyMcData', 'getManyDbData, setManyMcData'),
-                        'MC-M-DB' => array(
+                        'MC-M-DB' => [
                                 'getMcData',
-                                array('db' => 'getMcManyDbData', 'format' => 'formatMcData', 'set' => 'setMcData')
-                        ),
-                ),
-                'rebuildMc'         => array(
-                        'MC-M-DB' => array('getManyDbDataToMc'),
-                ),
-                'onlyUpdateMc'      => array(
-                        'DB-MC'   => array('updateMcOnly'),
-                        'MC-M-DB' => array('updateMMcOnly'),
-                ),
+                                ['db' => 'getMcManyDbData', 'format' => 'formatMcData', 'set' => 'setMcData']
+                        ],
+                ],
+                'rebuildMc'         => [
+                        'MC-M-DB' => ['getManyDbDataToMc'],
+                ],
+                'onlyUpdateMc'      => [
+                        'DB-MC'   => ['updateMcOnly'],
+                        'MC-M-DB' => ['updateMMcOnly'],
+                ],
                 'setManyData'       => array(
-                        'MC-M-DB' => array('setManyDbData'),
-                        'REDIS'   => array('setManyRedisData'),
+                        'MC-M-DB' => ['setManyDbData'],
+                        'REDIS'   => ['setManyRedisData'],
                 ),
-                'complexManyUpdate' => array(
-                        'DB'      => array('complexManyDbUpdate'),
-                        'MC-M-DB' => array('complexManyDbUpdate'),
-                ),
-        );
+                'complexManyUpdate' => [
+                        'DB'      => ['complexManyDbUpdate'],
+                        'MC-M-DB' => ['complexManyDbUpdate'],
+                ],
+        ];
         #   End
 
         if (empty($keyMapMethod[$method])) {

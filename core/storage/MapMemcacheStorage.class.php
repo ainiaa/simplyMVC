@@ -34,7 +34,7 @@ class MapMemcacheStorage
         $param = $params[0];
         if (empty($param['key'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MMS004', 'no' => 'MMS004', 'param' => array('paramString' => 'MMS004'))
+                    ['msg' => 'MMS004', 'no' => 'MMS004', 'param' => ['paramString' => 'MMS004']]
             );
         }
 
@@ -43,7 +43,7 @@ class MapMemcacheStorage
 
         if (!self::$mcHandle) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MMS005', 'no' => 'MMS005', 'param' => array('paramString' => 'MMS005'))
+                    ['msg' => 'MMS005', 'no' => 'MMS005', 'param' => ['paramString' => 'MMS005']]
             );
         }
 
@@ -148,7 +148,7 @@ class MapMemcacheStorage
         }
 
         if (is_array($result)) {
-            $tmp = array();
+            $tmp = [];
             foreach ($result as $keyId => $info) {
                 $splitKey          = SC::splitMapKey($keyId);
                 $tmp[$splitKey[1]] = $info;
@@ -173,7 +173,7 @@ class MapMemcacheStorage
         }
 
         if ($value === 'J7PHPFCSxzpA2ucmu_array') {
-            return array();
+            return [];
         } elseif ($value === 'J7PHPFCSxzpA2ucmu_string') {
             return '';
         } elseif ($value === 'J7PHPFCSxzpA2ucmu_int') {
@@ -194,7 +194,7 @@ class MapMemcacheStorage
             return false;
         }
         self::$mcCaches[$key]   = $param['value'];
-        self::$doSaveList[$key] = array('expire' => self::$expire, 'clientServer' => self::$clientServer);
+        self::$doSaveList[$key] = ['expire' => self::$expire, 'clientServer' => self::$clientServer];
         empty(self::$mcCachesCount[$key]) && self::$mcCachesCount[$key] = 0;
         self::$mcCachesCount[$key]++;
 
@@ -215,7 +215,7 @@ class MapMemcacheStorage
             return false;
         }
         $expire = self::$expire;
-        $tmp    = array();
+        $tmp    = [];
         foreach ($param['value'] as $keyId => $value) {
             $keyId       = self::$mapPrefix . '/' . $keyId;
             $tmp[$keyId] = $value;
@@ -240,7 +240,7 @@ class MapMemcacheStorage
             return false;
         }
         self::$mcCaches[$key]   = $param['value'];
-        self::$doSaveList[$key] = array('expire' => self::$expire, 'clientServer' => self::$clientServer);
+        self::$doSaveList[$key] = ['expire' => self::$expire, 'clientServer' => self::$clientServer];
         return true;
 
     }
@@ -297,13 +297,13 @@ class MapMemcacheStorage
         if (empty($configArray['serverStatus'])) {
             #   exit ('Mc server is not work! ');
             return Logger::getInstance()->error(
-                    array('msg' => 'MMS001', 'no' => 'MMS001', 'param' => array('paramString' => 'MMS001'))
+                    ['msg' => 'MMS001', 'no' => 'MMS001', 'param' => ['paramString' => 'MMS001']]
             );
         }
         if (empty(SC::$mcHostConfig[$configArray['clientServer']])) {
             #   exit ('Mc server is not exist! ');
             return Logger::getInstance()->error(
-                    array('msg' => 'MMS002', 'no' => 'MMS002', 'param' => array('paramString' => 'MMS002'))
+                    ['msg' => 'MMS002', 'no' => 'MMS002', 'param' => ['paramString' => 'MMS002']]
             );
         }
         self::$mcKey        = $configArray['mcKey'];
@@ -338,7 +338,7 @@ class MapMemcacheStorage
             $mcHandle->connect($host, $port);
         } else {
             return Logger::getInstance()->error(
-                    array('msg' => 'MMS003', 'no' => 'MMS003', 'param' => array('paramString' => 'MMS003'))
+                    ['msg' => 'MMS003', 'no' => 'MMS003', 'param' => ['paramString' => 'MMS003']]
             );
         }
 

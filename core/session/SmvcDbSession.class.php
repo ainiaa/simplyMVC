@@ -17,14 +17,14 @@ class SmvcDbSession extends SmvcBaseSession
     /**
      * array of driver config defaults
      */
-    protected static $_defaults = array(
+    protected static $_defaults = [
             'cookie_name'    => 'smvcid', // name of the session cookie for database based sessions
             'table'          => 'smvc_sessions', // name of the sessions table
             'gc_probability' => 5 // probability % (between 0 and 100) for garbage collection
-    );
+    ];
 
 
-    public function __construct($config = array())
+    public function __construct($config = [])
     {
         parent::__construct($config);
         // merge the driver config with the global config
@@ -52,9 +52,9 @@ class SmvcDbSession extends SmvcBaseSession
     public function read($id = '')
     {
         // initialize the session
-        $this->data   = array();
-        $this->keys   = array();
-        $this->flash  = array();
+        $this->data   = [];
+        $this->keys   = [];
+        $this->flash  = [];
         $this->record = null;
 
         // get the session cookie
@@ -66,7 +66,7 @@ class SmvcDbSession extends SmvcBaseSession
             $this->record = $this->storager->get(
                     $this->config['table'],
                     '*',
-                    array('session_id' => $cookie[0])
+                    ['session_id' => $cookie[0]]
 
             );
 
@@ -79,7 +79,7 @@ class SmvcDbSession extends SmvcBaseSession
                 $this->record = $this->storager->get(
                         $this->config['table'],
                         '*',
-                        array('previous_id' => $cookie[0])
+                        ['previous_id' => $cookie[0]]
 
                 );
 
@@ -153,8 +153,8 @@ class SmvcDbSession extends SmvcBaseSession
                 $session_id = ''; //todo 需要处理
                 $result     = $this->storager->update(
                         $this->config['table'],
-                        array(),
-                        array('session_id' => $session_id)
+                        [],
+                        ['session_id' => $session_id]
                 );
             }
 
@@ -193,7 +193,7 @@ class SmvcDbSession extends SmvcBaseSession
             // delete the session record
             $this->storager->delete(
                     $this->config['table'],
-                    array('session_id[<]' => $this->keys['session_id'])
+                    ['session_id[<]' => $this->keys['session_id']]
             );
         }
 
@@ -219,7 +219,7 @@ class SmvcDbSession extends SmvcBaseSession
      */
     public function validateConfig($config)
     {
-        $validated = array();
+        $validated = [];
 
         foreach ($config as $name => $item) {
             // filter out any driver config
@@ -279,15 +279,15 @@ class SmvcDbSession extends SmvcBaseSession
     public function getStorageInstance()
     {
         if (empty($this->storager)) {
-            $dbConf = C('session.database', array());
+            $dbConf = C('session.database', []);
             if (empty($dbConf)) {
-                $dbConf = array(
+                $dbConf = [
                         'database_type' => C('DB_TYPE', 'mysql'),
                         'database_name' => C('DB_NAME', 'test'),
                         'server'        => C('DB_HOST', 'localhost'),
                         'username'      => C('DB_USER', 'root'),
                         'password'      => C('DB_PASS', ''),
-                );
+                ];
             } else {
                 if (!isset($dbConf['database_type'])) {
                     $dbConf['database_type'] = C('DB_TYPE', 'mysql');

@@ -17,10 +17,10 @@ class SmvcRedisSession extends SmvcBaseSession
     /**
      * array of driver config defaults
      */
-    protected static $_defaults = array(
+    protected static $_defaults = [
             'cookie_name' => 'smvcid', // name of the session cookie for redis based sessions
             'database'    => 'default' // name of the redis database to use (as configured in config/db.php)
-    );
+    ];
 
     /*
      * @var	storage for the redis object
@@ -28,7 +28,7 @@ class SmvcRedisSession extends SmvcBaseSession
     protected $redis = false;
 
 
-    public function __construct($config = array())
+    public function __construct($config = [])
     {
         parent::__construct($config);
         // merge the driver config with the global config
@@ -56,9 +56,9 @@ class SmvcRedisSession extends SmvcBaseSession
     public function read($id = '')
     {
         // initialize the session
-        $this->data   = array();
-        $this->keys   = array();
-        $this->flash  = array();
+        $this->data   = [];
+        $this->keys   = [];
+        $this->flash  = [];
         $this->record = null;
 
         // get the session cookie
@@ -93,7 +93,10 @@ class SmvcRedisSession extends SmvcBaseSession
                 // not a valid cookie payload
             } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
-            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::getRemoteIp() . Router::clientIp())) {
+            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(
+                            Router::getRemoteIp() . Router::clientIp()
+                    )
+            ) {
                 // IP address doesn't match
             } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
                 // user agent doesn't match
@@ -137,7 +140,7 @@ class SmvcRedisSession extends SmvcBaseSession
             $this->keys['updated'] = SmvcUtilHelper::getTime();
 
             // session payload
-            $payload = $this->serialize(array($this->keys, $this->data, $this->flash));
+            $payload = $this->serialize([$this->keys, $this->data, $this->flash]);
 
             // create the session file
             $this->writeRedis($this->keys['session_id'], $payload);
@@ -145,11 +148,11 @@ class SmvcRedisSession extends SmvcBaseSession
             // was the session id rotated?
             if (isset($this->keys['previous_id']) and $this->keys['previous_id'] != $this->keys['session_id']) {
                 // point the old session file to the new one, we don't want to lose the session
-                $payload = $this->serialize(array('rotated_session_id' => $this->keys['session_id']));
+                $payload = $this->serialize(['rotated_session_id' => $this->keys['session_id']]);
                 $this->writeRedis($this->keys['previous_id'], $payload);
             }
 
-            $this->setCookie(array($this->keys['session_id']));
+            $this->setCookie([$this->keys['session_id']]);
         }
 
         return $this;
@@ -223,7 +226,7 @@ class SmvcRedisSession extends SmvcBaseSession
      */
     public function validateConfig($config)
     {
-        $validated = array();
+        $validated = [];
 
         foreach ($config as $name => $item) {
             // filter out any driver config
@@ -241,7 +244,7 @@ class SmvcRedisSession extends SmvcBaseSession
                             $item = 'default';
                         }
                         break;
-                    
+
                     default:
                         break;
                 }
@@ -270,13 +273,13 @@ class SmvcRedisSession extends SmvcBaseSession
     public function getStorageInstance()
     {
         if (empty($this->storager)) {
-            $redisConf = C('session.redis', array());
+            $redisConf = C('session.redis', []);
             if (empty($redisConf)) {
-                $redisConf = array(
+                $redisConf = [
                         'host'     => '127.0.0.1',
                         'port'     => '3306',
                         'pconnect' => false,
-                );
+                ];
             }
             $this->storager = new Redis();
             if (isset($redisConf['pconnect']) && $redisConf['pconnect']) {

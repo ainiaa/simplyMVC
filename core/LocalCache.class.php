@@ -11,7 +11,7 @@ class LocalCache implements ArrayAccess
      * 静态实例
      * @var array
      */
-    private static $cachedData = array();
+    private static $cachedData = [];
 
     /**
      * @param string $name

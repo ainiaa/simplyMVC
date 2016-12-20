@@ -6,21 +6,21 @@ class SmvcFileSession extends SmvcBaseSession
     /**
      * array of driver config defaults
      */
-    protected static $_defaults = array(
+    protected static $_defaults = [
             'cookie_name'    => 'smvcid', // name of the session cookie for file based sessions
             'path'           => '/tmp', // path where the session files should be stored
             'gc_probability' => 5 // probability % (between 0 and 100) for garbage collection
-    );
+    ];
 
     // --------------------------------------------------------------------
 
-    public function __construct($config = array())
+    public function __construct($config = [])
     {
         parent::__construct($config);
         // merge the driver config with the global config
         if (is_array($config)) {
-            $file_config = isset($config['file']) && is_array($config['file']) ? $config['file'] : array();
-            $config      = array_merge(self::$_defaults, $config, $file_config);
+            $fileConfig = isset($config['file']) && is_array($config['file']) ? $config['file'] : [];
+            $config     = array_merge(self::$_defaults, $config, $fileConfig);
         }
 
         $this->config = $config;
@@ -42,9 +42,9 @@ class SmvcFileSession extends SmvcBaseSession
     public function read($id = '')
     {
         // initialize the session
-        $this->data  = array();
-        $this->keys  = array();
-        $this->flash = array();
+        $this->data  = [];
+        $this->keys  = [];
+        $this->flash = [];
 
         // get the session cookie
         $cookie = $this->getCookie();
@@ -78,7 +78,10 @@ class SmvcFileSession extends SmvcBaseSession
                 // not a valid cookie payload
             } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
-            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::getRemoteIp() . Router::clientIp())) {
+            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(
+                            Router::getRemoteIp() . Router::clientIp()
+                    )
+            ) {
                 // IP address doesn't match
             } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
                 // user agent doesn't match
@@ -120,7 +123,7 @@ class SmvcFileSession extends SmvcBaseSession
             $this->keys['updated'] = SmvcUtilHelper::getTime();
 
             // session payload
-            $payload = $this->serialize(array($this->keys, $this->data, $this->flash));
+            $payload = $this->serialize([$this->keys, $this->data, $this->flash]);
 
             // create the session file
             $this->writeFile($this->keys['session_id'], $payload);
@@ -128,7 +131,7 @@ class SmvcFileSession extends SmvcBaseSession
             // was the session id rotated?
             if (isset($this->keys['previous_id']) and $this->keys['previous_id'] != $this->keys['session_id']) {
                 // point the old session file to the new one, we don't want to lose the session
-                $payload = $this->serialize(array('rotated_session_id' => $this->keys['session_id']));
+                $payload = $this->serialize(['rotated_session_id' => $this->keys['session_id']]);
                 $this->writeFile($this->keys['previous_id'], $payload);
             }
 
@@ -141,8 +144,10 @@ class SmvcFileSession extends SmvcBaseSession
                     $expire = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
 
                     while (($file = readdir($handle)) !== false) {
-                        if (filetype($this->config['path'] . $file) == 'file' and strpos($file,
-                                        $this->config['cookie_name'] . '_') === 0 and filemtime($this->config['path'] . $file) < $expire
+                        if (filetype($this->config['path'] . $file) == 'file' and strpos(
+                                        $file,
+                                        $this->config['cookie_name'] . '_'
+                                ) === 0 and filemtime($this->config['path'] . $file) < $expire
                         ) {
                             @unlink($this->config['path'] . $file);
                         }
@@ -280,7 +285,7 @@ class SmvcFileSession extends SmvcBaseSession
      */
     public function validateConfig($config)
     {
-        $validated = array();
+        $validated = [];
 
         foreach ($config as $name => $item) {
             // filter out any driver config
@@ -299,7 +304,9 @@ class SmvcFileSession extends SmvcBaseSession
                         }
                         // and can we write to it?
                         if (!is_writable($item)) {
-                            throw new Exception('The webserver doesn\'t have write access to the path to store the session data files.');
+                            throw new Exception(
+                                    'The webserver doesn\'t have write access to the path to store the session data files.'
+                            );
                         }
                         // update the path, and add the trailing slash
                         $item = realpath($item) . '/';

@@ -6,13 +6,13 @@ class SmvcCookieSession extends SmvcBaseSession
     /**
      * array of driver config defaults
      */
-    protected static $_defaults = array(
+    protected static $_defaults = [
             'cookie_name' => 'smvcid',
-    );
+    ];
 
     // --------------------------------------------------------------------
 
-    public function __construct($config = array())
+    public function __construct($config = [])
     {
 
         parent::__construct($config);
@@ -40,9 +40,9 @@ class SmvcCookieSession extends SmvcBaseSession
     public function read($id)
     {
         // initialize the session
-        $this->data  = array();
-        $this->keys  = array();
-        $this->flash = array();
+        $this->data  = [];
+        $this->keys  = [];
+        $this->flash = [];
 
         // get the session cookie
         $payload = $this->getCookie();
@@ -117,7 +117,7 @@ class SmvcCookieSession extends SmvcBaseSession
      */
     public function validateConfig($config)
     {
-        $validated = array();
+        $validated = [];
 
         foreach ($config as $name => $item) {
             // filter out any driver config

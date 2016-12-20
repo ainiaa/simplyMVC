@@ -42,8 +42,6 @@ class SmvcFileLogger extends SmvcBaseLogger
      * @param array $info
      *
      * @throws RuntimeException
-     *
-     * @return SmvcFileLogger
      */
     public function __construct($info = array( /*'logDir' => '', 'level' => 'debug'*/))
     {

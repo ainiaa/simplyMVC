@@ -10,12 +10,12 @@ class Session
     /**
      * array of loaded instances
      */
-    protected static $_instances = array();
+    protected static $_instances = [];
 
     /**
      * array of global config defaults
      */
-    protected static $_defaults = array(
+    protected static $_defaults = [
             'driver'                 => 'cookie',
             'match_ip'               => false,
             'match_ua'               => true,
@@ -30,7 +30,7 @@ class Session
             'flash_auto_expire'      => true,
             'flash_expire_after_get' => true,
             'post_cookie_name'       => ''
-    );
+    ];
 
 
 
@@ -45,7 +45,7 @@ class Session
      * @throws Exception
      * @return SmvcSessionInterface
      */
-    public static function forge($custom = array())
+    public static function forge($custom = [])
     {
         $config = C('session');
 
@@ -87,7 +87,7 @@ class Session
             $id = $driver->newSessionId();
             $driver->read($id);
 
-            register_shutdown_function(array(&$driver, "write"), array(''));
+            register_shutdown_function([&$driver, 'write'], ['']);
 
             // store this instance
             self::$_instances[$cookieName] =& $driver;

@@ -2,6 +2,7 @@
 return [
         CORE_PATH . '/Request.class.php',
         CORE_PATH . '/Router.class.php',
+        CORE_PATH . '/FactoryProxy.class.php',
         CORE_PATH . '/Factory.class.php',
         CORE_PATH . '/Dispatcher.class.php',
         CORE_PATH . '/SmvcObject.class.php',

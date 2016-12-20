@@ -30,7 +30,7 @@ class SmvcMemcache
     {
         $splitNum = 200;
         if (count($key) > $splitNum) {
-            $rtn = array();
+            $rtn = [];
             for ($sk = 0, $al = ceil(count($key) / $splitNum); $sk < $al; ++$sk) {
                 $ikey = array_slice($key, $sk * $splitNum, $splitNum);
                 $rtn += $this->memcache->get($ikey);
@@ -55,7 +55,7 @@ class SmvcMemcache
             $v = $this->memcache->get($perstring . $key);
             return $this->changeout($v, 'out');
         } elseif (is_array($key) && $perstring) {
-            $newa   = $newout = array();
+            $newa   = $newout = [];
             $lenpre = strlen($perstring);
             foreach ($key as $ek) {
                 $newa[] = $perstring . $ek;
@@ -71,7 +71,7 @@ class SmvcMemcache
             return $newout;
         } elseif (is_array($key)) {
             $out    = $this->mget($key);
-            $newout = array();
+            $newout = [];
             if ($out) {
                 foreach ($out as $ek => $v) {
                     $v           = $this->changeout($v, 'out');
@@ -95,7 +95,7 @@ class SmvcMemcache
     public function changeout($value, $changetype)
     {
         if ($changetype == 'in') {
-            if ($value === array()) {
+            if ($value === []) {
                 return 'SC:ARR';
             } elseif ($value === '') {
                 return 'SC:STR';
@@ -112,7 +112,7 @@ class SmvcMemcache
             if (is_string($value)) {
                 if (strlen($value) < 30) {
                     if ($value === 'SC:ARR') {
-                        return array();
+                        return [];
                     } elseif ($value === 'SC:STR') {
                         return '';
                     } elseif ($value === 'SC:INT') {
@@ -224,7 +224,7 @@ class SmvcMemcache
                         'memcacheErrCallback'
                 );
                 if ($cr === false) {
-                    $p = array('type' => 'memcache', 'config' => $cacheConfig[$server]);
+                    $p = ['type' => 'memcache', 'config' => $cacheConfig[$server]];
                     throw new Exception($p, 'error Connect Server !@' . json_encode($cacheConfig[$server]));
                 }
             } else {

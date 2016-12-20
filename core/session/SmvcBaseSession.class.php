@@ -10,22 +10,22 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     /*
      * @var	session class configuration
      */
-    protected $config = array();
+    protected $config = [];
 
     /*
      * @var	session indentification keys
      */
-    protected $keys = array();
+    protected $keys = [];
 
     /*
      * @var	session variable data
      */
-    protected $data = array();
+    protected $data = [];
 
     /*
      * @var	session flash data
      */
-    protected $flash = array();
+    protected $flash = [];
 
     /*
      * @var	session time object
@@ -33,15 +33,15 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     protected $time = null;
 
 
-    public function __construct($config = array())
+    public function __construct($config = [])
     {
         session_set_save_handler(
-                array($this, 'create'),
-                array($this, 'destroy'),
-                array($this, 'read'),
-                array($this, 'write'),
-                array($this, 'destroy'),
-                array($this, 'gc')
+                [$this, 'create'],
+                [$this, 'destroy'],
+                [$this, 'read'],
+                [$this, 'write'],
+                [$this, 'destroy'],
+                [$this, 'gc']
         );
     }
 
@@ -73,15 +73,18 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      * destroy the current session
      *
      * @access    public
+     *
+     * @param string $id
+     *
+     * @return $this
      */
     public function destroy($id = '')
     {
         // delete the session cookie
         Cookie::delete($this->config['cookie_name']);
-        //        unset($_COOKIE[$this->config['cookie_name']]);
 
         // reset the stored session data
-        $this->keys = $this->flash = $this->data = array();
+        $this->keys = $this->flash = $this->data = [];
 
         return $this;
     }
@@ -271,11 +274,11 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         if ($keys) {
             isset($this->flash[$this->config['flash_id'] . '::' . $name]['value']) or $this->flash[$this->config['flash_id'] . '::' . $name] = array(
                     'state' => 'new',
-                    'value' => array()
+                    'value' => []
             );
             SmvcArrayHelper::set($this->flash[$this->config['flash_id'] . '::' . $name]['value'], $keys[0], $value);
         } else {
-            $this->flash[$this->config['flash_id'] . '::' . $name] = array('state' => 'new', 'value' => $value);
+            $this->flash[$this->config['flash_id'] . '::' . $name] = ['state' => 'new', 'value' => $value];
         }
 
         return $this;
@@ -300,7 +303,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         is_bool($expire) or $expire = $this->config['flash_expire_after_get'];
 
         if (is_null($name)) {
-            $default = array();
+            $default = [];
             foreach ($this->flash as $key => $value) {
                 $key           = substr($key, strpos($key, '::') + 2);
                 $default[$key] = $value;
@@ -372,7 +375,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     public function deleteFlash($name)
     {
         if (is_null($name)) {
-            $this->flash = array();
+            $this->flash = [];
         } elseif (isset($this->flash[$this->config['flash_id'] . '::' . $name])) {
             unset($this->flash[$this->config['flash_id'] . '::' . $name]);
         }
@@ -492,7 +495,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      * @throws Exception
      * @return boolean
      */
-    public function setCookie($payload = array())
+    public function setCookie($payload = [])
     {
         $enable_cookie = isset($this->config['enable_cookie']) ? $this->config['enable_cookie'] : true;
         if ($enable_cookie) {
@@ -582,7 +585,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
                 }
             } // or a string containing the session id
             elseif (is_string($cookie) and strlen($cookie) == 32) {
-                $cookie = array($cookie);
+                $cookie = [$cookie];
             } // invalid general format
             else {
                 $cookie = false;
@@ -651,7 +654,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
 
             return $data;
         } else if ($data === false) {
-            is_string($input) and $data = array($input);
+            is_string($input) and $data = [$input];
         }
 
         return (is_string($data)) ? str_replace('{{slash}}', '\\', $data) : $data;
@@ -672,7 +675,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      */
     public function validateConfig($config)
     {
-        $validated = array();
+        $validated = [];
 
         foreach ($config as $name => $item) {
             switch ($name) {

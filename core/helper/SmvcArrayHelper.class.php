@@ -46,9 +46,9 @@ class SmvcArrayHelper
      * Gets a dot-notated key from an array, with a default value if it does
      * not exist.
      *
-     * @param   array|ArrayAccess  $array   The search array
-     * @param   mixed  $key     The dot-notated key or array of keys
-     * @param   string $default The default value
+     * @param   array|ArrayAccess $array   The search array
+     * @param   mixed             $key     The dot-notated key or array of keys
+     * @param   string            $default The default value
      *
      * @throws Exception
      * @return  mixed
@@ -64,7 +64,7 @@ class SmvcArrayHelper
         }
 
         if (is_array($key)) {
-            $return = array();
+            $return = [];
             foreach ($key as $k) {
                 $return[$k] = self::get($array, $k, $default);
             }
@@ -113,7 +113,7 @@ class SmvcArrayHelper
                 $key = array_shift($keys);
 
                 if (!isset($array[$key]) or !is_array($array[$key])) {
-                    $array[$key] = array();
+                    $array[$key] = [];
                 }
 
                 $array =& $array[$key];
@@ -134,7 +134,7 @@ class SmvcArrayHelper
      */
     public static function pluck($array, $key, $index = null)
     {
-        $return   = array();
+        $return   = [];
         $get_deep = strpos($key, '.') !== false;
 
         if (!$index) {
@@ -193,7 +193,7 @@ class SmvcArrayHelper
         }
 
         if (is_array($key)) {
-            $return = array();
+            $return = [];
             foreach ($key as $k) {
                 $return[$k] = self::delete($array, $k);
             }
@@ -236,7 +236,7 @@ class SmvcArrayHelper
             throw new Exception('The first parameter must be an array.');
         }
 
-        $output = array();
+        $output = [];
         foreach ($assoc as $row) {
             if (isset($row[$keyField]) and isset($row[$valField])) {
                 $output[$row[$keyField]] = $row[$valField];
@@ -254,7 +254,7 @@ class SmvcArrayHelper
      *
      *     self::toAssoc(array('foo','bar'));
      *
-     * @param   string $arr the array to change
+     * @param   array $arr the array to change
      *
      * @return  array|null  the new array or null
      * @throws  Exception
@@ -264,7 +264,7 @@ class SmvcArrayHelper
         if (($count = count($arr)) % 2 > 0) {
             throw new Exception('Number of values in to_assoc must be even.');
         }
-        $keys = $vals = array();
+        $keys = $vals = [];
 
         for ($i = 0; $i < $count - 1; $i += 2) {
             $keys[] = array_shift($arr);
@@ -311,12 +311,12 @@ class SmvcArrayHelper
      */
     public static function flatten($array, $glue = ':', $reset = true, $indexed = true)
     {
-        static $return = array();
-        static $currKey = array();
+        static $return = [];
+        static $currKey = [];
 
         if ($reset) {
-            $return  = array();
-            $currKey = array();
+            $return  = [];
+            $currKey = [];
         }
 
         foreach ($array as $key => $val) {
@@ -357,7 +357,7 @@ class SmvcArrayHelper
      */
     public static function reverseFlatten($array, $glue = ':')
     {
-        $return = array();
+        $return = [];
 
         foreach ($array as $key => $value) {
             if (stripos($key, $glue) !== false) {
@@ -367,7 +367,7 @@ class SmvcArrayHelper
                     $key = array_shift($keys);
                     $key = is_numeric($key) ? (int)$key : $key;
                     if (!isset($temp[$key]) or !is_array($temp[$key])) {
-                        $temp[$key] = array();
+                        $temp[$key] = [];
                     }
                     $temp =& $temp[$key];
                 }
@@ -395,7 +395,7 @@ class SmvcArrayHelper
      */
     public static function filterPrefixed($array, $prefix, $removePrefix = true)
     {
-        $return = array();
+        $return = [];
         foreach ($array as $key => $val) {
             if (preg_match('/^' . $prefix . '/', $key)) {
                 if ($removePrefix === true) {
@@ -457,7 +457,7 @@ class SmvcArrayHelper
      */
     public static function filterSuffixed($array, $suffix, $removeSuffix = true)
     {
-        $return = array();
+        $return = [];
         foreach ($array as $key => $val) {
             if (preg_match('/' . $suffix . '$/', $key)) {
                 if ($removeSuffix === true) {
@@ -500,7 +500,7 @@ class SmvcArrayHelper
      */
     public static function filter_keys($array, $keys, $remove = false)
     {
-        $return = array();
+        $return = [];
         foreach ($keys as $key) {
             if (array_key_exists($key, $array)) {
                 $remove or $return[$key] = $array[$key];
@@ -709,7 +709,7 @@ class SmvcArrayHelper
      */
     public static function multiSort($array, $conditions, $ignoreCase = false)
     {
-        $temp = array();
+        $temp = [];
         $keys = array_keys($conditions);
 
         foreach ($keys as $key) {
@@ -717,7 +717,7 @@ class SmvcArrayHelper
             is_array($conditions[$key]) or $conditions[$key] = array($conditions[$key]);
         }
 
-        $args = array();
+        $args = [];
         foreach ($keys as $key) {
             $args[] = $ignoreCase ? array_map('strtolower', $temp[$key]) : $temp[$key];
             foreach ($conditions[$key] as $flag) {
@@ -771,7 +771,7 @@ class SmvcArrayHelper
         return array_filter(
                 $originData,
                 function ($item) use ($strict, $callback) {
-                    static $haystack = array();
+                    static $haystack = [];
                     $needle = $callback($item);
                     if (in_array($needle, $haystack, $strict)) {
                         return false;
@@ -825,7 +825,7 @@ class SmvcArrayHelper
             );
         }
 
-        $result = array();
+        $result = [];
 
         foreach ($source as $key => $value) {
             if (array_key_exists($key, $replace)) {
@@ -998,12 +998,12 @@ class SmvcArrayHelper
         $key = array_search($value, $array);
 
         if ($recursive and $key === false) {
-            $keys = array();
+            $keys = [];
             foreach ($array as $k => $v) {
                 if (is_array($v)) {
                     $rk = self::search($v, $value, $default, true, $delimiter);
                     if ($rk !== $default) {
-                        $keys = array($k, $rk);
+                        $keys = [$k, $rk];
                         break;
                     }
                 }
@@ -1028,7 +1028,7 @@ class SmvcArrayHelper
                 $arr,
                 function ($item) {
                     // contrary to popular belief, this is not as static as you think...
-                    static $vars = array();
+                    static $vars = [];
 
                     if (in_array($item, $vars, true)) {
                         // duplicate

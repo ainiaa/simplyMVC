@@ -17,7 +17,7 @@ class MapDbStorage
      *
      * @return array|bool|mixed
      */
-    public static function getOneResult($param)
+    public static function getOne($param)
     {
         $dbHandle = self::dbHandle($param['key']);
         if (empty($dbHandle)) {
@@ -28,7 +28,7 @@ class MapDbStorage
         $fields  = isset($param['fields']) ? $param['fields'] : null;
         $orderBy = isset($param['orderBy']) ? $param['orderBy'] : null;
         $dbSql   = self::getConditionQuerySentence($fields, $where, $orderBy);
-        $result  = $dbHandle->getOneResult($dbSql);
+        $result  = $dbHandle->getOne($dbSql);
 
         return $result;
     }
@@ -40,7 +40,7 @@ class MapDbStorage
      *
      * @return array|bool
      */
-    public static function getManyResult($param)
+    public static function getAll($param)
     {
         $dbHandle = self::dbHandle($param['key']);
         if (empty($dbHandle)) {
@@ -53,9 +53,9 @@ class MapDbStorage
         $start   = isset($param['start']) ? $param['start'] : null;
         $length  = isset($param['length']) ? $param['length'] : null;
         $dbSql   = self::getConditionQuerySentence($fields, $where, $orderBy, $start, $length);
-        $result  = $dbHandle->getManyResult($dbSql);
+        $result  = $dbHandle->getAll($dbSql);
         if (is_array($result)) {
-            $tmp = array();
+            $tmp = [];
             foreach ($result as $value) {
                 $tmp[$value[self::$manyIndex]] = $value;
             }
@@ -119,8 +119,8 @@ class MapDbStorage
     {
         if (empty($param['value'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MDS003', 'no' => 'MDS003', 'param' => array('paramString' => 'MDS003'))
-            );//AC::setErrorNo('MDS003');
+                    ['msg' => 'MDS003', 'no' => 'MDS003', 'param' => ['paramString' => 'MDS003']]
+            );
         }
 
         $dbHandle = self::dbHandle($param['key']);
@@ -173,7 +173,7 @@ class MapDbStorage
 
         $where  = isset($param['where']) ? $param['where'] : null;
         $dbSql  = self::getCountRowSentence($where);
-        $result = $dbHandle->getOneResult($dbSql);
+        $result = $dbHandle->getOne($dbSql);
         if (empty($result['num'])) {
             return 0;
         }
@@ -300,9 +300,9 @@ class MapDbStorage
         }
 
         if (1 == $rows) {
-            $result = $dbHandle->getOneResult($dbSql);
+            $result = $dbHandle->getOne($dbSql);
         } else {
-            $result = $dbHandle->getManyResult($dbSql);
+            $result = $dbHandle->getAll($dbSql);
         }
 
         return $result;
@@ -326,7 +326,7 @@ class MapDbStorage
                 $field = $fields;
             }
         }
-        $where = Array();
+        $where = [];
         self::getPrimaryKeyConditionArray($where);
         if (empty($where[self::$uuidName]) || empty(self::$uuidValue)) {
             $whereString = ' TRUE ';
@@ -363,7 +363,7 @@ class MapDbStorage
             return self::getQuerySentence($fields, $orderBy, $start, $len);
         }
 
-        $conditionArray = array();
+        $conditionArray = [];
         $whereString    = null;
         if (is_array($where)) {
             self::getPrimaryKeyConditionArray($where);
@@ -421,7 +421,7 @@ class MapDbStorage
         } elseif (is_array($where)) {
             self::getPrimaryKeyConditionArray($where);
 
-            $conditionArray = array();
+            $conditionArray = [];
             foreach ($where as $field => $v) {
                 if (empty($field)) {
                     continue;
@@ -450,7 +450,7 @@ class MapDbStorage
     {
         $sql = 'INSERT INTO ' . self::$dbName . '.' . self::$tableName . ' (`' . self::$uuidName . '`) VALUES("' . self::$uuidValue . '")';
         if (is_array($value)) {
-            $fields = $newValues = array();
+            $fields = $newValues = [];
             foreach ($value as $field => $newValue) {
                 if (empty($field)) {
                     continue;
@@ -487,9 +487,9 @@ class MapDbStorage
         }
 
         $fieldString = null;
-        $valueString = array();
+        $valueString = [];
         foreach ($value as $mapArray) {
-            $fields = $newValues = array();
+            $fields = $newValues = [];
             foreach ($mapArray as $field => $newValue) {
                 if (empty($field)) {
                     continue;
@@ -533,7 +533,7 @@ class MapDbStorage
             return $sql;
         }
 
-        $setArray = array();
+        $setArray = [];
         foreach ($value as $field => $newValue) {
             if (empty($field)) {
                 continue;
@@ -572,7 +572,7 @@ class MapDbStorage
         }
 
         # if where is null ,the call getUpdateSentence()
-        $conditionArray = array();
+        $conditionArray = [];
         $whereString    = null;
         if (is_array($where)) {
             self::getPrimaryKeyConditionArray($where);
@@ -593,7 +593,7 @@ class MapDbStorage
         }
 
         # if set value is null, return NULL
-        $setArray = array();
+        $setArray = [];
         foreach ($value as $field => $newValue) {
             if (empty($field)) {
                 continue;
@@ -637,7 +637,7 @@ class MapDbStorage
             return self::getRemoveSentence();
         }
 
-        $conditionArray = array();
+        $conditionArray = [];
         $whereString    = null;
         if (is_array($where)) {
             self::getPrimaryKeyConditionArray($where);
@@ -677,7 +677,7 @@ class MapDbStorage
             return $sql;
         }
 
-        $setArray = $whereArray = array();
+        $setArray = $whereArray = [];
         if (!empty($where)) {
             if (is_array($where)) {
                 foreach ($where as $f => $v) {
@@ -732,7 +732,7 @@ class MapDbStorage
             return $sql;
         }
 
-        $setArray = $whereArray = array();
+        $setArray = $whereArray = [];
         if (!empty($where)) {
             if (is_array($where)) {
                 foreach ($where as $f => $v) {
@@ -781,7 +781,7 @@ class MapDbStorage
     private static function getPrimaryKeyConditionArray(&$whereArray)
     {
         if (self::$isPrimary && !empty(self::$uuidValue)) {
-            $whereArray = array(self::$uuidName => self::$uuidValue) + $whereArray;
+            $whereArray = [self::$uuidName => self::$uuidValue] + $whereArray;
         }
         return null;
     }
@@ -815,7 +815,7 @@ class MapDbStorage
             #   exit ('DB server is not exist! ');
             #      'MDS001';
             return Logger::getInstance()->error(
-                    array('msg' => 'MDS001', 'no' => 'MDS001', 'param' => array('paramString' => 'MDS001'))
+                    ['msg' => 'MDS001', 'no' => 'MDS001', 'param' => ['paramString' => 'MDS001']]
             );
         }
         $hostConfig = SC::$dbHostConfig[$configArray['clientServer']];
@@ -831,7 +831,7 @@ class MapDbStorage
         $dbHandle->dbConnect($configArray['clientServer'], $hostConfig);
         if (empty($dbHandle)) {
             Logger::getInstance()->error(
-                    array('msg' => 'MDS002', 'no' => 'MDS002', 'param' => array('paramString' => 'MDS002'))
+                    ['msg' => 'MDS002', 'no' => 'MDS002', 'param' => ['paramString' => 'MDS002']]
             );
         }
 

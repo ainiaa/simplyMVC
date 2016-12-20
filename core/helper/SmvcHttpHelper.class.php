@@ -63,12 +63,11 @@ class SmvcHttpHelper
     public static function sendGet($url, $data = null)
     {
         if (!is_null($data)) {
-            $param        = http_build_query($data);
             $urlComponent = parse_url($url, PHP_URL_QUERY);
             $urlQuery     = isset($urlComponent['query']) ? $urlComponent['query'] : '';
             if ($urlQuery) {
                 parse_str($urlQuery, $urlQueryParam);
-                $param = array_merge($param, $urlQueryParam);
+                $param = array_merge($data, $urlQueryParam);
                 array(
                         'scheme' => 'https',
                         'host'   => 'www.baidu.com',

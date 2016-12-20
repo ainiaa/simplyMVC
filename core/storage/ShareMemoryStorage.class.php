@@ -31,7 +31,7 @@ class ShareMemoryStorage
         $result = shm_get_var(self::$shmHandle, $key);
 
         if (empty($result)) {
-            $result = array();
+            $result = [];
         }
 
         return $result;
@@ -62,7 +62,7 @@ class ShareMemoryStorage
      */
     public function getManyResult($keys)
     {
-        $result = array();
+        $result = [];
         foreach ($keys as $key) {
             $value = shm_get_var(self::$shmHandle, $key);
             !empty($value) && $result[$key] = $value;

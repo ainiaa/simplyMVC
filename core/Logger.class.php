@@ -54,7 +54,7 @@ class Logger
      */
     public function __call($name, $arguments)
     {
-        return call_user_func_array(array($this->driver, $name), $arguments);
+        return call_user_func_array([$this->driver, $name], $arguments);
     }
 
     /**

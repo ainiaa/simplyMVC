@@ -6,20 +6,20 @@ class Cookie
     /**
      * @var  array  Cookie class configuration defaults
      */
-    protected static $config = array(
+    protected static $config = [
             'expiration' => 0,
             'path'       => '/',
             'domain'     => null,
             'secure'     => false,
             'http_only'  => false,
-    );
+    ];
 
     /*
      * initialisation and auto configuration
      */
     public static function _init()
     {
-        static::$config = array_merge(self::$config, C('cookie', array()));
+        static::$config = array_merge(self::$config, C('cookie', []));
     }
 
     /**

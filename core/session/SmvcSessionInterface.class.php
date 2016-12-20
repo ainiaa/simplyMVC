@@ -258,7 +258,7 @@ interface SmvcSessionInterface
      *
      * @return  void
      */
-    public function setCookie($payload = array());
+    public function setCookie($payload = []);
 
     // --------------------------------------------------------------------
 

@@ -20,18 +20,18 @@ class StorageFactory
         $splitKey = self::splitMapKey($key);
         if (!isset($splitKey[1])) {
             return Logger::getInstance()->error(
-                    array(
+                    [
                             'msg'   => 'SConf001',
                             'no'    => 'SConf001',
-                            'param' => array('paramString' => 'key  no split ' . $key)
-                    )
+                            'param' => ['paramString' => 'key  no split ' . $key]
+                    ]
             );
         }
 
         # db index list
         if (empty(self::$dbIndexList[$splitKey[0]])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'SConf002', 'no' => 'SConf002', 'param' => array('paramString' => 'SConf002'))
+                    ['msg' => 'SConf002', 'no' => 'SConf002', 'param' => ['paramString' => 'SConf002']]
             );
         }
 
@@ -106,18 +106,18 @@ class StorageFactory
         $splitKey = self::splitMapKey($key);
         if (!isset($splitKey[1])) {
             return Logger::getInstance()->error(
-                    array(
+                    [
                             'msg'   => 'SConf005',
                             'no'    => 'SConf005',
-                            'param' => array('paramString' => 'key  no split ' . $key)
-                    )
+                            'param' =>['paramString' => 'key  no split ' . $key]
+                    ]
             );
         }
 
         # mc index list
         if (empty(self::$mcIndexList[$splitKey[0]])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'SConf006', 'no' => 'SConf006', 'param' => array('paramString' => 'SConf006'))
+                    ['msg' => 'SConf006', 'no' => 'SConf006', 'param' => ['paramString' => 'SConf006']]
             );
         }
 
@@ -163,18 +163,18 @@ class StorageFactory
         $splitKey = self::splitMapKey($key);
         if (!isset($splitKey[1])) {
             return Logger::getInstance()->error(
-                    array(
+                   [
                             'msg'   => 'SConf003',
                             'no'    => 'SConf003',
-                            'param' => array('paramString' => 'key  no split ' . $key)
-                    )
+                            'param' => ['paramString' => 'key  no split ' . $key]
+                    ]
             );
         }
 
         # redis index list
         if (empty(self::$redisIndexList[$splitKey[0]])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'SConf004', 'no' => 'SConf004', 'param' => array('paramString' => 'SConf004'))
+                    ['msg' => 'SConf004', 'no' => 'SConf004', 'param' => ['paramString' => 'SConf004']]
             );
         }
 
@@ -217,11 +217,11 @@ class StorageFactory
     {
         if (empty(self::$keyMapStorage[$code])) {
             return Logger::getInstance()->error(
-                    array(
+                    [
                             'msg'   => 'SConf003',
                             'no'    => 'SConf003',
-                            'param' => array('paramString' => 'code no Map storage : ' . $code)
-                    )
+                            'param' => ['paramString' => 'code no Map storage : ' . $code]
+                    ]
             );
         }
 
@@ -279,39 +279,39 @@ class StorageFactory
         }
 
         $libNo = self::getIdByHash($key, count(self::$splitLibMapServer));
-        return array('db' => $libNo, 'redis' => $libNo);
+        return ['db' => $libNo, 'redis' => $libNo];
     }
 
     # split Lib Map Switch
     # lib server 此处DB,Redis参与Split的配置，都必须同步设置，包括数量一直和key从a,b 开始一致，不参与的server 从z,y,x 等倒排序使用
     public static $splitLibMapSwitch = true;
-    public static $splitLibMapServer = array(0 => 'a', 1 => 'b');
-    public static $splitLibMapRedis = array(0 => 'a', 1 => 'a', '2' => 'b');
+    public static $splitLibMapServer = [0 => 'a', 1 => 'b'];
+    public static $splitLibMapRedis = [0 => 'a', 1 => 'a', '2' => 'b'];
 
     # DB Host Config
-    public static $dbHostConfig = array(
-            'a' => array('host' => '127.0.0.1', 'port' => '3306', 'user' => 'php', 'passwd' => '123456'),
-            'b' => array('host' => '127.0.0.1', 'port' => '3306', 'user' => 'php', 'passwd' => '123456'),
-    );
+    public static $dbHostConfig = [
+            'a' => ['host' => '127.0.0.1', 'port' => '3306', 'user' => 'php', 'passwd' => '123456'],
+            'b' => ['host' => '127.0.0.1', 'port' => '3306', 'user' => 'php', 'passwd' => '123456'],
+   ];
     # Mc Host Config
     public static $mcHostConfig = array(
-            'a' => array('host' => '127.0.0.1', 'port' => '11210'),
-            'b' => array('host' => '127.0.0.1', 'port' => '11210'),
+            'a' => ['host' => '127.0.0.1', 'port' => '11210'],
+            'b' => ['host' => '127.0.0.1', 'port' => '11210'],
     );/*}}}*/
     # Redis Host Config
-    public static $redisHostConfig = array(
-            'a' => array('host' => '127.0.0.1', 'port' => '6370'),
-            'b' => array('host' => '127.0.0.1', 'port' => '6370'),
-    );
+    public static $redisHostConfig = [
+            'a' => ['host' => '127.0.0.1', 'port' => '6370'],
+            'b' => ['host' => '127.0.0.1', 'port' => '6370'],
+    ];
 
     # Log Server Config 
-    public static $logServerConfig = array(
+    public static $logServerConfig = [
             'host'          => '127.0.0.1',
             'port'          => '6001',
             'connTimeOut'   => 5,
             'sendTimeOut'   => 5,
             'isLogCompress' => true,
-    );
+    ];
 
     private static function getIdByUid($key, $num)
     {
@@ -350,16 +350,16 @@ class StorageFactory
     #   #   'DB-REDIS'      #   REDIS 缓存，DB后备
     #   
     # Key => Storage    
-    private static $keyMapStorage = array();
+    private static $keyMapStorage =[];
 
     # DB Index List
-    private static $dbIndexList = array();
+    private static $dbIndexList =[];
 
     # Mc Index List     
-    private static $mcIndexList = array();
+    private static $mcIndexList =[];
 
     # Redis Index List  
-    private static $redisIndexList = array();
+    private static $redisIndexList =[];
 
 }
 

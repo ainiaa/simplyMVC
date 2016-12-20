@@ -48,7 +48,7 @@ class BaseController extends SmvcObject
      *
      * @return string
      */
-    function fetch($file)
+    public function fetch($file)
     {
         //初始化 视图类
         $this->initView();
@@ -64,7 +64,7 @@ class BaseController extends SmvcObject
      *
      * @return mixed
      */
-    function get($var = null)
+    public function get($var = null)
     {
         //初始化 视图类
         $this->initView();
@@ -80,7 +80,7 @@ class BaseController extends SmvcObject
      *
      * @return mixed
      */
-    function display($tpl = null)
+    public function display($tpl = null)
     {
         //初始化 视图类
         $this->initView();
@@ -254,7 +254,7 @@ class BaseController extends SmvcObject
                 header("refresh:{$time};url={$url}");
                 echo $msg;
             }
-            exit();
+            exit;
         }
     }
 

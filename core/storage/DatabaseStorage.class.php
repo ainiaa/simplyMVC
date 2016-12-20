@@ -19,7 +19,7 @@ class DatabaseStorage
      *
      * @return array|bool|mixed
      */
-    public function getOneResult($sql)
+    public function getOne($sql)
     {
         $result = false;
         if (empty($sql)) {
@@ -33,7 +33,7 @@ class DatabaseStorage
 
         $result = $query->fetch(PDO::FETCH_ASSOC);
         if (empty($result)) {
-            return array();
+            return [];
         }
 
         return $result;
@@ -46,7 +46,7 @@ class DatabaseStorage
      *
      * @return array|bool
      */
-    public function getManyResult($sql)
+    public function getAll($sql)
     {
         $result = false;
         if (empty($sql)) {
@@ -103,7 +103,7 @@ class DatabaseStorage
             $error  = $result->errorInfo();
             $string = $sql . '-' . SmvcUtilHelper::encodeData($error);
             return Logger::getInstance()->error(
-                    array('msg' => $string, 'no' => 'DBS001', 'param' => array('paramString' => $string))
+                    ['msg' => $string, 'no' => 'DBS001', 'param' => ['paramString' => $string]]
             );
         }
     }

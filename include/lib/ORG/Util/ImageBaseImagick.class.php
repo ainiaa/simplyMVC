@@ -26,13 +26,13 @@ class ImageBaseImagick
         if ($imageInfo !== false) {
             $imageType = strtolower(substr(image_type_to_extension($imageInfo[2]), 1));
             $imageSize = filesize($img);
-            $info      = array(
-                    "width"  => $imageInfo[0],
-                    "height" => $imageInfo[1],
-                    "type"   => $imageType,
-                    "size"   => $imageSize,
-                    "mime"   => $imageInfo['mime']
-            );
+            $info      = [
+                    'width'  => $imageInfo[0],
+                    'height' => $imageInfo[1],
+                    'type'   => $imageType,
+                    'size'   => $imageSize,
+                    'mime'   => $imageInfo['mime']
+            ];
             return $info;
         } else {
             return false;

@@ -84,7 +84,7 @@ function file_exists_case($filename)
 function xml_encode($data, $root = 'think', $item = 'item', $attr = '', $id = 'id', $encoding = 'utf-8')
 {
     if (is_array($attr)) {
-        $_attr = array();
+        $_attr = [];
         foreach ($attr as $key => $value) {
             $_attr[] = "{$key}=\"{$value}\"";
         }
@@ -143,7 +143,7 @@ function in_array_case($value, $array)
  */
 function smvc_define($source)
 {
-    static $defined = array();
+    static $defined = [];
     if (is_string($source)) { //导入数组
         $source = include($source);
     }
@@ -226,7 +226,7 @@ function site_url()
  */
 function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = false)
 {
-    static $_trace = array();
+    static $_trace = [];
     if ('[think]' === $value) { // 获取trace信息
         return $_trace;
     } else {
@@ -236,7 +236,7 @@ function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = fals
         }
         $level = strtoupper($level);
         if (!isset($_trace[$level])) {
-            $_trace[$level] = array();
+            $_trace[$level] = [];
         }
         $_trace[$level][] = $info;
         if ((defined('IS_AJAX') && IS_AJAX) || !C('SHOW_PAGE_TRACE') || $record) {

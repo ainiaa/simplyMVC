@@ -29,9 +29,9 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      */
     public function __construct($mode = null, $uid = null)
     {
+        parent::__construct();
         $this->localCache = LocalCache::getData($this->tableName);
         $this->uId        = LocalCache::getData('uId');
-        parent::__construct();
     }
 
     /**
@@ -48,7 +48,7 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
         $this->uId = $uid;
 
         if (empty($this->memcached)) {
-            $memcacheConf = C('memcached', array());
+            $memcacheConf = C('memcached', []);
             if (empty($memcacheConf)) {
                 $memcacheConf = array(
                         'server'   => C('MC_HOST', 'localhost'),

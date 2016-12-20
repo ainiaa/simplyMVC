@@ -22,7 +22,7 @@ class Crypt
      *
      * @var	array
      */
-    private static $config = array();
+    private static $config = [];
 
     private static $inited = false;
 
@@ -35,7 +35,7 @@ class Crypt
             self::$crypter = new Crypt_AES();
             self::$hasher  = new Crypt_Hash('sha256');
 
-            self::$config = C('crypt', array());
+            self::$config = C('crypt', []);
 
             // generate random crypto keys if we don't have them or they are incorrect length
             $update = false;

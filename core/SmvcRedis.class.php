@@ -9,7 +9,7 @@ class SmvcRedis
     /**
      * @var Redis
      */
-    private static $instance = array();
+    private static $instance = [];
 
     /**
      * @var Redis
@@ -71,7 +71,7 @@ class SmvcRedis
      */
     public function __call($method, $params)
     {
-        return call_user_func_array(array($this->redis, $method), $params);
+        return call_user_func_array([$this->redis, $method], $params);
     }
 
     /**
@@ -173,7 +173,7 @@ class SmvcRedis
      */
     public function mset($keyvaluearray)
     {
-        $newarr = array();
+        $newarr = [];
         foreach ($keyvaluearray as $key => $value) {
             if (is_array($value)) {
                 $value = 'SC:ARR' . serialize($value);
@@ -269,7 +269,7 @@ class SmvcRedis
      *
      * @return array
      */
-    public function sort($key, $sortkey = array())
+    public function sort($key, $sortkey = [])
     {
         $key = $this->cachePrefix . $key;
         return $this->redis->sort($key, $sortkey);
@@ -281,18 +281,18 @@ class SmvcRedis
      *
      * @return array
      */
-    public function sortget($key, $sortkey = array()) //建议使用这个，这个根据get的结果会进行重组数据
+    public function sortget($key, $sortkey = []) //建议使用这个，这个根据get的结果会进行重组数据
     {
         if (!isset($sortkey['by'])) {
             $sortkey['by'] = microtime(true);
         }
         $ret = $this->redis->sort($key, $sortkey);
         if (!is_array($ret)) {
-            return array();
+            return [];
         }
         if (isset($sortkey['get']) && is_array($sortkey['get']) && count($sortkey['get']) > 1) {
             $tecount = 0;
-            $outret  = $smarr = array();
+            $outret  = $smarr = [];
             $ecount  = count($sortkey['get']);
             foreach ($ret as $eachret) {
                 if (is_string($eachret) && substr($eachret, 0, 6) == 'SC:ARR') {
@@ -304,7 +304,7 @@ class SmvcRedis
                 } else {
                     $tecount  = 0;
                     $outret[] = $smarr;
-                    $smarr    = array();
+                    $smarr    = [];
                 }
             }
             $smarr = null;
@@ -326,19 +326,19 @@ class SmvcRedis
      *
      * @return array
      */
-    public function sortget2($key, $sortkey = array()) //建议使用这个，这个根据get的结果会进行重组数据
+    public function sortget2($key, $sortkey = []) //建议使用这个，这个根据get的结果会进行重组数据
     {
         if (!isset($sortkey['by'])) {
             $sortkey['by'] = microtime(true);
         }
         $ret = $this->redis->sort($key, $sortkey);
         if (!is_array($ret)) {
-            return array();
+            return [];
         }
         if (isset($sortkey['get']) && is_array($sortkey['get']) && count($sortkey['get']) > 1) {
             $i       = 1;
             $tecount = 0;
-            $outret  = $smarr = array();
+            $outret  = $smarr = [];
             $ecount  = count($sortkey['get']);
 
             foreach ($ret as $eachret) {
@@ -878,21 +878,21 @@ class SmvcRedis
     public function sInter()
     {
         $params = func_get_args();
-        $newp   = array();
+        $newp   = [];
         foreach ($params as $eachp) {
             $newp[] = $this->cachePrefix . $eachp;
         }
-        return call_user_func_array(array($this->redis, 'sInter'), $newp);
+        return call_user_func_array([$this->redis, 'sInter'], $newp);
     }
 
     public function sInterStore()
     {
         $params = func_get_args();
-        $newp   = array();
+        $newp   = [];
         foreach ($params as $eachp) {
             $newp[] = $this->cachePrefix . $eachp;
         }
-        return call_user_func_array(array($this->redis, 'sInterStore'), $newp);
+        return call_user_func_array([$this->redis, 'sInterStore'], $newp);
     }
 
     /**
@@ -902,11 +902,11 @@ class SmvcRedis
     public function sUnion()
     {
         $params = func_get_args();
-        $newp   = array();
+        $newp   = [];
         foreach ($params as $eachp) {
             $newp[] = $this->cachePrefix . $eachp;
         }
-        return call_user_func_array(array($this->redis, 'sUnion'), $newp);
+        return call_user_func_array([$this->redis, 'sUnion'], $newp);
     }
 
     /**
@@ -915,11 +915,11 @@ class SmvcRedis
     public function sUnionStore()
     {
         $params = func_get_args();
-        $newp   = array();
+        $newp   = [];
         foreach ($params as $eachp) {
             $newp[] = $this->cachePrefix . $eachp;
         }
-        return call_user_func_array(array($this->redis, 'sUnionStore'), $newp);
+        return call_user_func_array([$this->redis, 'sUnionStore'], $newp);
     }
 
     /**
@@ -929,11 +929,11 @@ class SmvcRedis
     public function sDiff()
     {
         $params = func_get_args();
-        $newp   = array();
+        $newp   = [];
         foreach ($params as $eachp) {
             $newp[] = $this->cachePrefix . $eachp;
         }
-        return call_user_func_array(array($this->redis, 'sDiff'), $newp);
+        return call_user_func_array([$this->redis, 'sDiff'], $newp);
     }
 
     /**
@@ -942,11 +942,11 @@ class SmvcRedis
     public function sDiffStore()
     {
         $params = func_get_args();
-        $newp   = array();
+        $newp   = [];
         foreach ($params as $eachp) {
             $newp[] = $this->cachePrefix . $eachp;
         }
-        return call_user_func_array(array($this->redis, 'sDiffStore'), $newp);
+        return call_user_func_array([$this->redis, 'sDiffStore'], $newp);
     }
 
     /**
@@ -1038,7 +1038,7 @@ class SmvcRedis
      *
      * @return array
      */
-    public function zRangeByScore($key, $start, $end, $options = array())
+    public function zRangeByScore($key, $start, $end, $options = [])
     {
         return $this->redis->zRangeByScore($this->cachePrefix . $key, $start, $end, $options);
     }
@@ -1051,7 +1051,7 @@ class SmvcRedis
      *
      * @return array
      */
-    public function zRevRangeByScore($key, $start, $end, $options = array())
+    public function zRevRangeByScore($key, $start, $end, $options = [])
     {
         $ret = $this->redis->zRangeByScore($this->cachePrefix . $key, $start, $end, $options);
         return array_reverse($ret);
@@ -1179,9 +1179,9 @@ class SmvcRedis
      *
      * @return int
      */
-    public function zUnion($outkey, $keysarr = array(), $Weights = array(), $aggregateFunction)
+    public function zUnion($outkey, $keysarr = [], $Weights = [], $aggregateFunction)
     {
-        $newarr = array();
+        $newarr = [];
         foreach ($keysarr as $eachkey) {
             $newarr[] = $this->cachePrefix . $eachkey;
         }
@@ -1197,9 +1197,9 @@ class SmvcRedis
      *
      * @return int
      */
-    public function zInter($outkey, $keysarr = array(), $Weights = array(), $aggregateFunction)
+    public function zInter($outkey, $keysarr = [], $Weights = [], $aggregateFunction)
     {
-        $newarr = array();
+        $newarr = [];
         foreach ($keysarr as $eachkey) {
             $newarr[] = $this->cachePrefix . $eachkey;
         }

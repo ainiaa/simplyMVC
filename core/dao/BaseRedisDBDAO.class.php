@@ -31,9 +31,9 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      */
     public function __construct($mode = null, $uid = null)
     {
+        parent::__construct();
         $this->localCache = LocalCache::getData($this->tableName);
         $this->uId        = LocalCache::getData('uId');
-        parent::__construct();
     }
 
     /**
@@ -49,7 +49,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
         $this->uId = $uid;
 
         if (empty($this->redis)) {
-            $redisConf = C('redis', array());
+            $redisConf = C('redis', []);
             if (empty($redisConf)) {
                 $redisConf = [
                         'host'     => '127.0.0.1',
@@ -76,11 +76,11 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
         if (empty($this->storager)) {
             $redisConf = C('session.redis', array());
             if (empty($redisConf)) {
-                $redisConf = array(
+                $redisConf = [
                         'host'     => '127.0.0.1',
                         'port'     => '3306',
                         'pconnect' => false,
-                );
+                ];
             }
             $this->storager = new Redis();
             if (isset($redisConf['pconnect']) && $redisConf['pconnect']) {
@@ -169,11 +169,10 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      *
      * @return int
      */
-    public function updateByPk($currentData, $pinfo = array())
+    public function updateByPk($currentData, $pinfo = [])
     {
         $pk = $currentData[$this->pk];
         if (count($this->defaultValue) !== count($currentData)) {    //不完整完整字段, 合并更新
-
             $where = sprintf('%s=%s', $this->pk, $currentData[$this->pk]);
 
             if ($this->isMulit()) {
@@ -204,7 +203,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             $tmp[$sk]               = $currentData;
             $this->localCache[$key] = $tmp;
 
-            $this->redis->hMset($key, array($sk => $currentData));
+            $this->redis->hMset($key, [$sk => $currentData]);
 
             unset($sk, $tmp);
         } else {
@@ -225,7 +224,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      *
      * @return array|mixed
      */
-    public function getByPk($pk, $pinfo = array())
+    public function getByPk($pk, $pinfo = [])
     {
         if (is_array($pk)) {
             unset($pinfo);
@@ -267,7 +266,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      *
      * @return bool
      */
-    public function deleteBySk($ids, $pinfo = array())
+    public function deleteBySk($ids, $pinfo = [])
     {
         return $this->deleteByPk($ids, $pinfo);
     }
@@ -280,7 +279,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      *
      * @return boolean
      */
-    public function deleteByPk($condition, $pinfo = array())
+    public function deleteByPk($condition, $pinfo = [])
     {
         if (is_array($condition)) {
             $pk = $condition[$this->pk];
@@ -341,10 +340,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      */
     public function get($pkid, $skid)
     {
-        $infos = array(
-                $this->pk => $pkid,
-                $this->sk => $skid
-        );
+        $infos = [$this->pk => $pkid, $this->sk => $skid];
 
         return $this->getBySk($infos);
     }

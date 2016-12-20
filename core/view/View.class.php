@@ -2,7 +2,7 @@
 
 class View
 {
-    public $tpl_vars = array();
+    public $tpl_vars = [];
 
     /**
      *  模板引擎实例
@@ -15,7 +15,7 @@ class View
     /**
      * @var array
      */
-    public $viewEngineConfig = array( //视图engine相关配置
+    public $viewEngineConfig = [ //视图engine相关配置
             'caching'         => false, //是否使用缓存，项目在调试期间，不建议启用缓存
             'template_dir'    => '@/templates', //设置模板目录
             'compile_dir'     => '@/templates_c', //设置编译目录
@@ -25,7 +25,7 @@ class View
             'left_delimiter'  => '<{', // smarty左限定符
             'right_delimiter' => '}>', // smarty右限定符
             'auto_literal'    => true, // Smarty3新特性
-    );
+    ];
 
     /**
      * @return View

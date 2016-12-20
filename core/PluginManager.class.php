@@ -21,7 +21,7 @@ class PluginManager
      * @access private
      * @var array
      */
-    private $_listeners = array();
+    private $_listeners = [];
 
     /**
      * 构造函数
@@ -59,7 +59,7 @@ class PluginManager
      */
     public function getActivePlugins()
     {
-        return array();
+        return [];
     }
 
     /**

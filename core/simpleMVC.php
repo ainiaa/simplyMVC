@@ -144,7 +144,7 @@ class SimpleMVC
     public static function initAutoLoad()
     {
         if (function_exists('spl_autoload_register')) {
-            spl_autoload_register(array('Importer', 'autoLoad'));
+            spl_autoload_register(['Importer', 'autoLoad']);
         } else {
             function __autoload($sClassName)
             {

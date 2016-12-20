@@ -7,13 +7,9 @@
  */
 class SmvcPHPTemplate
 {
-    public $tplVars = array();
+    public $tplVars =[];
 
     private $templateDir; //设置模板目录
-
-    function __construct()
-    {
-    }
 
     /**
      * @param $key

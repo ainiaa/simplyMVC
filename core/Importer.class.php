@@ -8,7 +8,7 @@
  */
 class Importer
 {
-    private static $loadedFiles = array(); //已经加载的文件
+    private static $loadedFiles = []; //已经加载的文件
 
 
     /**
@@ -91,7 +91,7 @@ class Importer
      */
     public static function importConfigFile($configPath, $configFileExt = 'inc.php')
     {
-        $finalResult = array();
+        $finalResult = [];
         if (empty($configPath)) {
             $configPath = ROOT_PATH . '/config';
         }
@@ -384,8 +384,8 @@ class Importer
     public static function getControllerListByGroupAndModule($groupName, $moduleName)
     {
         $appFileStruct  = self::getAppFileStruct();
-        $files          = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : array();
-        $controllerList = isset($files['controllers']) ? $files['controllers'] : array();
+        $files          = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : [];
+        $controllerList = isset($files['controllers']) ? $files['controllers'] : [];
 
         return $controllerList;
     }
@@ -401,8 +401,8 @@ class Importer
     public static function getServiceListByGroupAndModule($groupName, $moduleName)
     {
         $appFileStruct = self::getAppFileStruct();
-        $files         = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : array();
-        $serviceList   = isset($files['services']) ? $files['services'] : array();
+        $files         = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : [];
+        $serviceList   = isset($files['services']) ? $files['services'] : [];
 
         return $serviceList;
     }
@@ -418,8 +418,8 @@ class Importer
     public static function getDAOListByGroupAndModule($groupName, $moduleName)
     {
         $appFileStruct = self::getAppFileStruct();
-        $files         = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : array();
-        $daoList       = isset($files['daos']) ? $files['daos'] : array();
+        $files         = isset($appFileStruct[$groupName][$moduleName]) ? $appFileStruct[$groupName][$moduleName] : [];
+        $daoList       = isset($files['daos']) ? $files['daos'] : [];
 
         return $daoList;
     }
@@ -433,7 +433,7 @@ class Importer
      */
     public static function getFileStructBypath($path)
     {
-        $tree = array();
+        $tree = [];
         if ('/' === substr($path, -1)) {
             $globPattern = $path . '*';
         } else {
@@ -468,7 +468,7 @@ class Importer
      */
     public static function getModuleList($groupName = '')
     {
-        $finalData = array();
+        $finalData = [];
         $groupList = self::getGroupList();
         foreach ($groupList as $group) {
             $groupBasePath = APP_PATH . $group . '/';
@@ -493,7 +493,7 @@ class Importer
      */
     public static function getAppFileStruct()
     {
-        static $finalFileStruct = array();
+        static $finalFileStruct = [];
         if (C('APP_GROUP_LIST')) {
             $appGroupList = explode(',', C('APP_GROUP_LIST'));
             foreach ($appGroupList as $groupName) {
@@ -562,18 +562,11 @@ class Importer
                 // 根据自动加载路径设置进行尝试搜索
                 $includePath    = get_include_path();
                 $paths          = explode(PATH_SEPARATOR, $includePath);
-                $fileExtensions = array('.class.php', '.php');
+                $fileExtensions = ['.class.php', '.php'];
                 foreach ($paths as $path) {
                     // TODO 如果加载类成功则返回 这个需要完善。。。 文件名后缀需要整理
                     foreach ($fileExtensions as $fileExtension) {
                         $fullFilePath = $path . '/' . $className . $fileExtension;
-                        //                        SmvcDebugHelper::instance()->debug(
-                        //                                array(
-                        //                                        'info'  => array('className' => $className, 'path' => $fullFilePath),
-                        //                                        'label' => '$class_name',
-                        //                                        'level' => 'warn'
-                        //                                )
-                        //                        );
                         if (self::importFileByFullPath($fullFilePath, false)) {
                             break;
                         }
@@ -581,10 +574,6 @@ class Importer
                 }
             }
         }
-
-        //        SmvcDebugHelper::instance()->debug(
-        //                array('info' => $className, 'label' => '$class_name', 'level' => 'warn')
-        //        );
     }
 
     /**
@@ -663,7 +652,7 @@ class Importer
      */
     public static function fileMapping()
     {
-        return array(
+        return [
             // phpseclib /Crypt
                 'Crypt_AES'                 => VENDOR_PATH . 'phpseclib/Crypt/AES.php',
                 'Crypt_Base'                => VENDOR_PATH . 'phpseclib/Crypt/Base.php',
@@ -691,7 +680,7 @@ class Importer
                 'Net_SFTP_Stream'           => VENDOR_PATH . 'phpseclib/Net/SFTP/Stream.php',
             //phpseclib /System
                 'System_SSH_Agent_Identity' => VENDOR_PATH . 'phpseclib/System/SSH/Agent.php',
-        );
+        ];
     }
 
     /**

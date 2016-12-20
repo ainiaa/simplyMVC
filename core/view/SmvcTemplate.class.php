@@ -10,14 +10,14 @@ class SmvcTemplate
     var $cache_lifetime = 3600; // 缓存更新时间, 默认 3600 秒
     var $direct_output = false;
     var $caching = false;
-    var $template = array();
+    var $template =[];
     var $force_compile = false;
     var $appoint_cache_id = false;
     var $gzip = false;
 
-    var $_var = array();
+    var $_var =[];
     var $_echash = '554fcae493e564ee0dc75bdf2ebf94ca';
-    var $_foreach = array();
+    var $_foreach =[];
     var $_current_file = '';
     var $_expires = 0;
     var $_errorlevel = 0;
@@ -26,8 +26,8 @@ class SmvcTemplate
     var $_foreachmark = '';
     var $_seterror = 0;
 
-    var $_temp_key = array(); // 临时存放 foreach 里 key 的数组
-    var $_temp_val = array(); // 临时存放 foreach 里 item 的数组
+    var $_temp_key =[]; // 临时存放 foreach 里 key 的数组
+    var $_temp_val =[]; // 临时存放 foreach 里 item 的数组
 
     var $template_out;
     var $_vars;
@@ -181,11 +181,11 @@ class SmvcTemplate
                             $cachename = basename($filename, strrchr($filename, '.')) . '_' . $cache_id;
                         }
                         $data = serialize(
-                                array(
+                                [
                                         'template' => $this->template,
                                         'expires'  => $this->_nowtime + $this->cache_lifetime,
                                         'maketime' => $this->_nowtime
-                                )
+                                ]
                         );
                         $out  = str_replace("\r", '', $out);
 
@@ -201,7 +201,7 @@ class SmvcTemplate
                         ) {
                             trigger_error('can\'t write:' . $this->cache_dir . '/' . $cachename . '.php');
                         }
-                        $this->template = array();
+                        $this->template =[];
                     }
                 }
             }
@@ -501,7 +501,7 @@ class SmvcTemplate
                     //$t = $this->get_para(substr($tag, 6), 0); //remark by wj because of unfit this tag
                     $cycle_para = explode("=", trim(substr($tag, 6)), 2);
                     if (count($cycle_para) > 1) {
-                        $t = array(trim($cycle_para[0]) => trim($cycle_para[1], "'"));
+                        $t = [trim($cycle_para[0]) => trim($cycle_para[1], "'")];
 
                         return '<?php echo $this->cycle(' . $this->make_array($t) . '); ?>';
                     } else {
@@ -620,7 +620,7 @@ class SmvcTemplate
                     } else {
                         $glue = ", &nbsp;";
                     }
-                    $str = "\$tmp = array();";
+                    $str = "\$tmp =[];";
                     foreach ($t as $value) {
                         $str .= "if (!empty(" . $value . ")) array_push(\$tmp, " . $value . ");";
                     }
@@ -756,7 +756,7 @@ class SmvcTemplate
                             /* 默认是简单格式 */
                             $date_format = C('time_format_simple');
                         } else {
-                            if (in_array($s[1], array('simple', 'complete'))) {
+                            if (in_array($s[1], ['simple', 'complete'])) {
                                 /* 允许使用简单和完整格式，从配置项中取 */
                                 $date_format = C("time_format_{$s[1]}");
                             } else {
@@ -840,7 +840,7 @@ class SmvcTemplate
      */
     public function get_para($val, $type = 1) // 处理insert外部函数/需要include运行的函数的调用数据
     {
-        $para = array();
+        $para =[];
         $pa   = $this->str_trim($val);
         foreach ($pa AS $value) {
             if (strrpos($value, '=')) {
@@ -983,7 +983,7 @@ class SmvcTemplate
         $attrs = $this->get_para($tag_args, 0);
         $from  = $attrs['from'];
         if ($from === false) {
-            $from = array();
+            $from =[];
         }
 
         $item = $this->get_val($attrs['item']);
@@ -1003,7 +1003,7 @@ class SmvcTemplate
         }
 
         $output = '<?php ';
-        $output .= "\$_from = {$from}; if (\$_from === false) {\$_from = array();}";
+        $output .= "\$_from = {$from}; if (\$_from === false) {\$_from =[];}";
         if (isset($attrs["key"]) && isset($attrs["item"])) {
             $output .= "if (!is_array(\$_from) && !is_object(\$_from)) { settype(\$_from, 'array'); }; \$this->push_vars('{$attrs["key"]}', '{$attrs["item"]}');";
         } else {
@@ -1013,7 +1013,7 @@ class SmvcTemplate
 
         if (!empty($name)) {
             $foreach_props = "\$this->_foreach['$name']";
-            $output .= "{$foreach_props} = array('total' => count(\$_from), 'iteration' => 0);\n";
+            $output .= "{$foreach_props} = ['total' => count(\$_from), 'iteration' => 0];\n";
             $output .= "if ({$foreach_props}['total'] > 0):\n";
             $output .= "    foreach (\$_from AS $key_part$item):\n";
             $output .= "        {$foreach_props}['iteration']++;\n";
@@ -1280,23 +1280,23 @@ class SmvcTemplate
 
         $tmp_dir = "themes/mall/skin/" . $this->skin . '/';
 
-        $pattern = array(
+        $pattern = [
                 '/<!--[^>|\n|#]*?({.+?})[^<|{|\n]*?-->/', // 替换smarty注释
                 '/<!--[^<|>|{|\n|#]*?-->/', // 替换不换行的html注释
                 '/(href=["|\'])\.\.\/(.*?)(["|\'])/i', // 替换相对链接
                 '/((?:background|src)\s*=\s*["|\'])(?:\.\/|\.\.\/)?(images\/.*?["|\'])/is', // 在images前加上 $tmp_dir
                 '/((?:background|background-image):\s*?url\()(?:\.\/|\.\.\/)?(images\/)/is', // 在images前加上 $tmp_dir
                 '/{nocache}(.+?){\/nocache}/is', //无缓存模块
-        );
+        ];
 
-        $replace = array(
+        $replace = [
                 '\1',
                 '',
                 '\1\2\3',
                 '\1' . $tmp_dir . '\2',
                 '\1' . $tmp_dir . '\2',
                 "'{insert name=\"nocache\" ' . '" . $this->_echash . "' . base64_encode('\\1') . '}'",
-        );
+        ];
 
         return preg_replace($pattern, $replace, $source);
     }
@@ -1313,14 +1313,14 @@ class SmvcTemplate
 
         $url        = '';
         $custom_url = '';
-        $tmp        = array();
+        $tmp        =[];
 
         if (defined('URL_REWRITE') && URL_REWRITE > 0) {
             foreach ($arr AS $key => $val) {
                 $tmp[] = $key . chr(9) . $val;
             }
 
-            $args = str_replace(array('+', '/'), array('.', '-'), base64_encode(join(chr(8), $tmp)));
+            $args = str_replace(['+', '/'], ['.', '-'], base64_encode(join(chr(8), $tmp)));
 
             $url .= $args . '.html';
         } else {
@@ -1437,7 +1437,7 @@ class SmvcTemplate
     public function html_checkbox($arr)
     {
         $name      = $arr['name'];
-        $checked   = empty($arr['checked']) ? array() : $arr['checked'];
+        $checked   = empty($arr['checked']) ?[] : $arr['checked'];
         $options   = $arr['options'];
         $separator = isset($arr['separator']) ? $arr['separator'] : '&nbsp;';
 
@@ -1458,7 +1458,7 @@ class SmvcTemplate
 
     public function html_page_links($arr)
     {
-        $page = array();
+        $page =[];
         if (isset($arr['from'])) {
             $page = $arr['from'];
         } else {
@@ -1531,7 +1531,7 @@ class SmvcTemplate
      **/
     public function html_page_selector($arr)
     {
-        $page = array();
+        $page =[];
 
         if (isset($arr['from'])) {
             $page = $arr['from'];
@@ -1560,7 +1560,7 @@ class SmvcTemplate
 
     public function html_page_simple($arr)
     {
-        $page = array();
+        $page =[];
         if (isset($arr['from'])) {
             $page = $arr['from'];
         } else {
@@ -1596,7 +1596,7 @@ class SmvcTemplate
     public function html_sort_link($arr)
     {
         $url = parse_url($_SERVER['REQUEST_URI']);
-        $arg = array();
+        $arg =[];
         $out = '';
 
         parse_str($url['query'], $arg);
@@ -1678,13 +1678,13 @@ class SmvcTemplate
         $out = '';
         foreach ($arr AS $key => $val) {
             if ($val{0} == '$') {
-                $out .= $out ? ",'$key'=>$val" : "array('$key'=>$val";
+                $out .= $out ? ",'$key'=>$val" : "['$key'=>$val";
             } else {
-                $out .= $out ? ",'$key'=>'$val'" : "array('$key'=>'$val'";
+                $out .= $out ? ",'$key'=>'$val'" : "['$key'=>'$val'";
             }
         }
 
-        return $out . ')';
+        return $out . ']';
     }
 
     public function smarty_create_pages($params)

@@ -159,7 +159,7 @@ class Router
     public static function routerCheckByWhiteList($controller, $action)
     {
         //只有 请求的route 在白名单中才可以执行
-        $whiteList = C('routerFilterWhiteList', array());
+        $whiteList = C('routerFilterWhiteList', []);
         $return    = false;
         if ($whiteList) {
             if ('*.*' === $whiteList) {
@@ -200,7 +200,7 @@ class Router
     public static function routerCheckByBlackList($controller, $action)
     {
         //只有 请求的route 不在黑名单中才可以执行
-        $blacklist = C('routerFilterBlackList', array());
+        $blacklist = C('routerFilterBlackList', []);
         $return    = true;
         if ($blacklist) {
             if ('*.*' === $blacklist) {
@@ -482,7 +482,7 @@ class Router
      *
      * @param array $info
      */
-    public static function getParams($info = array())
+    public static function getParams($info = [])
     {
     }
 
@@ -670,9 +670,9 @@ class Router
         static $server_keys = null;
 
         if (empty($server_keys)) {
-            $server_keys = array('HTTP_CLIENT_IP', 'REMOTE_ADDR');
+            $server_keys = ['HTTP_CLIENT_IP', 'REMOTE_ADDR'];
             if (C('security.allow_x_headers', false)) {
-                $server_keys = array_merge(array('HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'), $server_keys);
+                $server_keys = array_merge(['HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'], $server_keys);
             }
         }
 

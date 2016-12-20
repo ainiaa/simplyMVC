@@ -8,7 +8,7 @@
  */
 class Factory
 {
-    public static $instances = array();
+    public static $instances = [];
 
     //$QuoteObj = array(  引用的obj，obj的变量，引用参数  )
 
@@ -25,12 +25,12 @@ class Factory
      *
      * return XXXService , XXXDAODb ..
      */
-    public static function getInstance($instanceName = null, $quoteObj = array(), $params = array(), $getNow = false)
+    public static function getInstance($instanceName = null, $quoteObj = [], $params = [], $getNow = false)
     {
         if (!is_string($instanceName) || $instanceName == '') {
             throw new Exception('$instanceName must be a string!!!');
         }
-        $params     = $params ?: array();
+        $params     = $params ?: [];
         $instanceid = $instanceName . '_' . hash('crc32', serialize($params));
         if (!isset(self::$instances[$instanceid])) {
             if ($getNow) {
@@ -67,7 +67,7 @@ class Factory
      * @return object
      * @throws Exception
      */
-    public static function getInstanceNow($name, $constructparams = array())
+    public static function getInstanceNow($name, $constructparams = [])
     {
         $controllerSuffix    = 'Controller';
         $controllerSuffixLen = strlen($controllerSuffix);
@@ -84,7 +84,7 @@ class Factory
                 $action = new $name();
                 foreach ($action as $eachParamKey => $eachParamValue) {
                     if (substr($eachParamKey, -$serviceSuffixLen) === $serviceSuffix) {
-                        $action->$eachParamKey = self::getInstance($eachParamKey, array($action, $eachParamKey));
+                        $action->$eachParamKey = self::getInstance($eachParamKey, [$action, $eachParamKey]);
                     } else {
                         if (isset($constructparams[$eachParamKey])) {
                             $action->$eachParamKey = $constructparams[$eachParamKey];
@@ -107,7 +107,7 @@ class Factory
                     ) {
                         $serviceObject->$eachParamKey1 = self::getInstance(
                                 $eachParamKey1,
-                                array($serviceObject, $eachParamKey1)
+                                [$serviceObject, $eachParamKey1]
                         );
                     }
                 }
@@ -121,7 +121,7 @@ class Factory
         ) {
             $class = $name;
             if (!is_array($constructparams)) {
-                $constructparams = array();
+                $constructparams = [];
             }
             return self::getRealObject($class, $constructparams);
         } else {
@@ -160,7 +160,7 @@ class Factory
     {
         $realObject = null;
         if (!is_array($constructparams)) {
-            $constructparams = array($constructparams);
+            $constructparams = [$constructparams];
         }
         if ($constructparams) {
             $classRef = new ReflectionClass($class);
@@ -177,36 +177,4 @@ class Factory
         return $realObject;
     }
 
-}
-
-/**
- * 等的托管代理类
- * Class FactoryProxy
- */
-class FactoryProxy
-{
-    public $class = null;
-    public $params = null;
-    public $myQuote = null;
-
-    public function __call($name, $args)
-    {
-        $instanceid = $this->class;
-        if (!is_null($this->params)) {
-            $instanceid = $this->class . '_' . hash('crc32', serialize($this->params));
-        }
-        if (!isset(Factory::$instances[$instanceid]) || get_class(Factory::$instances[$instanceid]) == get_class(
-                        $this
-                )
-        ) {
-            Factory::$instances[$instanceid] = null;
-            Factory::$instances[$instanceid] = Factory::getInstance($this->class, array(), $this->params, true);
-        }
-        if (!is_null($this->myQuote)) {
-            $qclass        = $this->myQuote[0];
-            $qpro          = $this->myQuote[1];
-            $qclass->$qpro = Factory::$instances[$instanceid];
-        }
-        return call_user_func_array(array(Factory::$instances[$instanceid], $name), $args);
-    }
 }

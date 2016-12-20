@@ -8,7 +8,7 @@
 class SmvcObject
 {
 
-    private $_errors = array();
+    private $_errors = [];
     private $_errnum = 0;
 
     private static $i = 0;
@@ -65,7 +65,7 @@ class SmvcObject
         //使用call_user_func或call_user_func_array函数调用类方法，处理如下
         if (isset($bt[3]) && isset($bt[3]['function']) && in_array(
                         $bt[3]['function'],
-                        array('call_user_func', 'call_user_func_array')
+                        ['call_user_func', 'call_user_func_array']
                 )
         ) {
             //如果参数是数组

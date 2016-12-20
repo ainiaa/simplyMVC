@@ -82,7 +82,7 @@ class Dispatcher
         } catch (ReflectionException $e) {
             // 方法调用发生异常后 引导到__call方法处理
             $method = new ReflectionMethod($controller, '__call');
-            $method->invokeArgs($controller, array($actionName, ''));
+            $method->invokeArgs($controller, [$actionName, '']);
         }
 
         //前置操作
@@ -143,7 +143,7 @@ class Dispatcher
      */
     public static function getParams($controller, $actionName)
     {
-        $finalParams = array();
+        $finalParams = [];
         try {
             //执行当前操作
             $method = new ReflectionMethod($controller, $actionName);
@@ -160,7 +160,7 @@ class Dispatcher
                         $vars = $_GET;
                 }
                 $params      = $method->getParameters();
-                $finalParams = array();
+                $finalParams = [];
                 foreach ($params as $param) {
                     $name = $param->getName();
                     if (isset($vars[$name])) {
@@ -174,7 +174,7 @@ class Dispatcher
             }
         } catch (ReflectionException $e) { // 方法调用发生异常后 引导到__call方法处理
             $method = new ReflectionMethod($controller, '__call');
-            $method->invokeArgs($controller, array($actionName, ''));
+            $method->invokeArgs($controller, [$actionName, '']);
         }
         return $finalParams;
     }
@@ -185,7 +185,7 @@ class Dispatcher
      *
      * @param array $info
      */
-    private static function preDispatch($info = array())
+    private static function preDispatch($info = [])
     {
     }
 
@@ -196,7 +196,7 @@ class Dispatcher
      *
      * @param array $info
      */
-    private static function postDispatch($info = array())
+    private static function postDispatch($info = [])
     {
     }
 

@@ -321,7 +321,7 @@ class MapRedisStorage
     {
         if (!isset($param['fields'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS011', 'no' => 'MRS011', 'param' => array('paramString' => 'MRS011'))
+                    ['msg' => 'MRS011', 'no' => 'MRS011', 'param' => ['paramString' => 'MRS011']]
             );
         }
 
@@ -342,7 +342,7 @@ class MapRedisStorage
     {
         if (!isset($param['fields']) || !isset($param['value'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS011', 'no' => 'MRS011', 'param' => array('paramString' => 'MRS011'))
+                    ['msg' => 'MRS011', 'no' => 'MRS011', 'param' => ['paramString' => 'MRS011']]
             );
         }
         $values = self::formatHashValue($param['value']);
@@ -386,7 +386,7 @@ class MapRedisStorage
     {
         if (empty($param['fields'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS014', 'no' => 'MRS014', 'param' => array('paramString' => 'MRS014'))
+                    ['msg' => 'MRS014', 'no' => 'MRS014', 'param' => ['paramString' => 'MRS014']]
             );
         }
 
@@ -401,7 +401,7 @@ class MapRedisStorage
                 $fields[] = $field;
             }
             if (empty($fields)) {
-                return array();
+                return [];
             }
             $result = self::$redisHandle->hmGet($param['key'], $fields);
         }
@@ -420,7 +420,7 @@ class MapRedisStorage
     {
         if (empty($param['key'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS023', 'no' => 'MRS023', 'param' => array('paramString' => 'MRS023'))
+                    ['msg' => 'MRS023', 'no' => 'MRS023', 'param' => ['paramString' => 'MRS023']]
             );
         }
 
@@ -440,7 +440,7 @@ class MapRedisStorage
     {
         if (empty($param['value'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS015', 'no' => 'MRS015', 'param' => array('paramString' => 'MRS015'))
+                    ['msg' => 'MRS015', 'no' => 'MRS015', 'param' => ['paramString' => 'MRS015']]
             );
         }
         $value  = self::formatHashMValue($param['value']);
@@ -458,7 +458,7 @@ class MapRedisStorage
     {
         if (!isset($param['fields']) || empty($param['order'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS013', 'no' => 'MRS013', 'param' => array('paramString' => 'MRS013'))
+                    ['msg' => 'MRS013', 'no' => 'MRS013', 'param' => ['paramString' => 'MRS013']]
             );
         }
 
@@ -514,7 +514,7 @@ class MapRedisStorage
     {
         if (empty($param['value'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS016', 'no' => 'MRS016', 'param' => array('paramString' => 'MRS016'))
+                    ['msg' => 'MRS016', 'no' => 'MRS016', 'param' => ['paramString' => 'MRS016']]
             );
         }
 
@@ -532,7 +532,7 @@ class MapRedisStorage
     {
         if (empty($param['value'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS023', 'no' => 'MRS023', 'param' => array('paramString' => 'MRS023'))
+                    ['msg' => 'MRS023', 'no' => 'MRS023', 'param' => ['paramString' => 'MRS023']]
             );
         }
         if (empty($param['count'])) {
@@ -582,7 +582,7 @@ class MapRedisStorage
     {
         if (empty($param['fields'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS017', 'no' => 'MRS017', 'param' => array('paramString' => 'MRS017'))
+                    ['msg' => 'MRS017', 'no' => 'MRS017', 'param' => ['paramString' => 'MRS017']]
             );
         }
 
@@ -599,7 +599,7 @@ class MapRedisStorage
     {
         if (empty($param['fields'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS025', 'no' => 'MRS025', 'param' => array('paramString' => 'MRS025'))
+                    ['msg' => 'MRS025', 'no' => 'MRS025', 'param' => ['paramString' => 'MRS025']]
             );
         }
 
@@ -617,7 +617,7 @@ class MapRedisStorage
     {
         if (empty($param['fields'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS026', 'no' => 'MRS026', 'param' => array('paramString' => 'MRS026'))
+                    ['msg' => 'MRS026', 'no' => 'MRS026', 'param' => ['paramString' => 'MRS026']]
             );
         }
 
@@ -649,7 +649,7 @@ class MapRedisStorage
     {
         if (empty($param['fields']) || !isset($param['value'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS018', 'no' => 'MRS018', 'param' => array('paramString' => 'MRS018'))
+                    ['msg' => 'MRS018', 'no' => 'MRS018', 'param' => ['paramString' => 'MRS018']]
             );
         }
 
@@ -695,7 +695,7 @@ class MapRedisStorage
     {
         if (empty($param['fields'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS020', 'no' => 'MRS020', 'param' => array('paramString' => 'MRS020'))
+                    ['msg' => 'MRS020', 'no' => 'MRS020', 'param' => ['paramString' => 'MRS020']]
             );
         }
 
@@ -724,7 +724,7 @@ class MapRedisStorage
     {
         if (empty($param['fields']) || !isset($param['value'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS019', 'no' => 'MRS019', 'param' => array('paramString' => 'MRS019'))
+                    ['msg' => 'MRS019', 'no' => 'MRS019', 'param' => ['paramString' => 'MRS019']]
             );
         }
 
@@ -754,7 +754,7 @@ class MapRedisStorage
     {
         if (empty($param['fields'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS021', 'no' => 'MRS021', 'param' => array('paramString' => 'MRS021'))
+                    ['msg' => 'MRS021', 'no' => 'MRS021', 'param' => ['paramString' => 'MRS021']]
             );
         }
 
@@ -771,7 +771,7 @@ class MapRedisStorage
     {
         if (empty($param['fields'])) {
             return Logger::getInstance()->error(
-                    array('msg' => 'MRS022', 'no' => 'MRS022', 'param' => array('paramString' => 'MRS022'))
+                    ['msg' => 'MRS022', 'no' => 'MRS022', 'param' => ['paramString' => 'MRS022']]
             );
         }
         if (empty($param['order'])) {

@@ -72,7 +72,7 @@ class UserSplit
 
         $dbNo    = self::getIdByHash($key, $dbCount);
         $redisNo = self::getIdByHash($key, $redisCount);
-        return array('db' => $dbNo, 'redis' => $redisNo);
+        return ['db' => $dbNo, 'redis' => $redisNo];
     }
 
     /**

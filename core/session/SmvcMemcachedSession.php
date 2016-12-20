@@ -16,15 +16,15 @@ class SmvcMemcachedSession extends SmvcBaseSession
     /**
      * array of driver config defaults
      */
-    protected static $_defaults = array(
+    protected static $_defaults = [
             'cookie_name' => 'fuelmid', // name of the session cookie for memcached based sessions
-            'servers'     => array( // array of servers and portnumbers that run the memcached service
-                    array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100)
-            )
-    );
+            'servers'     => [ // array of servers and portnumbers that run the memcached service
+                    ['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100]
+            ]
+    ];
 
 
-    public function __construct($config = array())
+    public function __construct($config = [])
     {
         parent::__construct($config);
         // merge the driver config with the global config
@@ -59,7 +59,9 @@ class SmvcMemcachedSession extends SmvcBaseSession
         if ($this->memcached === false) {
             // do we have the PHP memcached extension available
             if (!class_exists('Memcached')) {
-                throw new Exception('Memcached sessions are configured, but your PHP installation doesn\'t have the Memcached extension loaded.');
+                throw new Exception(
+                        'Memcached sessions are configured, but your PHP installation doesn\'t have the Memcached extension loaded.'
+                );
             }
 
             // instantiate the memcached object
@@ -70,7 +72,9 @@ class SmvcMemcachedSession extends SmvcBaseSession
 
             // check if we can connect to the server(s)
             if ($this->memcached->getVersion() === false) {
-                throw new Exception('Memcached sessions are configured, but there is no connection possible. Check your configuration.');
+                throw new Exception(
+                        'Memcached sessions are configured, but there is no connection possible. Check your configuration.'
+                );
             }
         }
     }
@@ -89,9 +93,9 @@ class SmvcMemcachedSession extends SmvcBaseSession
     public function read($id = '')
     {
         // initialize the session
-        $this->data  = array();
-        $this->keys  = array();
-        $this->flash = array();
+        $this->data  = [];
+        $this->keys  = [];
+        $this->flash = [];
 
         // get the session cookie
         $cookie = $this->getCookie();
@@ -125,7 +129,10 @@ class SmvcMemcachedSession extends SmvcBaseSession
                 // not a valid cookie payload
             } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
-            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::getRemoteIp() . Router::clientIp())) {
+            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(
+                            Router::getRemoteIp() . Router::clientIp()
+                    )
+            ) {
                 // IP address doesn't match
             } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
                 // user agent doesn't match
@@ -169,7 +176,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
             $this->keys['updated'] = SmvcUtilHelper::getTime();
 
             // session payload
-            $payload = $this->serialize(array($this->keys, $this->data, $this->flash));
+            $payload = $this->serialize([$this->keys, $this->data, $this->flash]);
 
             // create the session file
             $this->writeMemcached($this->keys['session_id'], $payload);
@@ -177,7 +184,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
             // was the session id rotated?
             if (isset($this->keys['previous_id']) and $this->keys['previous_id'] != $this->keys['session_id']) {
                 // point the old session file to the new one, we don't want to lose the session
-                $payload = $this->serialize(array('rotated_session_id' => $this->keys['session_id']));
+                $payload = $this->serialize(['rotated_session_id' => $this->keys['session_id']]);
                 $this->writeMemcached($this->keys['previous_id'], $payload);
             }
 
@@ -185,7 +192,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
             // do some garbage collection
             if (mt_rand(0, 100) < $this->config['gc_probability']) {
                 $expired = SmvcUtilHelper::getTime() - $this->config['expiration_time'];
-                $this->storager->delete($this->config['table'], array('updated[<]' => $expired));
+                $this->storager->delete($this->config['table'], ['updated[<]' => $expired]);
             }
         }
 
@@ -209,8 +216,10 @@ class SmvcMemcachedSession extends SmvcBaseSession
         if (!empty($this->keys)) {
             // delete the key from the memcached server
             if ($this->storager->delete($this->config['cookie_name'] . '_' . $this->keys['session_id']) === false) {
-                throw new Exception('Memcached returned error code "' . $this->memcached->getResultCode(
-                        ) . '" on delete. Check your configuration.');
+                throw new Exception(
+                        'Memcached returned error code "' . $this->memcached->getResultCode(
+                        ) . '" on delete. Check your configuration.'
+                );
             }
         }
 
@@ -241,8 +250,10 @@ class SmvcMemcachedSession extends SmvcBaseSession
                         $this->config['expiration_time']
                 ) === false
         ) {
-            throw new Exception('Memcached returned error code "' . $this->storager->getResultCode(
-                    ) . '" on write. Check your configuration.');
+            throw new Exception(
+                    'Memcached returned error code "' . $this->storager->getResultCode(
+                    ) . '" on write. Check your configuration.'
+            );
         }
     }
 
@@ -278,7 +289,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
      */
     public function validateConfig($config)
     {
-        $validated = array();
+        $validated = [];
 
         foreach ($config as $name => $item) {
             if ($name == 'memcached' and is_array($item)) {
@@ -293,21 +304,25 @@ class SmvcMemcachedSession extends SmvcBaseSession
                         case 'servers':
                             // do we have a servers config
                             if (empty($value) or !is_array($value)) {
-                                $value = array('default' => array('host' => '127.0.0.1', 'port' => '11211'));
+                                $value = array('default' => ['host' => '127.0.0.1', 'port' => '11211']);
                             }
 
                             // validate the servers
                             foreach ($value as $key => $server) {
                                 // do we have a host?
                                 if (!isset($server['host']) or !is_string($server['host'])) {
-                                    throw new Exception('Invalid Memcached server definition in the session configuration.');
+                                    throw new Exception(
+                                            'Invalid Memcached server definition in the session configuration.'
+                                    );
                                 }
                                 // do we have a port number?
                                 if (!isset($server['port']) or !is_numeric(
                                                 $server['port']
                                         ) or $server['port'] < 1025 or $server['port'] > 65535
                                 ) {
-                                    throw new Exception('Invalid Memcached server definition in the session configuration.');
+                                    throw new Exception(
+                                            'Invalid Memcached server definition in the session configuration.'
+                                    );
                                 }
                                 // do we have a relative server weight?
                                 if (!isset($server['weight']) or !is_numeric(
@@ -358,17 +373,19 @@ class SmvcMemcachedSession extends SmvcBaseSession
     public function getStorageInstance()
     {
         if (empty($this->storager)) {
-            $memcacheConf = C('session.memcached', array());
+            $memcacheConf = C('session.memcached', []);
             if (empty($memcacheConf)) {
-                $memcacheConf = array(
+                $memcacheConf = [
                         'server'   => C('MC_HOST', 'localhost'),
                         'username' => C('MC_PORT', 11211),
                         'password' => C('MC_WEIGHT', 100),
-                );
+                ];
             }
             // do we have the PHP memcached extension available
             if (!class_exists('Memcached')) {
-                throw new Exception('Memcached sessions are configured, but your PHP installation doesn\'t have the Memcached extension loaded.');
+                throw new Exception(
+                        'Memcached sessions are configured, but your PHP installation doesn\'t have the Memcached extension loaded.'
+                );
             }
 
             // instantiate the memcached object
@@ -379,7 +396,9 @@ class SmvcMemcachedSession extends SmvcBaseSession
 
             // check if we can connect to the server(s)
             if ($this->storager->getVersion() === false) {
-                throw new Exception('Memcached sessions are configured, but there is no connection possible. Check your configuration.');
+                throw new Exception(
+                        'Memcached sessions are configured, but there is no connection possible. Check your configuration.'
+                );
             }
         }
 

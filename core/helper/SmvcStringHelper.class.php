@@ -1,7 +1,6 @@
 <?php
 
 /**
- * ×Ö·û´®°ïÖúÀà
  * @author Jeff Liu
  */
 class SmvcStringHelper
@@ -17,8 +16,7 @@ class SmvcStringHelper
         if (empty($size)) {
             return '0b';
         }
-        $i    = 0;
-        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
         return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
     }
 

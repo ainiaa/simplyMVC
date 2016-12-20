@@ -1,6 +1,6 @@
 <?php
 
-!defined('MIN_PHP_VERSION') && define('MIN_PHP_VERSION', '5.3.0');//定义PHP最小版本
+!defined('MIN_PHP_VERSION') && define('MIN_PHP_VERSION', '5.4.0');//定义PHP最小版本
 
 if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '<')) { //判断php的版本是不是为php5  php5.3.0之后才有匿名函数
     die('require PHP VERSION >= ' . MIN_PHP_VERSION);

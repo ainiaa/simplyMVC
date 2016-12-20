@@ -9,7 +9,7 @@ class SmvcConf implements ArrayAccess
 {
     private static $instance = null;
     private $configData = null;
-    private $configFileList = array();
+    private $configFileList = [];
     private $configPath = '';
 
     private function __construct()
