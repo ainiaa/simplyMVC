@@ -69,11 +69,21 @@ class Factory
      */
     public static function getInstanceNow($name, $constructparams = array())
     {
-        if (substr($name, -10) === 'Controller') {
+        $controllerSuffix    = 'Controller';
+        $controllerSuffixLen = strlen($controllerSuffix);
+        $serviceSuffix       = 'Service';
+        $serviceSuffixLen    = strlen($serviceSuffix);
+        $daoDBSuffix         = 'DAODb';
+        $daoDBSuffixLen      = strlen($daoDBSuffix);
+        $daoSuffix           = 'DAO';
+        $daoSuffixLen        = strlen($daoSuffix);
+        $daoRedisSuffix      = 'DAORedis';
+        $daoRedisSuffixLen   = strlen($daoRedisSuffix);
+        if (substr($name, -$controllerSuffixLen) === $controllerSuffix) {
             if (class_exists($name)) {
                 $action = new $name();
                 foreach ($action as $eachParamKey => $eachParamValue) {
-                    if (substr($eachParamKey, -7) === 'Service') {
+                    if (substr($eachParamKey, -$serviceSuffixLen) === $serviceSuffix) {
                         $action->$eachParamKey = self::getInstance($eachParamKey, array($action, $eachParamKey));
                     } else {
                         if (isset($constructparams[$eachParamKey])) {
@@ -86,14 +96,14 @@ class Factory
             } else {
                 throw new Exception('Class: ' . $name . ' is not exists!');
             }
-        } elseif (substr($name, -7) === 'Service') {
+        } else if (substr($name, -$serviceSuffixLen) === $serviceSuffix) {
             $serviceObject = self::getRealObject($name, $constructparams);
             foreach ($serviceObject as $eachParamKey1 => $eachParamValue1) {
                 if (is_null($eachParamValue1)) {
-                    if (substr($eachParamKey1, -5) === 'DAODb' || substr($eachParamKey1, -8) === 'DAORedis' || substr(
+                    if (substr($eachParamKey1, -$daoDBSuffixLen) === $daoDBSuffix || substr(
                                     $eachParamKey1,
-                                    -3
-                            ) == 'DAO'
+                                    -$daoRedisSuffixLen
+                            ) === $daoRedisSuffix || substr($eachParamKey1, -$daoSuffixLen) == $daoSuffix
                     ) {
                         $serviceObject->$eachParamKey1 = self::getInstance(
                                 $eachParamKey1,
@@ -104,7 +114,11 @@ class Factory
             }
             self::callSpecialMethod($serviceObject, '_initialize', $name);
             return $serviceObject;
-        } elseif (substr($name, -5) === 'DAODb' || substr($name, -8) === 'DAORedis') {
+        } else if (substr($name, -$daoDBSuffixLen) === $daoDBSuffix || substr(
+                        $name,
+                        -$daoRedisSuffixLen
+                ) === $daoRedisSuffix
+        ) {
             $class = $name;
             if (!is_array($constructparams)) {
                 $constructparams = array();
@@ -186,12 +200,7 @@ class FactoryProxy
                 )
         ) {
             Factory::$instances[$instanceid] = null;
-            Factory::$instances[$instanceid] = Factory::getInstance(
-                    $this->class,
-                    array(),
-                    $this->params,
-                    true
-            );
+            Factory::$instances[$instanceid] = Factory::getInstance($this->class, array(), $this->params, true);
         }
         if (!is_null($this->myQuote)) {
             $qclass        = $this->myQuote[0];

@@ -9,6 +9,7 @@ header('Content-Type:text/html;charset=utf-8');
 
 include dirname(__FILE__) . '/config/runtimeConst.inc.php';
 include CORE_PATH . '/Importer.class.php';
+
 define('PHP_SELF', htmlentities(isset($_SERVER['PHP_SELF']) ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME']));
 define('SHARE_TEMP_PATH', ROOT_PATH . '/temp/');
 define('SHARE_DATA_PATH', ROOT_PATH . '/data/');
@@ -172,7 +173,10 @@ class SimpleMVC
     public static function isAjax()
     {
         $isAjax = false;
-        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower(
+                        $_SERVER['HTTP_X_REQUESTED_WITH']
+                ) == 'xmlhttprequest'
+        ) {
             $isAjax = true;
         } elseif (!empty($_POST[VAR_AJAX_SUBMIT])) {
             $isAjax = true;

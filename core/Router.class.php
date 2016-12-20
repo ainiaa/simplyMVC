@@ -605,7 +605,7 @@ class Router
      * @param        $key
      * @param string $default
      *
-     * @return string
+     * @return mixed
      */
     public static function getServer($key = '', $default = '')
     {

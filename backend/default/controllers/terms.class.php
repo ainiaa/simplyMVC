@@ -23,7 +23,7 @@ class TermsController extends BackendController
         $this->setMainTpl('terms_list.tpl.html');
 
         $this->assign('title', 'Simply MVC backend - table list');
-        $this->assign('tableHeaderList', array('term_id', 'name', 'slug',));
+        $this->assign('tableHeaderList', array('term_id', 'name', 'term_type','desc',));
         $this->assign('termsList', $termsList);
         $this->display();
     }
