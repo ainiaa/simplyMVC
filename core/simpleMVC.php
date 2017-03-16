@@ -7,12 +7,12 @@
  */
 header('Content-Type:text/html;charset=utf-8');
 
-include dirname(__FILE__) . '/config/runtimeConst.inc.php';
-include CORE_PATH . '/Importer.class.php';
+include CORE_DIR. '/config/runtimeConst.php';
+include CORE_DIR . 'Importer.class.php';
 
 define('PHP_SELF', htmlentities(isset($_SERVER['PHP_SELF']) ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME']));
-define('SHARE_TEMP_PATH', ROOT_PATH . '/temp/');
-define('SHARE_DATA_PATH', ROOT_PATH . '/data/');
+define('SHARE_TEMP_PATH', ROOT_DIR . 'temp/');
+define('SHARE_DATA_PATH', ROOT_DIR . 'data/');
 
 class SimpleMVC
 {
@@ -40,7 +40,7 @@ class SimpleMVC
      */
     public static function getBaseFileList()
     {
-        return include CORE_PATH . '/config/frameworkFileList.inc.php';
+        return include CORE_DIR . 'config/frameworkFileList.php';
     }
 
     /**
@@ -77,7 +77,7 @@ class SimpleMVC
      */
     private static function init()
     {
-        self::$frameFileAllInOne = ROOT_PATH . '/public/tmp/~~core.php';
+        self::$frameFileAllInOne = ROOT_DIR . 'public/tmp/~~core.php';
 
         //注册自动加载
         self::initAutoLoad();
@@ -111,7 +111,8 @@ class SimpleMVC
      */
     private static function initConf()
     {
-        SmvcConf::init(CONF_PATH, 'inc.php');
+        SmvcConf::initEnv(CONF_DIR .'env.php', true);
+        SmvcConf::init(CONF_DIR, 'php');
     }
 
     /**

@@ -39,8 +39,8 @@ class PluginManager
         $plugins = $this->getActivePlugins(); #这个函数请自行实现
         if ($plugins) {
             foreach ($plugins as $plugin) { //假定每个插件文件夹中包含一个actions.php文件，它是插件的具体实现
-                if (@file_exists(ROOT_PATH . 'plugins/' . $plugin['directory'] . '/actions.php')) {
-                    include_once(ROOT_PATH . 'plugins/' . $plugin['directory'] . '/actions.php');
+                if (@file_exists(ROOT_DIR . 'plugins/' . $plugin['directory'] . '/actions.php')) {
+                    include_once(ROOT_DIR . 'plugins/' . $plugin['directory'] . '/actions.php');
                     $class = $plugin['name'] . '_actions';
                     if (class_exists($class)) {
                         //初始化所有插件

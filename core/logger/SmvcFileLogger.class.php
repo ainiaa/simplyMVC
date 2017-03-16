@@ -43,7 +43,7 @@ class SmvcFileLogger extends SmvcBaseLogger
      *
      * @throws RuntimeException
      */
-    public function __construct($info = array( /*'logDir' => '', 'level' => 'debug'*/))
+    public function __construct($info = [ /*'logDir' => '', 'level' => 'debug'*/])
     {
         parent::__construct($info);
         $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLogLevel;

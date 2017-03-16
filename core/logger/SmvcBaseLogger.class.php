@@ -25,7 +25,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
      *
      * @param array $info
      */
-    public function __construct($info = array( /*'logDir' => '', 'level' => 'debug'*/))
+    public function __construct($info = [/*'logDir' => '', 'level' => 'debug'*/] )
     {
         $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLogLevel;
     }
@@ -40,7 +40,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
     /**
      * @param array $info
      */
-    public function log($info = array( /* 'msg' => '', 'no' => '', 'param' => array()*/))
+    public function log($info = [ /* 'msg' => '', 'no' => '', 'param' => []*/])
     {
         $message = $this->formatMessage($info);
         $this->write($message);
@@ -49,7 +49,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
     /**
      * @param array $info
      */
-    public function error($info = array( /*'msg' => '', 'no' => '', 'param' => array()*/))
+    public function error($info = [ /*'msg' => '', 'no' => '', 'param' => []*/])
     {
         $info['level'] = 'error';
         $this->log($info);
@@ -58,7 +58,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
     /**
      * @param array $info
      */
-    public function info($info = array( /* 'msg' => '', 'param' => array()*/))
+    public function info($info = [ /* 'msg' => '', 'param' => []*/])
     {
         $info['level'] = 'info';
         $this->log($info);
@@ -67,7 +67,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
     /**
      * @param array $info
      */
-    public function warn($info = array( /* 'msg' => '', 'param' => array()*/))
+    public function warn($info = [ /* 'msg' => '', 'param' => []*/])
     {
         $info['level'] = 'warn';
         $this->log($info);
@@ -76,7 +76,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
     /**
      * @param array $info
      */
-    public function debug($info = array( /* 'msg' => '', 'param' => array()*/))
+    public function debug($info = [ /* 'msg' => '', 'param' => []*/])
     {
         $info['level'] = 'debug';
         $this->log($info);
@@ -85,7 +85,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
     /**
      * @param array $info
      */
-    public function notice($info = array( /* 'msg' => '', 'param' => array()*/))
+    public function notice($info = [ /* 'msg' => '', 'param' => []*/])
     {
         $info['level'] = 'notice';
         $this->log($info);
@@ -95,7 +95,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
     /**
      * @param array $info
      */
-    public function fatal($info = array( /* 'msg' => '', 'no' => '', 'param' => array()*/))
+    public function fatal($info = [ /* 'msg' => '', 'no' => '', 'param' => []*/])
     {
         $info['level'] = 'fatal';
         $this->log($info);
@@ -122,7 +122,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
      *
      * @param array $info
      */
-    public function setDateFormat($info = array( /*'dateFormat' => ''*/))
+    public function setDateFormat($info = [ /*'dateFormat' => ''*/])
     {
         $this->dateFormat = isset($info['dateFormat']) ? $info['dateFormat'] : $this->defaultDateFormat; //$dateFormat;
     }
@@ -135,12 +135,12 @@ class SmvcBaseLogger implements SmvcLoggerInterface
      * @return string
      */
     public function formatMessage(
-            $info = array( /*'level' => '', 'msg' => '', 'no' => '', 'param' => array(), 'format' => ''*/)
+            $info = [ /*'level' => '', 'msg' => '', 'no' => '', 'param' => [], 'format' => ''*/]
     ) {
         $level = isset($info['level']) ? $info['level'] : $this->logLevel;
         $msg   = isset($info['msg']) ? $info['msg'] : '';
         $no    = isset($info['no']) ? $info['no'] : null;
-        $param = isset($info['param']) ? $info['param'] : array();
+        $param = isset($info['param']) ? $info['param'] : [];
         if ($param) {
             return "{$this->getTimestamp()}|{$level}|{$no}|{$msg}|" . var_export($param, 1) . PHP_EOL;
         } else {

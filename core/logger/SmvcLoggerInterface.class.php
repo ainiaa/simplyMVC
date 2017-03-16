@@ -24,25 +24,25 @@ interface SmvcLoggerInterface
     const LOG_INFO = 5;
     const LOG_EXCEPTION = 6;
 
-    public function log($info = array( /* 'msg' => '', 'level' => ''*/));
+    public function log($info = [ /* 'msg' => '', 'level' => ''*/]);
 
-    public function error($info = array( /* 'msg' => '', 'no' => '', 'param' => array()*/));
+    public function error($info = [ /* 'msg' => '', 'no' => '', 'param' => []*/]);
 
-    public function info($info = array( /* 'msg' => '', 'param' => array()*/));
+    public function info($info = [ /* 'msg' => '', 'param' => []*/]);
 
-    public function warn($info = array( /* 'msg' => '', 'param' => array()*/));
+    public function warn($info = [ /* 'msg' => '', 'param' => []*/]);
 
-    public function debug($info = array( /* 'msg' => '', 'param' => array()*/));
+    public function debug($info = [ /* 'msg' => '', 'param' => []*/]);
 
-    public function notice($info = array( /* 'msg' => '', 'param' => array()*/));
+    public function notice($info = [ /* 'msg' => '', 'param' => []*/]);
 
-    public function fatal($info = array( /* 'msg' => '', 'no' => '', 'param' => array()*/));
+    public function fatal($info = [ /* 'msg' => '', 'no' => '', 'param' => []*/]);
 
     public function write($message);
 
-    public function setDateFormat($info = array( /*'dateFormat' => ''*/));
+    public function setDateFormat($info = [ /*'dateFormat' => ''*/]);
 
-    public function formatMessage($info = array( /*'level' => '', 'msg' => '', 'format' => ''*/));
+    public function formatMessage($info = [ /*'level' => '', 'msg' => '', 'format' => ''*/]);
 
     public function getTimestamp();
 

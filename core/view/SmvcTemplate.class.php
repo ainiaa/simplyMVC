@@ -1174,7 +1174,7 @@ class SmvcTemplate
             $mtime   = filemtime($file_path);
             $changed = false;
             foreach ($arr AS $val) {
-                $org_file = ROOT_PATH . "/js/$val.js";
+                $org_file = ROOT_DIR . "js/$val.js";
 
                 if (filemtime($org_file) > $mtime) {
                     $changed = true;
@@ -1190,7 +1190,7 @@ class SmvcTemplate
         if (!is_file($file_path) || $changed) {
             $js_code = '';
             foreach ($arr AS $val) {
-                $content       = file_get_contents(ROOT_PATH . "/js/$val.js");
+                $content       = file_get_contents(ROOT_DIR . "js/$val.js");
                 $patterns[]    = '/\s+\/\/.*+\n/';
                 $patterns[]    = '/\/\*.+?\*\//s';
                 $replacement[] = '';
@@ -1243,7 +1243,7 @@ class SmvcTemplate
             $js_code = '';
             foreach ($arr AS $file) {
                 $content  = file_get_contents(SHARE_DATA_PATH . '/' . $file);
-                $skin_img = dirname(ROOT_PATH . '/' . $file) . '/images';
+                $skin_img = dirname(ROOT_DIR . $file) . '/images';
 
                 $patterns[]    = '/\s+\/\/.*+\n/';
                 $replacement[] = '';
@@ -1730,7 +1730,7 @@ class SmvcTemplate
      */
     public function get_custom_module($id, $dir)
     {
-        $filename = ROOT_PATH . "/themes/$dir/resource/custom_module.html";
+        $filename = ROOT_DIR . "themes/{$dir}/resource/custom_module.html";
         $html     = file_get_contents($filename);
         $html     = str_replace('{index}', $id, $html);
 

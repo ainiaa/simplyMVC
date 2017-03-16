@@ -50,11 +50,11 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
         if (empty($this->memcached)) {
             $memcacheConf = C('memcached', []);
             if (empty($memcacheConf)) {
-                $memcacheConf = array(
+                $memcacheConf = [
                         'server'   => C('MC_HOST', 'localhost'),
                         'username' => C('MC_PORT', 11211),
                         'password' => C('MC_WEIGHT', 100),
-                );
+                ];
             }
             if (!class_exists('Memcached')) {
                 throw new Exception(
@@ -154,7 +154,7 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      *
      * @return int
      */
-    public function updateByPk($currentData, $pinfo = array())
+    public function updateByPk($currentData, $pinfo = [])
     {
         $pk = $currentData[$this->pk];
         if (count($this->defaultValue) !== count($currentData)) {    //不完整完整字段, 合并更新
@@ -214,7 +214,7 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      *
      * @return array|mixed
      */
-    public function getByPk($pk, $pinfo = array())
+    public function getByPk($pk, $pinfo = [])
     {
         if (is_array($pk)) {
             unset($pinfo);
@@ -252,7 +252,7 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      *
      * @return bool
      */
-    public function deleteBySk($ids, $pinfo = array())
+    public function deleteBySk($ids, $pinfo = [])
     {
         return $this->deleteByPk($ids, $pinfo);
     }
@@ -265,7 +265,7 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      *
      * @return boolean
      */
-    public function deleteByPk($condition, $pinfo = array())
+    public function deleteByPk($condition, $pinfo = [])
     {
         if (is_array($condition)) {
             $pk = $condition[$this->pk];
@@ -332,10 +332,10 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      */
     public function get($pkid, $skid)
     {
-        $infos = array(
+        $infos = [
                 $this->pk => $pkid,
                 $this->sk => $skid
-        );
+        ];
 
         return $this->getBySk($infos);
     }

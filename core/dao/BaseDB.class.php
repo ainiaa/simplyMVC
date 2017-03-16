@@ -17,7 +17,7 @@ class BaseDBDAO extends SmvcObject
     protected $tableName = '';
     protected $realTableName = '';
 
-    protected $defaultValue = array();
+    protected $defaultValue = [];
 
     /**
      * 读操作对应的storage
@@ -53,7 +53,7 @@ class BaseDBDAO extends SmvcObject
      * 数据库连接ID 支持多个连接
      * @var array
      */
-    protected $storageList = array();
+    protected $storageList = [];
 
     /**
      * 当前数据库连接
@@ -149,7 +149,7 @@ class BaseDBDAO extends SmvcObject
      */
     private function format($datas)
     {
-        $ret = array();
+        $ret = [];
         foreach ($datas as $data) {
             $sk       = $data[$this->sk];
             $ret[$sk] = $data;
@@ -190,7 +190,7 @@ class BaseDBDAO extends SmvcObject
     /**
      * @var Medoo[]
      */
-    private $dbInstance = array();
+    private $dbInstance = [];
 
     /**
      * 获得 db实例
@@ -205,13 +205,13 @@ class BaseDBDAO extends SmvcObject
         $configSha = md5(json_encode($dbConfig));
         if (!isset($this->dbInstance[$configSha])) {
             $this->dbInstance[$configSha] = new medoo(
-                    array(
+                    [
                             'database_type' => $dbConfig['DB_TYPE'],
                             'database_name' => $dbConfig['DB_NAME'],
                             'server'        => $dbConfig['DB_HOST'],
                             'username'      => $dbConfig['DB_USER'],
                             'password'      => $dbConfig['DB_PASS'],
-                    )
+                    ]
             );
         }
         return $this->dbInstance[$configSha];
@@ -377,7 +377,7 @@ class BaseDBDAO extends SmvcObject
         $this->setLatestStorageType(self::WRITE_STORAGE);
         array_unshift($data, $this->realTableName);
 
-        return call_user_func_array(array($this->getStorage(), 'insert'), $data);
+        return call_user_func_array([$this->getStorage(), 'insert'], $data);
     }
 
 
@@ -442,7 +442,7 @@ class BaseDBDAO extends SmvcObject
      *
      * @return array Return the data of the column.
      */
-    public function getOne($columns, $where = array())
+    public function getOne($columns, $where = [])
     {
         $this->setLatestStorageType(self::READ_STORAGE);
         return $this->getStorage()->get($this->realTableName, $columns, $where);
@@ -472,7 +472,7 @@ class BaseDBDAO extends SmvcObject
      *
      * @return array
      */
-    public function getAll($columns = '*', $where = array())
+    public function getAll($columns = '*', $where = [])
     {
         $this->setLatestStorageType(self::READ_STORAGE);
         $d = $this->getStorage();
@@ -502,7 +502,7 @@ class BaseDBDAO extends SmvcObject
      *
      * @return array|bool
      */
-    public function getAllWithJoin($join, $columns, $where = array())
+    public function getAllWithJoin($join, $columns, $where = [])
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
@@ -519,7 +519,7 @@ class BaseDBDAO extends SmvcObject
      *
      * @return int The number of rows affected.
      */
-    public function delete($where = array())
+    public function delete($where = [])
     {
         $this->setLatestStorageType(self::WRITE_STORAGE);
 

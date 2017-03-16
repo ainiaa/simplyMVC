@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
         'driver'            => 'file',
         'logDir'            => '/tmp/',
         'appGroupPath'      => '',
@@ -9,4 +9,4 @@ return array(
         'defaultController' => 'default',
         'defaultAction'     => 'index',
         'viewEngine'        => 'SmvcTemplate', //'Smarty', //视图engine
-);
+];

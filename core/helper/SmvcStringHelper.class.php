@@ -165,7 +165,7 @@ class SmvcStringHelper
      */
     public static function normalizeNewLines($s)
     {
-        return str_replace(array("\r\n", "\r"), "\n", $s);
+        return str_replace(["\r\n", "\r"], "\n", $s);
     }
 
 
@@ -190,7 +190,7 @@ class SmvcStringHelper
         } else {
             $s = @iconv('UTF-8', 'ASCII//TRANSLIT', $s); // intentionally @
         }
-        $s = str_replace(array('`', "'", '"', '^', '~'), '', $s);
+        $s = str_replace(['`', "'", '"', '^', '~'], '', $s);
         return strtr($s, "\x01\x02\x03\x04\x05", '`\'"^~');
     }
 
@@ -563,7 +563,7 @@ class SmvcStringHelper
     public static function matchAll($subject, $pattern, $flags = 0, $offset = 0)
     {
         if ($offset > strlen($subject)) {
-            return array();
+            return [];
         }
         set_error_handler(
                 function ($severity, $message) use ($pattern) { // preg_last_error does not return compile errors
@@ -648,14 +648,14 @@ class SmvcStringHelper
  */
 class RegexpException extends Exception
 {
-    static public $messages = array(
+    static public $messages = [
             PREG_INTERNAL_ERROR        => 'Internal error',
             PREG_BACKTRACK_LIMIT_ERROR => 'Backtrack limit was exhausted',
             PREG_RECURSION_LIMIT_ERROR => 'Recursion limit was exhausted',
             PREG_BAD_UTF8_ERROR        => 'Malformed UTF-8 data',
             5                          => 'Offset didn\'t correspond to the begin of a valid UTF-8 code point',
         // PREG_BAD_UTF8_OFFSET_ERROR
-    );
+    ];
 
     public function __construct($message, $code = null, $pattern = null)
     {

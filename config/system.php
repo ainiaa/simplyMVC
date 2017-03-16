@@ -6,7 +6,7 @@
  * Time: 下午2:30
  * To change this template use File | Settings | File Templates.
  */
-return array(
+return [
         'actionSuffix'         => 'Action',
         'controllerSuffix'     => 'Controller',
         'serviceSuffix'        => 'Service',
@@ -19,4 +19,4 @@ return array(
         'controllerFileSuffer' => '.class.php',
         'serviceFileSuffer'    => '.class.php',
         'daoFileSuffer'        => '.class.php',
-);
+];

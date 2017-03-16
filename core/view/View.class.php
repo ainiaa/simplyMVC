@@ -73,11 +73,11 @@ class View
         }
 
         $engineVars = get_class_vars(get_class($this->engine));
-        $groupName  = Router::getGroup($_REQUEST);
-        $moduleName = Router::getModule($_REQUEST);
+        $groupName  = Router::getGroup();
+        $moduleName = Router::getModule();
 
         foreach ((array)$this->viewEngineConfig as $key => $value) {
-            $value = str_replace('@', ROOT_PATH . '/' . $groupName . '/' . $moduleName, $value);
+            $value = str_replace('@', ROOT_DIR . $groupName . '/' . $moduleName, $value);
             if (isset($engineVars[$key])) {
                 $this->engine->{$key} = $value;
             } elseif ('Smarty' === $engine && 'template_dir' == $key) { //@see http://www.smarty.net/docs/zh_CN/variable.template.dir.tpl   自从smarty 3.1 之后 在Smarty 3.1之后，$template_dir属性不能直接访问，需使用 getTemplateDir()， setTemplateDir() 和 addTemplateDir()来进行存取。

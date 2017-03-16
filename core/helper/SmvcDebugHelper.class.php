@@ -109,7 +109,7 @@ class SmvcDebugHelper implements ArrayAccess
      *
      * @return bool
      */
-    public function debug2($param = array( /*'info' => '', 'label' => '', 'level' => '', 'options' => ''*/))
+    public function debug2($param = [ /*'info' => '', 'label' => '', 'level' => '', 'options' => ''*/])
     {
         $info       = isset($param['info']) ? $param['info'] : ''; //这个可以为数组 也可以为字符串
         $label      = isset($param['label']) ? $param['label'] : '';
@@ -119,7 +119,7 @@ class SmvcDebugHelper implements ArrayAccess
             return false;
         }
         $debugLevel = strtolower($debugLevel); //默认应该是log
-        if (!in_array($debugLevel, array('log', 'info', 'error', 'warn'), true)) {
+        if (!in_array($debugLevel, ['log', 'info', 'error', 'warn'], true)) {
             $debugLevel = 'log';
         }
         return $this->debugInstance->$debugLevel($info, $label, $options);
@@ -141,7 +141,7 @@ class SmvcDebugHelper implements ArrayAccess
             return false;
         }
         $debugLevel = strtolower($level); //默认应该是log
-        if (!in_array($debugLevel, array('log', 'info', 'error', 'warn'), true)) {
+        if (!in_array($debugLevel, ['log', 'info', 'error', 'warn'], true)) {
             $debugLevel = 'log';
         }
         return $this->debugInstance->$debugLevel($info, $label, $options);

@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     //    'APP_SUB_DOMAIN_DEPLOY' => true, //开启子域名部署
     //    'APP_SUB_DOMAIN_RULES' => array( // '子域名'=>array('项目[/分组]');
     //    ),
@@ -22,4 +22,4 @@ return array(
         'DEFAULT_CONTROLLER'   => 'default', //默认controller
         'APP_GROUP_MODE'       => 1, //启用独立分组
         'urlMode'              => 1, //1=>兼容性的url mode,2=>path_info的url mode,3=>url rewrite的mode url
-);
+];

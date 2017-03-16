@@ -236,7 +236,7 @@ class BaseController extends SmvcObject
      */
     function redirect($url, $time = 0, $msg = '')
     {
-        $url = str_replace(array("\n", "\r"), '', $url); // 多行URL地址支持
+        $url = str_replace(["\n", "\r"], '', $url); // 多行URL地址支持
         if (empty($msg)) {
             $msg = "系统将在 {$time}秒 之后自动跳转到 {$url} ！";
         }

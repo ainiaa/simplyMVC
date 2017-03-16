@@ -11,11 +11,10 @@ if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '<')) { //判断php的版本�
     define('MAGIC_QUOTES_GPC', false);
 }
 
-!defined('CORE_PATH') && define('CORE_PATH', dirname(__DIR__));
-
-!defined('CONF_PATH') && define('CONF_PATH', dirname(CORE_PATH) . '/config'); //config路径
-!defined('INCLUDE_PATH') && define('INCLUDE_PATH', dirname(CORE_PATH) . '/include'); //include目录的地址
-!defined('PEAR_PATH') && define('PEAR_PATH', INCLUDE_PATH . '/lib/pear'); //include目录的地址
+!defined('CORE_DIR') && define('CORE_DIR', dirname(__DIR__) . '/');//framework所在路径
+!defined('CONF_DIR') && define('CONF_DIR', dirname(CORE_DIR) . '/config/'); //config路径
+!defined('INCLUDE_DIR') && define('INCLUDE_DIR', dirname(CORE_DIR) . '/include/'); //include目录的地址
+!defined('PEAR_DIR') && define('PEAR_DIR', INCLUDE_DIR . '/lib/pear/'); //include目录的地址
 
 //  版本信息
 !defined('SMVC_VERSION') && define('SMVC_VERSION', '0.3.0');
@@ -29,7 +28,7 @@ if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '<')) { //判断php的版本�
 // 项目名称
 !defined('APP_NAME') && define('APP_NAME', basename(dirname($_SERVER['SCRIPT_FILENAME'])));
 
-!defined('VENDOR_PATH') && define('VENDOR_PATH', dirname(CORE_PATH) . '/include/vendor/');
+!defined('VENDOR_DIR') && define('VENDOR_DIR', dirname(CORE_DIR) . '/include/vendor/');
 
 !defined('VAR_AJAX_SUBMIT') && define('VAR_AJAX_SUBMIT', 'isAjax');
 

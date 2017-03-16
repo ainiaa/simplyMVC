@@ -54,7 +54,7 @@ class SmvcSocketLogger extends SmvcBaseLogger
      * @param array $info
      */
     public function __construct(
-            $info = array( /*'host' => '127.0.0.1', 'port' => '6000', 'sendTimeout' => '5', 'connectTimeout' => 5, 'isCompress' => true*/)
+            $info = [ /*'host' => '127.0.0.1', 'port' => '6000', 'sendTimeout' => '5', 'connectTimeout' => 5, 'isCompress' => true*/]
     ) {
         parent::__construct($info);
 

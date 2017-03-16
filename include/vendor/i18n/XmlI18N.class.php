@@ -21,7 +21,7 @@ class XmlI18N extends I18N
     public function _getData()
     {
         if (empty($this->directory)) {
-            self::setDirectory(ROOT_PATH . '/i18n/');
+            self::setDirectory(ROOT_DIR . 'i18n/');
         }
 
         $filename = sprintf("%s/%s/%s.xml", $this->getDirectory(), $this->locale, $this->fileName);

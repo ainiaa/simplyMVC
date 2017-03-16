@@ -16,7 +16,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
 
     protected $storager;
 
-    protected $defaultValue = array();
+    protected $defaultValue = [];
 
     /**
      * @var Redis
@@ -74,7 +74,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
     public function getStorageInstance()
     {
         if (empty($this->storager)) {
-            $redisConf = C('session.redis', array());
+            $redisConf = C('session.redis', []);
             if (empty($redisConf)) {
                 $redisConf = [
                         'host'     => '127.0.0.1',
@@ -146,7 +146,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
                     }
 
                     if ($this->redis->exists($key)) {
-                        $this->redis->hMset($key, array($sk => $datas));
+                        $this->redis->hMset($key, [$sk => $datas]);
                     }
                 } else {
                     $this->localCache[$key] = $datas;

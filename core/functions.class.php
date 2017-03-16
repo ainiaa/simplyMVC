@@ -15,7 +15,7 @@ if (!function_exists('SC')) {
 
 
 if (!function_exists('LCL')) {
-    function LCL($configFilePath, $configFileExt = 'inc.php')
+    function LCL($configFilePath, $configFileExt = 'php')
     {
         SmvcConf::instance()->loadConfigFileList($configFilePath, $configFileExt);
     }

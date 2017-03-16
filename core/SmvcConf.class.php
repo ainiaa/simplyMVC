@@ -39,8 +39,8 @@ class SmvcConf implements ArrayAccess
     {
         if ($path) {
             $this->configPath = $path;
-        } else if (defined('CONF_PATH') && file_exists(CONF_PATH)) {
-            $this->configPath = CONF_PATH;
+        } else if (defined('CONF_DIR') && file_exists(CONF_DIR)) {
+            $this->configPath = CONF_DIR;
         }
     }
 
@@ -72,7 +72,7 @@ class SmvcConf implements ArrayAccess
     {
 
         if ($configFile == null) {
-            $configFile = $this->configPath . 'config.inc.php';
+            $configFile = $this->configPath . 'config.php';
         } else {
             $configFile = $this->configPath . $configFile;
         }
@@ -93,18 +93,46 @@ class SmvcConf implements ArrayAccess
      * @param $configPath
      * @param $configFileExt
      */
-    public static function init($configPath, $configFileExt)
+    public static function init($configPath, $configFileExt = 'php')
     {
         SmvcConf::instance()->loadConfigFileList($configPath, $configFileExt);
+    }
+
+    public static function initEnv($envConfigPath, $configFileExt = 'php')
+    {
+        SmvcConf::instance()->loadConfigFileList($envConfigPath, $configFileExt);
+        if (defined('CURRENT_ENV')) {
+            switch (CURRENT_ENV) {
+                case 1://生产环境
+                    $confEnvPath = CONF_DIR . 'env.production.php';
+                    break;
+                case 2://预生产
+                    $confEnvPath = CONF_DIR . 'env.preview.php';
+                    break;
+                case 3://测试环境
+                    $confEnvPath = CONF_DIR . 'env.preview.php';
+                    break;
+                case 4://类生产
+                    $confEnvPath = CONF_DIR . 'env.productionlike.php';
+                    break;
+                case 0://开发环境
+                default:
+                    $confEnvPath = CONF_DIR . 'env.testing.php';
+            }
+            if (is_file($confEnvPath)) {
+                SmvcConf::instance()->loadConfigFileList($confEnvPath, $configFileExt);
+            }
+        }
     }
 
     /**
      * @param        $configPath
      * @param string $configFileExt
+     * @param bool   $excludEnv
      */
-    public function loadConfigFileList($configPath, $configFileExt = 'inc.php')
+    public function loadConfigFileList($configPath, $configFileExt = 'php', $excludEnv = true)
     {
-        $currentConfData = Importer::importConfigFile($configPath, $configFileExt);
+        $currentConfData = Importer::importConfigFile($configPath, $configFileExt, $excludEnv);
 
         if (is_array($this->configData)) {
             $this->configData += $currentConfData;

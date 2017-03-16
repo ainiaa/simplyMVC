@@ -19,7 +19,7 @@ class SmvcHttpHelper
      */
     public static function request($url, $data, $type = 'get')
     {
-        $lst = array();
+        $lst = [];
         $ch  = curl_init($url);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -68,12 +68,12 @@ class SmvcHttpHelper
             if ($urlQuery) {
                 parse_str($urlQuery, $urlQueryParam);
                 $param = array_merge($data, $urlQueryParam);
-                array(
+                [
                         'scheme' => 'https',
                         'host'   => 'www.baidu.com',
                         'path'   => '/pathto/bac/index.php',
                         'query'  => 'a=aa&b=bb&c=cc',
-                );
+                ];
                 $url = $urlComponent['scheme'] . '://' . $urlComponent['host'] . '/' . $urlComponent['path'] . '?' . http_build_query(
                                 $param
                         );

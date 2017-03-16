@@ -13,7 +13,7 @@ class FastMemcache extends SmvcMemcache
      *
      * @var array
      */
-    private static $cache = array();
+    private static $cache = [];
 
     /**
      * 获得本地缓存项
@@ -25,7 +25,7 @@ class FastMemcache extends SmvcMemcache
     private function qget($key)
     {
         if (!isset(self::$cache[$this->memcacheServer])) {
-            self::$cache[$this->memcacheServer] = array();
+            self::$cache[$this->memcacheServer] = [];
         }
 
         return isset(self::$cache[$this->memcacheServer][$key][0]) ? self::$cache[$this->memcacheServer][$key][0] : null;
@@ -44,10 +44,10 @@ class FastMemcache extends SmvcMemcache
     private function qset($key, $value, $limit = 2160000, $iswrite = false)
     {
         if (!isset(self::$cache[$this->memcacheServer])) {
-            self::$cache[$this->memcacheServer] = array();
+            self::$cache[$this->memcacheServer] = [];
         }
 
-        self::$cache[$this->memcacheServer][$key] = array($value, $limit, $iswrite);
+        self::$cache[$this->memcacheServer][$key] = [$value, $limit, $iswrite];
 
         return 1;
     }
@@ -63,8 +63,8 @@ class FastMemcache extends SmvcMemcache
     public function get($key, $perstring = '')
     {
         if (is_array($key)) {
-            $ret   = array();
-            $losts = array();
+            $ret   = [];
+            $losts = [];
             foreach ($key as $k) {
                 if (isset(self::$cache[$this->memcacheServer][$k])) {
                     $ret[$k] = $this->qget($k);

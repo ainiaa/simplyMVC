@@ -17,7 +17,7 @@ class ExceptionHandle
         echo $e->__toString();
 
         if (defined('LOG_RECORD') && LOG_RECORD) {
-            Logger::getInstance()->log(array('msg' => $e->__toString(), 'level' => SmvcLoggerInterface::LOG_EXCEPTION));
+            Logger::getInstance()->log(['msg' => $e->__toString(), 'level' => SmvcLoggerInterface::LOG_EXCEPTION]);
         }
     }
 
@@ -50,7 +50,7 @@ class ExceptionHandle
                 }
                 $errorStr = sprintf('%s %s  第 %s 行.', $errstr, $errfile, $errline);
                 if (defined('LOG_RECORD') && LOG_RECORD) {
-                    Logger::getInstance()->log(array('msg' => $errorStr, 'level' => SmvcLoggerInterface::LOG_ERROR));
+                    Logger::getInstance()->log(['msg' => $errorStr, 'level' => SmvcLoggerInterface::LOG_ERROR]);
                 }
                 function_exists('halt') ? halt($errorStr) : exit('ERROR:' . $errorStr); //todo halt方法不存在
                 break;
@@ -61,7 +61,7 @@ class ExceptionHandle
                 $errorStr = sprintf('[%s] %s %s 第 %s 行.', $errno, $errstr, $errfile, $errline);
                 echo $errorStr;
                 if (defined('LOG_RECORD') && LOG_RECORD) {
-                    Logger::getInstance()->log(array('msg' => $errorStr, 'level' => SmvcLoggerInterface::LOG_WARNING));
+                    Logger::getInstance()->log(['msg' => $errorStr, 'level' => SmvcLoggerInterface::LOG_WARNING]);
                 }
                 break;
         }
@@ -91,8 +91,8 @@ class ExceptionHandle
             ini_set('display_errors', 'off');
         }
 
-        register_shutdown_function(array('ExceptionHandle', 'fatalError'));
-        set_error_handler(array('ExceptionHandle', 'appError'));
-        set_exception_handler(array('ExceptionHandle', 'appException'));
+        register_shutdown_function(['ExceptionHandle', 'fatalError']);
+        set_error_handler(['ExceptionHandle', 'appError']);
+        set_exception_handler(['ExceptionHandle', 'appException']);
     }
 }

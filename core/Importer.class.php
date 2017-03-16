@@ -28,7 +28,7 @@ class Importer
      * @param string $fileExt
      * @param string $rootPath
      */
-    public static function importFile($filePath, $fileExt = 'php', $rootPath = INCLUDE_PATH)
+    public static function importFile($filePath, $fileExt = 'php', $rootPath = INCLUDE_DIR)
     {
         $finalPath = $rootPath . '/' . preg_replace('|\.|', '/', $filePath) . '.' . $fileExt;
         if (is_file($finalPath)) {
@@ -86,28 +86,33 @@ class Importer
      *
      * @param string $configPath    config目录
      * @param string $configFileExt config文件的后缀
+     * @param bool   $excludEnv 排除环境config
      *
      * @return array
      */
-    public static function importConfigFile($configPath, $configFileExt = 'inc.php')
+    public static function importConfigFile($configPath, $configFileExt = 'php', $excludEnv = true)
     {
         $finalResult = [];
         if (empty($configPath)) {
-            $configPath = ROOT_PATH . '/config';
+            $configPath = ROOT_DIR . 'config';
         }
 
         if (is_file($configPath)) { //如果传递过来的是一个具体的文件路径的话 直接调用importFileByFullPath方法
-            $configFiles = array($configPath);
+            $configFiles = [$configPath];
         } else {
             $configFiles = glob($configPath . '/' . '*.' . $configFileExt);
         }
 
         if (!empty($configFiles) && is_array($configFiles)) {
             foreach ($configFiles as $configFile) {
+                if ($excludEnv && stripos($configFile, 'env.') === 0) {//环境
+                    continue;
+                }
                 if (is_file($configFile)) {
                     if (is_readable($configFile)) {
                         $fileHash = md5($configFile);
                         if (!isset(Importer::$loadedFiles[$fileHash])) { //还没有加载过当前config文件 加载当前cofnig文件
+                            
                             $currentConf = include $configFile;
                             if (is_array($currentConf)) {
                                 $finalResult += $currentConf;
@@ -144,18 +149,18 @@ class Importer
         if ('@' == $moduleName) {
             $moduleName = Router::getModule();
         }
-        $baseControllerFile = APP_PATH . '/' . $groupName . '/' . $groupName . $controllerFileSuffer;
+        $baseControllerFile = APP_DIR . $groupName . '/' . $groupName . $controllerFileSuffer;
         self::importFileByFullPath($baseControllerFile);
 
         $controllerFileName = $controllerName . $controllerFileSuffer;
 
-        $controllerFile = APP_PATH . '/' . $groupName . '/' . $moduleName . '/controllers/' . $controllerFileName;
+        $controllerFile = APP_DIR . $groupName . '/' . $moduleName . '/controllers/' . $controllerFileName;
         $loadResult     = self::importFileByFullPath($controllerFile);
 
         if (!$loadResult) { //当前group module下加载controller失败
             $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
-                $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/controllers/' . $controllerFileName;
+                $filePath = APP_DIR . $groupName . '/' . $module . '/controllers/' . $controllerFileName;
                 $files    = self::getControllerListByGroupAndModule($groupName, $module);
                 if (in_array($filePath, $files, true)) {
                     $loadResult = self::importFileByFullPath($controllerFile);
@@ -170,7 +175,7 @@ class Importer
                 foreach ((array)$groupList as $group) {
                     $groupModules = self::getModuleList($group);
                     foreach ($groupModules as $groupModule) {
-                        $filePath = APP_PATH . '/' . $group . '/' . $groupModule . '/controllers/' . $controllerFileName;
+                        $filePath = APP_DIR . $group . '/' . $groupModule . '/controllers/' . $controllerFileName;
                         $files    = self::getControllerListByGroupAndModule($group, $groupModule);
                         if (in_array($filePath, $files, true)) {
                             $loadResult = self::importFileByFullPath($controllerFile);
@@ -205,13 +210,13 @@ class Importer
 
         $serviceFileName = $serviceName . $serviceFileSuffer;
 
-        $serviceFile = APP_PATH . $groupName . '/' . $moduleName . '/services/' . ucfirst($serviceFileName);
+        $serviceFile = APP_DIR . $groupName . '/' . $moduleName . '/services/' . ucfirst($serviceFileName);
         //echo $model_file,':',var_export(is_file($model_file));exit;
         $loadResult = self::importFileByFullPath($serviceFile);
         if (!$loadResult) { //当前group module下加载controller失败
             $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
-                $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/services/' . $serviceFileName;
+                $filePath = APP_DIR . $groupName . '/' . $module . '/services/' . $serviceFileName;
                 $files    = self::getServiceListByGroupAndModule($groupName, $module);
                 if (in_array($filePath, $files, true)) {
                     $loadResult = self::importFileByFullPath($serviceFile);
@@ -226,7 +231,7 @@ class Importer
                 foreach ((array)$groupList as $group) {
                     $groupModules = self::getModuleList($group);
                     foreach ($groupModules as $groupModule) {
-                        $filePath = APP_PATH . '/' . $group . '/' . $groupModule . '/services/' . $serviceFileName;
+                        $filePath = APP_DIR . $group . '/' . $groupModule . '/services/' . $serviceFileName;
                         $files    = self::getDAOListByGroupAndModule($group, $groupModule);
                         if (in_array($filePath, $files, true)) {
                             $loadResult = self::importFileByFullPath($serviceFile);
@@ -261,7 +266,7 @@ class Importer
         $helperFileName = $helperName . '.class.php';
 
         //首先加载core目录下的helper
-        $helperFile = CORE_PATH . '/helper/' . $helperFileName;
+        $helperFile = CORE_DIR . 'helper/' . $helperFileName;
         $loadResult = self::importFileByFullPath($helperFile, false);
         //        SmvcDebugHelper::instance()->debug(
         //                array(
@@ -272,13 +277,13 @@ class Importer
         //        );
 
         if (!$loadResult) {
-            $helperFile = APP_PATH . '/' . $groupName . '/' . $moduleName . '/helper/' . $helperFileName;
+            $helperFile = APP_DIR .  $groupName . '/' . $moduleName . '/helper/' . $helperFileName;
             $loadResult = self::importFileByFullPath($helperFile, false);
 
             if (!$loadResult) { //当前group module下加载controller失败
                 $modules = self::getModuleList($groupName);
                 foreach ($modules as $module) {
-                    $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/helper/' . $helperFileName;
+                    $filePath = APP_DIR  . $groupName . '/' . $module . '/helper/' . $helperFileName;
                     $files    = self::getServiceListByGroupAndModule($groupName, $module);
                     if (in_array($filePath, $files, true)) {
                         $loadResult = self::importFileByFullPath($helperFile);
@@ -292,15 +297,8 @@ class Importer
                     $groupList = self::getGroupList();
                     foreach ((array)$groupList as $group) {
                         $groupModules = self::getModuleList($group);
-                        //                        SmvcDebugHelper::instance()->debug(
-                        //                                array(
-                        //                                        'info'  => $groupModules,
-                        //                                        'label' => '$groupModules ' . __METHOD__,
-                        //                                        'level' => 'info'
-                        //                                )
-                        //                        );
                         foreach ($groupModules as $groupModule) {
-                            $filePath = APP_PATH . '/' . $group . '/' . $groupModule . '/helpers/' . $helperFileName;
+                            $filePath = APP_DIR . $group . '/' . $groupModule . '/helpers/' . $helperFileName;
                             $files    = self::getDAOListByGroupAndModule($group, $groupModule);
                             if (in_array($filePath, $files, true)) {
                                 $loadResult = self::importFileByFullPath($helperFile);
@@ -337,13 +335,13 @@ class Importer
 
         $daoFileName = $daoName . $daoFileSuffer;
 
-        $daoFile    = APP_PATH . '/' . $groupName . '/' . $moduleName . '/daos/' . $daoFileName;
+        $daoFile    = APP_DIR . $groupName . '/' . $moduleName . '/daos/' . $daoFileName;
         $loadResult = self::importFileByFullPath($daoFile);
 
         if (!$loadResult) { //当前group module下加载controller失败
             $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
-                $filePath = APP_PATH . '/' . $groupName . '/' . $module . '/daos/' . $daoFileName;
+                $filePath = APP_DIR . $groupName . '/' . $module . '/daos/' . $daoFileName;
                 $files    = self::getDAOListByGroupAndModule($groupName, $module);
                 if (in_array($filePath, $files, true)) {
                     $loadResult = self::importFileByFullPath($daoFile);
@@ -358,7 +356,7 @@ class Importer
                 foreach ((array)$groupList as $group) {
                     $groupModules = self::getModuleList($group);
                     foreach ($groupModules as $groupModule) {
-                        $filePath = APP_PATH . '/' . $group . '/' . $groupModule . '/daos/' . $daoFileName;
+                        $filePath = APP_DIR . $group . '/' . $groupModule . '/daos/' . $daoFileName;
                         $files    = self::getDAOListByGroupAndModule($group, $groupModule);
                         if (in_array($filePath, $files, true)) {
                             $loadResult = self::importFileByFullPath($daoFile);
@@ -471,7 +469,7 @@ class Importer
         $finalData = [];
         $groupList = self::getGroupList();
         foreach ($groupList as $group) {
-            $groupBasePath = APP_PATH . $group . '/';
+            $groupBasePath = APP_DIR . $group . '/';
             $files         = glob($groupBasePath . '*');
             foreach ((array)$files as $file) {
                 if (is_dir($file)) {
@@ -497,7 +495,7 @@ class Importer
         if (C('APP_GROUP_LIST')) {
             $appGroupList = explode(',', C('APP_GROUP_LIST'));
             foreach ($appGroupList as $groupName) {
-                $groupBasePath                          = APP_PATH . $groupName . '/';
+                $groupBasePath                          = APP_DIR . $groupName . '/';
                 $files                                  = glob($groupBasePath . '*');
                 $finalFileStruct[$groupName]['_FILES_'] = $files;
                 foreach ($files as $file) {
@@ -654,32 +652,32 @@ class Importer
     {
         return [
             // phpseclib /Crypt
-                'Crypt_AES'                 => VENDOR_PATH . 'phpseclib/Crypt/AES.php',
-                'Crypt_Base'                => VENDOR_PATH . 'phpseclib/Crypt/Base.php',
-                'Crypt_Blowfish'            => VENDOR_PATH . 'phpseclib/Crypt/Blowfish.php',
-                'Crypt_DES'                 => VENDOR_PATH . 'phpseclib/Crypt/DES.php',
-                'Crypt_Hash'                => VENDOR_PATH . 'phpseclib/Crypt/Hash.php',
-                'Crypt_RC2'                 => VENDOR_PATH . 'phpseclib/Crypt/RC2.php',
-                'Crypt_RC4'                 => VENDOR_PATH . 'phpseclib/Crypt/RC4.php',
-                'Crypt_Rijndael'            => VENDOR_PATH . 'phpseclib/Crypt/Rijndael.php',
-                'Crypt_RSA'                 => VENDOR_PATH . 'phpseclib/Crypt/RSA.php',
-                'Crypt_TripleDES'           => VENDOR_PATH . 'phpseclib/Crypt/TripleDES.php',
-                'Crypt_Twofish'             => VENDOR_PATH . 'phpseclib/Crypt/Twofish.php',
+                'Crypt_AES'                 => VENDOR_DIR . 'phpseclib/Crypt/AES.php',
+                'Crypt_Base'                => VENDOR_DIR . 'phpseclib/Crypt/Base.php',
+                'Crypt_Blowfish'            => VENDOR_DIR . 'phpseclib/Crypt/Blowfish.php',
+                'Crypt_DES'                 => VENDOR_DIR . 'phpseclib/Crypt/DES.php',
+                'Crypt_Hash'                => VENDOR_DIR . 'phpseclib/Crypt/Hash.php',
+                'Crypt_RC2'                 => VENDOR_DIR . 'phpseclib/Crypt/RC2.php',
+                'Crypt_RC4'                 => VENDOR_DIR . 'phpseclib/Crypt/RC4.php',
+                'Crypt_Rijndael'            => VENDOR_DIR . 'phpseclib/Crypt/Rijndael.php',
+                'Crypt_RSA'                 => VENDOR_DIR . 'phpseclib/Crypt/RSA.php',
+                'Crypt_TripleDES'           => VENDOR_DIR . 'phpseclib/Crypt/TripleDES.php',
+                'Crypt_Twofish'             => VENDOR_DIR . 'phpseclib/Crypt/Twofish.php',
             // phpseclib /File
-                'File_ANSI'                 => VENDOR_PATH . 'phpseclib/File/ANSI.php',
-                'File_ANSI1'                => VENDOR_PATH . 'phpseclib/File/ASN1.php',
-                'File_X509'                 => VENDOR_PATH . 'phpseclib/File/X509.php',
+                'File_ANSI'                 => VENDOR_DIR . 'phpseclib/File/ANSI.php',
+                'File_ANSI1'                => VENDOR_DIR . 'phpseclib/File/ASN1.php',
+                'File_X509'                 => VENDOR_DIR . 'phpseclib/File/X509.php',
             //phpseclib /Math
-                'Math_BigInteger'           => VENDOR_PATH . 'phpseclib/Math/BigInteger.php',
+                'Math_BigInteger'           => VENDOR_DIR . 'phpseclib/Math/BigInteger.php',
             //phpseclib /Net
-                'Net_SCP'                   => VENDOR_PATH . 'phpseclib/Net/SCP.php',
-                'Net_SFTP'                  => VENDOR_PATH . 'phpseclib/Net/SFTP.php',
-                'Net_SSH1'                  => VENDOR_PATH . 'phpseclib/Net/SSH1.php',
-                'Net_SSH2'                  => VENDOR_PATH . 'phpseclib/Net/SSH2.php',
+                'Net_SCP'                   => VENDOR_DIR . 'phpseclib/Net/SCP.php',
+                'Net_SFTP'                  => VENDOR_DIR . 'phpseclib/Net/SFTP.php',
+                'Net_SSH1'                  => VENDOR_DIR . 'phpseclib/Net/SSH1.php',
+                'Net_SSH2'                  => VENDOR_DIR . 'phpseclib/Net/SSH2.php',
             //phpseclib /Net/SFTP
-                'Net_SFTP_Stream'           => VENDOR_PATH . 'phpseclib/Net/SFTP/Stream.php',
+                'Net_SFTP_Stream'           => VENDOR_DIR . 'phpseclib/Net/SFTP/Stream.php',
             //phpseclib /System
-                'System_SSH_Agent_Identity' => VENDOR_PATH . 'phpseclib/System/SSH/Agent.php',
+                'System_SSH_Agent_Identity' => VENDOR_DIR . 'phpseclib/System/SSH/Agent.php',
         ];
     }
 

@@ -1,6 +1,6 @@
 <?php
-return array(
-        'session' => array(
+return [
+        'session' => [
                 'auto_initialize'        => true, //获取方式  C('session.auto_initialize')
                 'driver'                 => 'cookie', //cookie database redis memcache
                 'enable_cookie'          => true,
@@ -25,11 +25,11 @@ return array(
                 'file'                   => array(
                         'path' => 'e:/tmp/',
                 ),
-                'memcached'              => array(
+                'memcached'              => [
                         'host' => '127.0.0.1',
                         'port' => '11211',
-                ),
-                'database'               => array(
+                ],
+                'database'               => [
                         'database_type'  => 'mysql',
                         'server'         => 'localhost',
                         'database_name'  => 'test',
@@ -38,6 +38,6 @@ return array(
                         'password'       => '',
                         'table'          => 'smvc_sessions',
                         'gc_probability' => 5,
-                ),
-        ),
-);
+                ],
+        ],
+];

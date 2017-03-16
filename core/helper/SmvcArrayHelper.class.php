@@ -714,7 +714,7 @@ class SmvcArrayHelper
 
         foreach ($keys as $key) {
             $temp[$key] = self::pluck($array, $key, true);
-            is_array($conditions[$key]) or $conditions[$key] = array($conditions[$key]);
+            is_array($conditions[$key]) or $conditions[$key] = [$conditions[$key]];
         }
 
         $args = [];
@@ -816,7 +816,7 @@ class SmvcArrayHelper
     public static function replaceKey($source, $replace, $newKey = null)
     {
         if (is_string($replace)) {
-            $replace = array($replace => $newKey);
+            $replace = [$replace => $newKey];
         }
 
         if (!is_array($source) or !is_array($replace)) {

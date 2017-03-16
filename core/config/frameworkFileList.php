@@ -1,0 +1,22 @@
+<?php
+return [
+        CORE_DIR . 'Request.class.php',
+        CORE_DIR . 'Router.class.php',
+        CORE_DIR . 'FactoryProxy.class.php',
+        CORE_DIR . 'Factory.class.php',
+        CORE_DIR . 'Dispatcher.class.php',
+        CORE_DIR . 'SmvcObject.class.php',
+        CORE_DIR . 'Session.class.php',
+        CORE_DIR . 'session/SessionException.class.php',
+        CORE_DIR . 'controller/Base.class.php',
+        CORE_DIR . 'dao/BaseDB.class.php',
+        CORE_DIR . 'dao/UserSplitDBDAO.class.php',
+        CORE_DIR . 'service/Base.class.php',
+        CORE_DIR . 'service/UserSplitService.class.php',
+        CORE_DIR . 'view/View.class.php',
+        CORE_DIR . 'SmvcConf.class.php',
+        CORE_DIR . 'functions.class.php',
+        CORE_DIR . 'exception/ExceptionHandle.class.php',
+        VENDOR_DIR . '/FirePHP.class.php',
+        VENDOR_DIR . '/Medoo/medoo.php',
+];
