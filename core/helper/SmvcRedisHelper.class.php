@@ -176,9 +176,10 @@ class SmvcRedisHelper
      *
      * @return mixed|null
      */
-    public function delete($key)
+    public function delete($keys)
     {
-        return $this->__call('delete', [$key]);
+        $keys = func_get_args();
+        return $this->del($keys);
     }
 
     /**
@@ -346,39 +347,39 @@ class SmvcRedisHelper
     }
 
     /**
-     * @param       $name
-     * @param array $param
+     * @param       $cmd
+     * @param array $args
      *
      * @return mixed|null
      */
-    public function __call($name, $param = [])
+    public function __call($cmd, $args = [])
     {
         $flag = $this->init();
         if (!$flag) { //init失败直接报错
             trigger_error('Redis init error', E_USER_ERROR);
         }
-        if (stripos($param[0], $this->prefix) === 0) {//先去除前缀
-            $param[0] = substr($param[0], strlen($this->prefix));
+        if (stripos($args[0], $this->prefix) === 0) {//先去除前缀
+            $args[0] = substr($args[0], strlen($this->prefix));
         }
-        if (!in_array($name, ['script', 'evalSha', 'evaluate'])) {
-            $param[0] = $this->prefix . $param[0];
+        if (!in_array($cmd, ['script', 'evalSha', 'evaluate'])) {
+            $args[0] = $this->prefix . $args[0];
         }
-        if ($name === 'evalSha' || $name === 'evaluate') {
-            array_unshift($param[1], $this->prefix);
-            $param[2] += 1;
+        if ($cmd === 'evalSha' || $cmd === 'evaluate') {
+            array_unshift($args[1], $this->prefix);
+            $args[2] += 1;
         }
-        if ($name == 'zunion') {
-            $keys = isset($param[1]) ? $param[1] : array();
+        if ($cmd == 'zunion') {
+            $keys = isset($args[1]) ? $args[1] : [];
             if (is_array($keys)) {
                 foreach ($keys as $index => $key) {
                     $keys[$index] = $this->prefix . $key;
                 }
-                $param[1] = $keys;
+                $args[1] = $keys;
             }
         }
 
         if ($flag) {
-            $ret = call_user_func_array([&$this->handle, $name], $param);
+            $ret = call_user_func_array([&$this->handle, $cmd], $args);
             return $ret;
         } else {
             return null;
@@ -823,4 +824,336 @@ SCRIPT;
     {
         $this->__call('quit');
     }
+
+    public function select($index)
+    {
+        return $this->__call('select', [$index]);
+    }
+
+    public function type($key)
+    {
+        return $this->__call('type', [$key]);
+    }
+
+    public function getMultiple($keys)
+    {
+        return $this->__call('getMultiple', [$keys]);
+    }
+
+    public function del($keys)
+    {
+        $keys = func_get_args();
+        return $this->__call('del', [$keys]);
+    }
+
+    public function setex($key, $ttl, $value)
+    {
+        return $this->__call('setex', [$key, $ttl, $value]);
+    }
+
+    public function mset($array)
+    {
+        $newarr = [];
+        foreach ($array as $key => $value) {
+            $newarr[$key] = $this->tryEncodeData($value);
+        }
+        return $this->__call('mset', [$newarr]);
+    }
+
+    public function append($key, $value)
+    {
+        return $this->__call('append', [$key, $value]);
+    }
+
+    public function getRange($key, $start, $end)
+    {
+        return $this->__call('getRange', [$key, $start, $end]);
+    }
+
+    public function setRange($key, $offset, $value)
+    {
+        return $this->__call('setRange', [$key, $offset, $value]);
+    }
+
+    public function sort($key, $option = null)
+    {
+        return $this->__call('sort', [$key, $option]);
+    }
+
+    public function exists($key)
+    {
+        return $this->__call('exists', [$key]);
+    }
+
+    public function lPush($key, $args = null)
+    {
+        $args = func_get_args();
+
+        return $this->__call('lPush', [$args]);
+    }
+
+    public function rPush($key, $args)
+    {
+        $args = func_get_args();
+        return $this->__call('rPush', [$args]);
+    }
+
+    public function lRange($key, $start, $end)
+    {
+        return $this->__call('lRange', [$key, $start, $end]);
+    }
+
+    public function lPop($key)
+    {
+        return $this->__call('lPop', [$key]);
+    }
+
+    public function rPop($key)
+    {
+        return $this->__call('rPop', [$key]);
+    }
+
+    public function lSize($key)
+    {
+        return $this->__call('lSize', [$key]);
+    }
+
+    public function lIndex($key, $index)
+    {
+        return $this->__call('lIndex', [$key, $index]);
+    }
+
+    public function lSet($key, $index, $value)
+    {
+        return $this->__call('lSet', [$key, $index, $value]);
+    }
+
+    public function lTrim($key, $start, $stop)
+    {
+        return $this->__call('lTrim', [$key, $start, $stop]);
+    }
+
+    public function lRem($key, $value, $count)
+    {
+        return $this->__call('lRem', [$key, $value, $count]);
+    }
+
+    public function lRemove($key, $value, $count)
+    {
+        return $this->__call('lRemove', [$key, $value, $count]);
+    }
+
+    public function lInsert($key, $position, $pivot, $value)
+    {
+        return $this->__call('lInsert', [$key, $position, $pivot, $value]);
+    }
+
+    public function hVals($key)
+    {
+        return $this->__call('hVals', [$key]);
+    }
+
+    public function hKeys($key)
+    {
+        return $this->__call('hKeys', [$key]);
+    }
+
+    public function hLen($key)
+    {
+        return $this->__call('hLen', [$key]);
+    }
+
+    public function hSetNx($key, $hashKey, $value)
+    {
+        $value = $this->tryEncodeData($value);
+        return $this->__call('hSetNx', [$key, $hashKey, $value]);
+    }
+
+    /**
+     * @param      $key
+     * @param      $args
+     *
+     * @return mixed|null
+     */
+    public function sAdd($key, $args)
+    {
+        $args = func_get_args();
+        return $this->__call('sAdd', [$args]);
+    }
+
+    public function sRem($key, $args)
+    {
+        $args = func_get_args();
+        return $this->__call('sRem', [$args]);
+    }
+
+    public function sRemove($key, $args)
+    {
+        $args = func_get_args();
+        return $this->__call('sRemove', [$args]);
+    }
+
+
+    public function sMove($srcKey, $dstKey, $member)
+    {
+        return $this->__call('sMove', [$srcKey, $dstKey, $member]);
+    }
+
+    public function sIsMember($key, $value)
+    {
+        return $this->__call('sIsMember', [$key, $value]);
+    }
+
+    public function sSize($key)
+    {
+        return $this->sCard($key);
+    }
+
+    public function sCard($key)
+    {
+        return $this->__call('sCard', [$key]);
+    }
+
+    public function sPop($key)
+    {
+        return $this->__call('sPop', [$key]);
+    }
+
+    public function sRandMember($key, $count = null)
+    {
+        return $this->__call('sRandMember', [$key, $count]);
+    }
+
+    public function sMembers($key)
+    {
+        return $this->__call('sMembers', [$key]);
+    }
+
+    public function sGetMembers($key)
+    {
+        return $this->__call('sGetMembers', [$key]);
+    }
+
+    public function zAdd($key, $args)
+    {
+        $args = func_get_args();
+        return $this->__call('zAdd', [$args]);
+    }
+
+    public function zRange($key, $start, $end, $withscores = null)
+    {
+        return $this->__call('zRange', [$key, $start, $end, $withscores]);
+    }
+
+    public function zRevRange($key, $start, $end, $withscore = null)
+    {
+        return $this->__call('zRevRange', [$key, $start, $end, $withscore]);
+    }
+
+    public function zRem($key, $args)
+    {
+        $args = func_get_args();
+        return $this->__call('zRem', [$args]);
+    }
+
+    public function zDelete($key, $args)
+    {
+        $args = func_get_args();
+        return $this->__call('zDelete', [$args]);
+    }
+
+    public function zRangeByScore($key, $start, $end, array $options = [])
+    {
+        return $this->__call('zRangeByScore', [$key, $start, $end, $options]);
+    }
+
+    public function zCount($key, $start, $end)
+    {
+        return $this->__call('zCount', [$key, $start, $end]);
+    }
+
+    public function zDeleteRangeByScore($key, $start, $end)
+    {
+        return $this->__call('zDeleteRangeByScore', [$key, $start, $end]);
+    }
+
+    public function zDeleteRangeByRank($key, $start, $end)
+    {
+        return $this->__call('zDeleteRangeByRank', [$key, $start, $end]);
+    }
+
+    public function zCard($key)
+    {
+        return $this->__call('zCard', [$key]);
+    }
+
+    public function zScore($key, $member)
+    {
+        return $this->__call('zScore', [$key, $member]);
+    }
+
+    public function zRank($key, $member)
+    {
+        return $this->__call('zRank', [$key, $member]);
+    }
+
+    public function zRevRank($key, $member)
+    {
+        return $this->__call('zRevRank', [$key, $member]);
+    }
+
+    public function zIncrBy($key, $value, $member)
+    {
+        return $this->__call('zIncrBy', [$key, $value, $member]);
+    }
+
+    public function zInter($Output, $ZSetKeys, array $Weights = null, $aggregateFunction = 'SUM')
+    {
+        return $this->__call('zInter', [$Output, $ZSetKeys, $Weights, $aggregateFunction]);
+    }
+
+    public function object($string = '', $key = '')
+    {
+        return $this->__call('object', [$string, $key]);
+    }
+
+    public function setTimeout($key, $ttl)
+    {
+        return $this->__call('setTimeout', [$key, $ttl]);
+    }
+
+    public function expireAt($key, $timestamp)
+    {
+        return $this->__call('expireAt', [$key, $timestamp]);
+    }
+
+    public function hExists($key, $hashKey)
+    {
+        return $this->__call('hExists', [$key, $hashKey]);
+    }
+
+    public function sInter($args)
+    {
+        $args = func_get_args();
+        return $this->__call('sInter', [$args]);
+    }
+
+    public function sInterStore($args)
+    {
+        $args = func_get_args();
+        return $this->__call('sInterStore', [$args]);
+    }
+
+    public function sUnion($args)
+    {
+        $args = func_get_args();
+        return $this->__call('sUnion', [$args]);
+    }
+
+    public function sUnionStore($dstKey, $args)
+    {
+        $args = func_get_args();
+        return $this->__call('sUnionStore', [$args]);
+    }
+
 }

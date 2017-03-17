@@ -16,9 +16,6 @@ class SmvcRedis
      */
     private $RedisHelper = null;
 
-
-    private $cachePrefix;
-
     private $pconnect = false;
 
     /**
@@ -36,11 +33,11 @@ class SmvcRedis
      *
      * @return mixed
      */
-    public static function instance($config)
+    public static function getInstance($config)
     {
         $instanceNameSet = hash('crc32', serialize($config));
         if (!isset(self::$instance[$instanceNameSet])) {
-            $redisHelper       = SmvcRedisHelper::getInstance();
+            $redisHelper                      = SmvcRedisHelper::getInstance();
             self::$instance[$instanceNameSet] = $redisHelper;
         }
         return self::$instance[$instanceNameSet];
@@ -61,13 +58,13 @@ class SmvcRedis
     }
 
     /**
-     * @param $int
+     * @param $index
      *
      * @return bool
      */
-    public function select($int)
+    public function select($index)
     {
-        return $this->RedisHelper->select($int);
+        return $this->RedisHelper->select($index);
     }
 
     /**
@@ -77,63 +74,34 @@ class SmvcRedis
      */
     public function type($key)
     {
-        return $this->RedisHelper->type($this->cachePrefix . $key);
+        return $this->RedisHelper->type($key);
     }
 
     /**
      * @param        $key
-     * @param string $perstring
      *
-     * @return array|bool|mixed|string
+     * @return string
      */
-    public function get($key, $perstring = '')
+    public function get($key)
     {
-        $perstring = $this->cachePrefix . $perstring;
-        if (is_array($key)) {
-            if ($perstring) {
-                foreach ($key as $i_key => $i_value) {
-                    $key[$i_key] = $perstring . $i_value;
-                }
-            }
-            $ret = $this->RedisHelper->getMultiple($key);
-            if ($ret) {
-                array_walk($ret, 'checkArr');
-            }
-            return $ret;
-        } else {
-            $ret = $this->RedisHelper->get($perstring . $key);
-            if (substr($ret, 0, 6) == 'SC:ARR') {
-                return unserialize(substr($ret, 6));
-            } else {
-                return $ret;
-            }
-        }
+        return $this->RedisHelper->get($key);
     }
 
     /**
      * 仅限于key是字符串模式 //数组模式请使用 mset
+     *
      * @param     $key
      * @param     $value
      * @param int $limit
      *
-     * @return bool|int
+     * @return int
      */
     public function set($key, $value, $limit = 2592000)
     {
-        if (is_null($value)) {
-            return $this->RedisHelper->del($key);
-        }
-        if (is_array($value)) {
-            $value = 'SC:ARR' . serialize($value);
-        }
-        if (is_string($value) || is_int($value)) {
-            if ($limit) {
-                return ($this->RedisHelper->setex($this->cachePrefix . $key, $limit, $value));
-            } else {
-                return ($this->RedisHelper->set($this->cachePrefix . $key, $value));
-            }
+        if ($limit) {
+            return $this->RedisHelper->setex($key, $limit, $value);
         } else {
-            return false;
+            return $this->RedisHelper->set($key, $value);
         }
     }
 
@@ -145,58 +113,36 @@ class SmvcRedis
      */
     public function setnx($key, $value)
     {
-        if (is_array($value)) {
-            $value = 'SC:ARR' . serialize($value);
-        }
-        return $this->RedisHelper->setnx($this->cachePrefix . $key, $value);
+        return $this->RedisHelper->setnx($key, $value);
     }
 
     /**
      * msetnx
-     * @param $keyvaluearray
+     *
+     * @param $array
      *
      * @return bool
      */
-    public function mset($keyvaluearray)
+    public function mset($array)
     {
-        $newarr = [];
-        foreach ($keyvaluearray as $key => $value) {
-            if (is_array($value)) {
-                $value = 'SC:ARR' . serialize($value);
-            }
-            $newarr[$this->cachePrefix . $key] = $value;
-        }
-        return $this->RedisHelper->mset($newarr);
+        return $this->RedisHelper->mset($array);
     }
 
     /**
      * @param        $key
-     * @param string $perstring
      */
-    public function delete($key, $perstring = '')
+    public function delete($key)
     {
-        $this->RedisHelper->delete($key, $perstring);
+        $this->RedisHelper->delete($key);
     }
 
     /**
      * @param        $key
-     * @param string $perstring
      *
      * @return int
      */
-    public function del($key, $perstring = '')
+    public function del($key)
     {
-        $perstring = $this->cachePrefix . $perstring;
-        if (is_array($key)) {
-            if ($perstring) {
-                foreach ($key as $i_key => $i_value) {
-                    $key[$i_key] = $perstring . $i_value;
-                }
-            }
-        } else {
-            $key = $this->cachePrefix . $key;
-        }
-
         return $this->RedisHelper->del($key);
     }
 
@@ -208,7 +154,6 @@ class SmvcRedis
      */
     public function append($key, $value)
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->append($key, $value);
     }
 
@@ -221,7 +166,6 @@ class SmvcRedis
      */
     public function getRange($key, $keystart, $keyend) //截获字符串
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->getRange($key, $keystart, $keyend);
     }
 
@@ -234,7 +178,6 @@ class SmvcRedis
      */
     public function setRange($key, $offset, $value)
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->setRange($key, $offset, $value);
     }
 
@@ -246,7 +189,7 @@ class SmvcRedis
      */
     public function strlen($key)
     {
-        return $this->strlen($this->cachePrefix . $key);
+        return $this->strlen($key);
     }
 
     /**
@@ -257,7 +200,6 @@ class SmvcRedis
      */
     public function sort($key, $sortkey = [])
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->sort($key, $sortkey);
     }
 
@@ -362,7 +304,7 @@ class SmvcRedis
      */
     public function exists($key)
     {
-        return $this->RedisHelper->exists($this->cachePrefix . $key);
+        return $this->RedisHelper->exists($key);
     }
 
     /**
@@ -373,7 +315,7 @@ class SmvcRedis
      */
     public function incr($key, $incrnum = 1) // incr, incrBy
     {
-        return $this->RedisHelper->incrBy($this->cachePrefix . $key, $incrnum);
+        return $this->RedisHelper->incrBy($key, $incrnum);
     }
 
     /**
@@ -384,12 +326,13 @@ class SmvcRedis
      */
     public function decr($key, $incrnum = 1) //decr, decrBy
     {
-        return $this->RedisHelper->decrBy($this->cachePrefix . $key, $incrnum);
+        return $this->RedisHelper->decrBy($key, $incrnum);
     }
 
     /**
      * list操作
      * 左插入list
+     *
      * @param $key
      * @param $listvalue
      *
@@ -397,18 +340,12 @@ class SmvcRedis
      */
     public function lPush($key, $listvalue)
     {
-        $key = $this->cachePrefix . $key;
-        if (is_string($listvalue)) {
-            return $this->RedisHelper->lPush($key, $listvalue);
-        }
-        foreach ($listvalue as $eachv) {
-            $this->RedisHelper->lPush($key, $eachv);
-        }
-        return count($listvalue);
+        return $this->RedisHelper->lPush($key, $listvalue);
     }
 
     /**
      * 右插入list
+     *
      * @param $key
      * @param $listvalue
      *
@@ -416,14 +353,7 @@ class SmvcRedis
      */
     public function rPush($key, $listvalue)
     {
-        $key = $this->cachePrefix . $key;
-        if (is_string($listvalue)) {
-            return $this->RedisHelper->rPush($key, $listvalue);
-        }
-        foreach ($listvalue as $eachv) {
-            $this->RedisHelper->rPush($key, $eachv);
-        }
-        return count($listvalue);
+        return $this->RedisHelper->rPush($key, $listvalue);
     }
 
     /**
@@ -434,7 +364,7 @@ class SmvcRedis
      */
     public function rpoplpush($list, $list2)
     {
-        return $this->rpoplpush($this->cachePrefix . $list, $this->cachePrefix . $list2);
+        return $this->rpoplpush($list, $list2);
     }
 
     /**
@@ -458,19 +388,18 @@ class SmvcRedis
      */
     public function lRange($key, $start = 0, $end = -1)
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->lRange($key, $start, $end);
     }
 
     /**
      * lPushx rPushx
+     *
      * @param $key
      *
      * @return string
      */
     public function lPop($key)
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->lPop($key);
     }
 
@@ -481,17 +410,16 @@ class SmvcRedis
      */
     public function rPop($key)
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->rPop($key);
     }
 
     /**
      * blPop, brPop
+     *
      * @param $key
      */
     public function lSize($key)
     {
-        $key = $this->cachePrefix . $key;
         $this->RedisHelper->lSize($key);
     }
 
@@ -515,7 +443,6 @@ class SmvcRedis
      */
     public function lIndex($key, $index)
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->lIndex($key, $index);
     }
 
@@ -528,7 +455,6 @@ class SmvcRedis
      */
     public function lSet($key, $index, $value)
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->lSet($key, $index, $value);
     }
 
@@ -541,7 +467,6 @@ class SmvcRedis
      */
     public function lTrim($key, $start, $stop)
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->lTrim($key, $start, $stop);
     }
 
@@ -566,26 +491,20 @@ class SmvcRedis
      */
     public function lRem($key, $value, $count = 0)
     {
-        $key = $this->cachePrefix . $key;
         return $this->RedisHelper->lRem($key, $value, $count);
     }
 
     /**
-     * @param      $key
-     * @param      $pivot
-     * @param      $value
-     * @param bool $before
+     * @param $key
+     * @param $position
+     * @param $pivot
+     * @param $value
      *
      * @return int
      */
-    public function lInsert($key, $pivot, $value, $before = true)
+    public function lInsert($key, $position, $pivot, $value)
     {
-        $key = $this->cachePrefix . $key;
-        if ($before) {
-            return $this->RedisHelper->lRem($key, Redis::BEFORE, $pivot, $value);
-        } else {
-            return $this->RedisHelper->lRem($key, Redis::AFTER, $pivot, $value);
-        }
+        return $this->RedisHelper->lInsert($key, $position, $pivot, $value);
     }
 
 
@@ -599,7 +518,7 @@ class SmvcRedis
     public function hMset($key, $valuearr) //array('name' => 'Joe', 'salary' => 2000) //key=>value
     {
         array_walk($valuearr, 'checkArrToStr');
-        return $this->RedisHelper->hMset($this->cachePrefix . $key, $valuearr);
+        return $this->RedisHelper->hMset($key, $valuearr);
     }
 
     /**
@@ -610,7 +529,7 @@ class SmvcRedis
      */
     public function hMGet($key, $valuearr) //array('field1', 'field2')
     {
-        $ret = $this->RedisHelper->hMGet($this->cachePrefix . $key, $valuearr);
+        $ret = $this->RedisHelper->hMGet($key, $valuearr);
         if ($ret) {
             array_walk($ret, 'checkArr');
         }
@@ -624,7 +543,7 @@ class SmvcRedis
      */
     public function hGetAll($key)
     {
-        $ret = $this->RedisHelper->hGetAll($this->cachePrefix . $key);
+        $ret = $this->RedisHelper->hGetAll($key);
         if ($ret) {
             array_walk($ret, 'checkArr');
         }
@@ -639,7 +558,7 @@ class SmvcRedis
      */
     public function hExists($key, $mkey)
     {
-        return $this->RedisHelper->hExists($this->cachePrefix . $key, $mkey);
+        return $this->RedisHelper->hExists($key, $mkey);
     }
 
     /**
@@ -651,7 +570,7 @@ class SmvcRedis
      */
     public function hIncrBy($key, $mkey, $value)
     {
-        return $this->RedisHelper->hIncrBy($this->cachePrefix . $key, $mkey, $value);
+        return $this->RedisHelper->hIncrBy($key, $mkey, $value);
     }
 
     /**
@@ -661,7 +580,7 @@ class SmvcRedis
      */
     public function hVals($key) //类似 PHP's array_values().
     {
-        return $this->RedisHelper->hVals($this->cachePrefix . $key);
+        return $this->RedisHelper->hVals($key);
     }
 
     /**
@@ -671,7 +590,7 @@ class SmvcRedis
      */
     public function hKeys($key)
     {
-        return $this->RedisHelper->hKeys($this->cachePrefix . $key);
+        return $this->RedisHelper->hKeys($key);
     }
 
     /**
@@ -681,11 +600,12 @@ class SmvcRedis
      */
     public function hLen($key)
     {
-        return $this->RedisHelper->hLen($this->cachePrefix . $key);
+        return $this->RedisHelper->hLen($key);
     }
 
     /**
      * 删除hash里面的子健
+     *
      * @param $key
      * @param $mkey
      *
@@ -693,11 +613,12 @@ class SmvcRedis
      */
     public function hDel($key, $mkey)
     {
-        return $this->RedisHelper->hDel($this->cachePrefix . $key, $mkey);
+        return $this->RedisHelper->hDel($key, $mkey);
     }
 
     /**
      * get hash里面的子健
+     *
      * @param $key
      * @param $mkey
      *
@@ -705,7 +626,7 @@ class SmvcRedis
      */
     public function hGet($key, $mkey)
     {
-        $value = $this->RedisHelper->hGet($this->cachePrefix . $key, $mkey);
+        $value = $this->RedisHelper->hGet($key, $mkey);
         if (is_string($value) && substr($value, 0, 6) == 'SC:ARR') {
             $value = unserialize(substr($value, 6));
         }
@@ -715,6 +636,7 @@ class SmvcRedis
     /**
      *
      * set hash里面的子健
+     *
      * @param $key
      * @param $mkey
      * @param $value
@@ -726,11 +648,12 @@ class SmvcRedis
         if (is_array($value)) {
             $value = 'SC:ARR' . serialize($value);
         }
-        return $this->RedisHelper->hSet($this->cachePrefix . $key, $mkey, $value);
+        return $this->RedisHelper->hSet($key, $mkey, $value);
     }
 
     /**
      * setxn hash里面的子健
+     *
      * @param $key
      * @param $mkey
      * @param $value
@@ -739,15 +662,13 @@ class SmvcRedis
      */
     public function hSetNx($key, $mkey, $value)
     {
-        if (is_array($value)) {
-            $value = 'SC:ARR' . serialize($value);
-        }
-        return $this->RedisHelper->hSetNx($this->cachePrefix . $key, $mkey, $value);
+        return $this->RedisHelper->hSetNx($key, $mkey, $value);
     }
 
 
     /**
      * sAdd ...... stored set结构，无序stored
+     *
      * @param $key
      * @param $value
      *
@@ -755,7 +676,7 @@ class SmvcRedis
      */
     public function sAdd($key, $value)
     {
-        return $this->RedisHelper->sAdd($this->cachePrefix . $key, $value);
+        return $this->RedisHelper->sAdd($key, $value);
     }
 
     /**
@@ -778,20 +699,21 @@ class SmvcRedis
      */
     public function sRem($key, $value)
     {
-        return $this->RedisHelper->sRem($this->cachePrefix . $key, $value);
+        return $this->RedisHelper->sRem($key, $value);
     }
 
     /**
      * 将$value从$key移到$key1
-     * @param $key
-     * @param $key1
-     * @param $value
+     *
+     * @param $srcKey
+     * @param $dstKey
+     * @param $member
      *
      * @return bool
      */
-    public function sMove($key, $key1, $value)
+    public function sMove($srcKey, $dstKey, $member)
     {
-        return $this->RedisHelper->sMove($this->cachePrefix . $key, $this->cachePrefix . $key1, $value);
+        return $this->RedisHelper->sMove($srcKey, $dstKey, $member);
     }
 
     /**
@@ -807,6 +729,7 @@ class SmvcRedis
 
     /**
      * 将$value从$key移到$key1
+     *
      * @param $key
      * @param $value
      *
@@ -814,7 +737,7 @@ class SmvcRedis
      */
     public function sIsMember($key, $value)
     {
-        return $this->RedisHelper->sIsMember($this->cachePrefix . $key, $value);
+        return $this->RedisHelper->sIsMember($key, $value);
     }
 
     /**
@@ -834,7 +757,7 @@ class SmvcRedis
      */
     public function sSize($key)
     {
-        return $this->RedisHelper->sSize($this->cachePrefix . $key);
+        return $this->RedisHelper->sSize($key);
     }
 
     /**
@@ -844,41 +767,35 @@ class SmvcRedis
      */
     public function sPop($key)
     {
-        return $this->RedisHelper->sPop($this->cachePrefix . $key);
+        return $this->RedisHelper->sPop($key);
     }
 
     /**
-     * @param $key
+     * @param      $key
+     *
+     * @param null $count
      *
      * @return string
      */
-    public function sRandMember($key)
+    public function sRandMember($key, $count = null)
     {
-        return $this->RedisHelper->sRandMember($this->cachePrefix . $key);
+        return $this->RedisHelper->sRandMember($key, $count);
     }
 
     /**
      * 交集成员的列表
      * @return mixed
      */
-    public function sInter()
+    public function sInter($args)
     {
-        $params = func_get_args();
-        $newp   = [];
-        foreach ($params as $eachp) {
-            $newp[] = $this->cachePrefix . $eachp;
-        }
-        return call_user_func_array([$this->RedisHelper, 'sInter'], $newp);
+        $args = func_get_args();
+        return $this->RedisHelper->sInter($args);
     }
 
     public function sInterStore()
     {
-        $params = func_get_args();
-        $newp   = [];
-        foreach ($params as $eachp) {
-            $newp[] = $this->cachePrefix . $eachp;
-        }
-        return call_user_func_array([$this->RedisHelper, 'sInterStore'], $newp);
+        $args = func_get_args();
+        return $this->RedisHelper->sInterStore($args);
     }
 
     /**
@@ -887,25 +804,17 @@ class SmvcRedis
      */
     public function sUnion()
     {
-        $params = func_get_args();
-        $newp   = [];
-        foreach ($params as $eachp) {
-            $newp[] = $this->cachePrefix . $eachp;
-        }
-        return call_user_func_array([$this->RedisHelper, 'sUnion'], $newp);
+        $args = func_get_args();
+        return $this->RedisHelper->sUnion($args);
     }
 
     /**
      * @return mixed
      */
-    public function sUnionStore()
+    public function sUnionStore($dstKey, $args)
     {
-        $params = func_get_args();
-        $newp   = [];
-        foreach ($params as $eachp) {
-            $newp[] = $this->cachePrefix . $eachp;
-        }
-        return call_user_func_array([$this->RedisHelper, 'sUnionStore'], $newp);
+        $args = func_get_args();
+        return $this->RedisHelper->sUnion($dstKey, $args);
     }
 
     /**
@@ -917,7 +826,7 @@ class SmvcRedis
         $params = func_get_args();
         $newp   = [];
         foreach ($params as $eachp) {
-            $newp[] = $this->cachePrefix . $eachp;
+            $newp[] = $eachp;
         }
         return call_user_func_array([$this->RedisHelper, 'sDiff'], $newp);
     }
@@ -930,7 +839,7 @@ class SmvcRedis
         $params = func_get_args();
         $newp   = [];
         foreach ($params as $eachp) {
-            $newp[] = $this->cachePrefix . $eachp;
+            $newp[] = $eachp;
         }
         return call_user_func_array([$this->RedisHelper, 'sDiffStore'], $newp);
     }
@@ -952,11 +861,12 @@ class SmvcRedis
      */
     public function sMembers($key)
     {
-        return $this->RedisHelper->sMembers($this->cachePrefix . $key);
+        return $this->RedisHelper->sMembers($key);
     }
 
     /**
      * 有序集(Sorted Set)
+     *
      * @param $key
      * @param $score
      * @param $value
@@ -965,7 +875,7 @@ class SmvcRedis
      */
     public function zAdd($key, $score, $value)
     {
-        return $this->RedisHelper->zAdd($this->cachePrefix . $key, $score, $value);
+        return $this->RedisHelper->zAdd($key, $score, $value);
     }
 
     /**
@@ -978,7 +888,7 @@ class SmvcRedis
      */
     public function zRange($key, $start = 0, $end = -1, $withscores = false)
     {
-        return $this->RedisHelper->zRange($this->cachePrefix . $key, $start, $end, $withscores);
+        return $this->RedisHelper->zRange($key, $start, $end, $withscores);
     }
 
     /**
@@ -991,29 +901,31 @@ class SmvcRedis
      */
     public function zRevRange($key, $start = 0, $end = -1, $withscores = false)
     {
-        return $this->RedisHelper->zRevRange($this->cachePrefix . $key, $start, $end, $withscores);
+        return $this->RedisHelper->zRevRange($key, $start, $end, $withscores);
     }
 
     /**
      * @param $key
-     * @param $value
+     * @param $args
      *
      * @return int
+     *
      */
-    public function zRem($key, $value)
+    public function zRem($key, $args)
     {
-        return $this->RedisHelper->zRem($this->cachePrefix . $key, $value);
+        return $this->RedisHelper->zRem($key, $args);
     }
 
     /**
      * @param $key
-     * @param $value
+     * @param $args
      *
      * @return int
+     *
      */
-    public function zDelete($key, $value)
+    public function zDelete($key, $args)
     {
-        return $this->RedisHelper->zDelete($this->cachePrefix . $key, $value);
+        return $this->RedisHelper->zDelete($key, $args);
     }
 
     /**
@@ -1026,7 +938,7 @@ class SmvcRedis
      */
     public function zRangeByScore($key, $start, $end, $options = [])
     {
-        return $this->RedisHelper->zRangeByScore($this->cachePrefix . $key, $start, $end, $options);
+        return $this->RedisHelper->zRangeByScore($key, $start, $end, $options);
     }
 
     /**
@@ -1039,7 +951,7 @@ class SmvcRedis
      */
     public function zRevRangeByScore($key, $start, $end, $options = [])
     {
-        $ret = $this->RedisHelper->zRangeByScore($this->cachePrefix . $key, $start, $end, $options);
+        $ret = $this->RedisHelper->zRangeByScore($key, $start, $end, $options);
         return array_reverse($ret);
     }
 
@@ -1052,7 +964,7 @@ class SmvcRedis
      */
     public function zCount($key, $scorestart, $scoreend)
     {
-        return $this->RedisHelper->zCount($this->cachePrefix . $key, $scorestart, $scoreend);
+        return $this->RedisHelper->zCount($key, $scorestart, $scoreend);
     }
 
     /**
@@ -1072,7 +984,7 @@ class SmvcRedis
      */
     public function zDeleteRangeByScore($key, $scorestart, $scoreend)
     {
-        $this->RedisHelper->zDeleteRangeByScore($this->cachePrefix . $key, $scorestart, $scoreend);
+        $this->RedisHelper->zDeleteRangeByScore($key, $scorestart, $scoreend);
     }
 
     /**
@@ -1082,7 +994,7 @@ class SmvcRedis
      */
     public function zRemRangeByRank($key, $start = 0, $end = -1)
     {
-         $this->RedisHelper->zDeleteRangeByRank($key, $start, $end);
+        $this->RedisHelper->zDeleteRangeByRank($key, $start, $end);
     }
 
     /**
@@ -1092,7 +1004,7 @@ class SmvcRedis
      */
     public function zDeleteRangeByRank($key, $start = 0, $end = -1)
     {
-         $this->RedisHelper->zDeleteRangeByRank($this->cachePrefix . $key, $start, $end);
+        $this->RedisHelper->zDeleteRangeByRank($key, $start, $end);
     }
 
     /**
@@ -1100,7 +1012,7 @@ class SmvcRedis
      */
     public function zCard($key)
     {
-        $this->RedisHelper->zSize($key);
+        $this->RedisHelper->zCard($key);
     }
 
     /**
@@ -1108,7 +1020,7 @@ class SmvcRedis
      */
     public function zSize($key)
     {
-        $this->RedisHelper->zSize($this->cachePrefix . $key);
+        $this->zCard($key);
     }
 
     /**
@@ -1119,7 +1031,7 @@ class SmvcRedis
      */
     public function zScore($key, $value)
     {
-        return $this->RedisHelper->zScore($this->cachePrefix . $key, $value);
+        return $this->RedisHelper->zScore($key, $value);
     }
 
     /**
@@ -1130,7 +1042,7 @@ class SmvcRedis
      */
     public function zRank($key, $value)
     {
-        return $this->RedisHelper->zRank($this->cachePrefix . $key, $value);
+        return $this->RedisHelper->zRank($key, $value);
     }
 
     /**
@@ -1141,7 +1053,7 @@ class SmvcRedis
      */
     public function zRevRank($key, $value)
     {
-        return $this->RedisHelper->zRevRank($this->cachePrefix . $key, $value);
+        return $this->RedisHelper->zRevRank($key, $value);
     }
 
     /**
@@ -1153,11 +1065,12 @@ class SmvcRedis
      */
     public function zIncrBy($key, $addscore, $value)
     {
-        return $this->RedisHelper->zIncrBy($this->cachePrefix . $key, $addscore, $value);
+        return $this->RedisHelper->zIncrBy($key, $addscore, $value);
     }
 
     /**
      * 复杂模式取并集，$Weights是乘法因子，个数为$keysarr,会把score相乘,赋予结果集
+     *
      * @param       $outkey
      * @param array $keysarr
      * @param array $Weights
@@ -1169,13 +1082,14 @@ class SmvcRedis
     {
         $newarr = [];
         foreach ($keysarr as $eachkey) {
-            $newarr[] = $this->cachePrefix . $eachkey;
+            $newarr[] = $eachkey;
         }
-        return $this->RedisHelper->zUnion($this->cachePrefix . $outkey, $newarr, $Weights, $aggregateFunction);
+        return $this->RedisHelper->zUnion($outkey, $newarr, $Weights, $aggregateFunction);
     }
 
     /**
      * 交集
+     *
      * @param       $outkey
      * @param array $keysarr
      * @param array $Weights
@@ -1187,9 +1101,9 @@ class SmvcRedis
     {
         $newarr = [];
         foreach ($keysarr as $eachkey) {
-            $newarr[] = $this->cachePrefix . $eachkey;
+            $newarr[] = $eachkey;
         }
-        return $this->RedisHelper->zInter($this->cachePrefix . $outkey, $newarr, $Weights, $aggregateFunction);
+        return $this->RedisHelper->zInter($outkey, $newarr, $Weights, $aggregateFunction);
     }
 
     /**
@@ -1200,7 +1114,7 @@ class SmvcRedis
      */
     public function object($type, $key)
     {
-        return $this->RedisHelper->object($type, $this->cachePrefix . $key);
+        return $this->RedisHelper->object($type, $key);
     }
 
     /**
@@ -1211,7 +1125,7 @@ class SmvcRedis
      */
     public function expire($key, $time)
     {
-        return $this->RedisHelper->expire($this->cachePrefix . $key, $time);
+        return $this->RedisHelper->expire($key, $time);
     }
 
     /**
@@ -1220,7 +1134,7 @@ class SmvcRedis
      */
     public function setTimeout($key, $time)
     {
-        $this->RedisHelper->setTimeout($this->cachePrefix . $key, $time);
+        $this->RedisHelper->setTimeout($key, $time);
     }
 
     /**
@@ -1231,12 +1145,12 @@ class SmvcRedis
      */
     public function expireAt($key, $time)
     {
-        return $this->RedisHelper->expireAt($this->cachePrefix . $key, $time);
+        return $this->RedisHelper->expireAt($key, $time);
     }
 }
 
 if (!function_exists('checkArr')) {
-    function checkArr(&$value, $key)
+    function checkArr(&$value)
     {
         if (is_string($value) && substr($value, 0, 6) == 'SC:ARR') {
             $value = unserialize(substr($value, 6));
@@ -1245,7 +1159,7 @@ if (!function_exists('checkArr')) {
 }
 
 if (!function_exists('checkArrToStr')) {
-    function checkarrtostr(&$value, $key)
+    function checkarrtostr(&$value)
     {
         if (is_array($value)) {
             $value = 'SC:ARR' . serialize($value);
