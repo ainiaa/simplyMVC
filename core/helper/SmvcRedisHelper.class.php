@@ -24,9 +24,10 @@ class SmvcRedisHelper
 
     /**
      *
-     * @param int $index
+     * @param int   $index
+     * @param array $config
      *
-     * @return SmvcRedisHelper|Redis
+     * @return Redis|SmvcRedisHelper
      */
     public static function getInstance($index = 0, $config = [])
     {
@@ -171,8 +172,7 @@ class SmvcRedisHelper
     }
 
     /**
-     *
-     * @param $key
+     * @param $keys
      *
      * @return mixed|null
      */
@@ -209,7 +209,6 @@ class SmvcRedisHelper
             $data = $this->tryEncodeData($data);
         }
         $reData = $this->__call('hmset', [$key, $datas]);
-        //        $this->__call('expire', [$key, self::REDIS_EXPIRE_TIME]);
         return $reData;
     }
 
@@ -224,7 +223,6 @@ class SmvcRedisHelper
     {
         $data   = $this->tryEncodeData($data);
         $reData = $this->__call('hset', [$key, $field, $data]);
-        //        $this->__call('expire', [$key, self::REDIS_EXPIRE_TIME]);
         return $reData;
     }
 
@@ -888,7 +886,6 @@ SCRIPT;
     public function lPush($key, $args = null)
     {
         $args = func_get_args();
-
         return $this->__call('lPush', [$args]);
     }
 
