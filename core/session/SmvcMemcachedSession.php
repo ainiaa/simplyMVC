@@ -130,7 +130,7 @@ class SmvcMemcachedSession extends SmvcBaseSession
             } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
             } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(
-                            Router::getRemoteIp() . Router::clientIp()
+                            Router::getRemoteIp() . Router::getClientIp()
                     )
             ) {
                 // IP address doesn't match

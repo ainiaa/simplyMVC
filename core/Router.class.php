@@ -151,6 +151,7 @@ class Router
     /**
      * router检验白名单
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+     *
      * @param $controller
      * @param $action
      *
@@ -192,6 +193,7 @@ class Router
     /**
      * router检验黑名单
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+     *
      * @param $controller
      * @param $action
      *
@@ -492,7 +494,7 @@ class Router
      *
      * @return array
      */
-    public static function  getRequestUri()
+    public static function getRequestUri()
     {
         if (isset($_SERVER['HTTP_X_REWRITE_URL'])) { // check this first so IIS will catch
             $requestUri = $_SERVER['HTTP_X_REWRITE_URL'];
@@ -616,6 +618,21 @@ class Router
         return SmvcArrayHelper::get($_SERVER, $key, $default);
     }
 
+    /**
+     * @param string $key
+     * @param string $default
+     *
+     * @return mixed
+     */
+    public static function getEnv($key = '', $default = '')
+    {
+        if (func_num_args() === 0) {
+            return $_ENV;
+        }
+
+        return SmvcArrayHelper::get($_ENV, $key, $default);
+    }
+
 
     /**
      * Get the public ip address of the user.
@@ -665,47 +682,51 @@ class Router
      *
      * @return  string  the real ip address of the user
      */
-    public static function clientIp($default = '0.0.0.0', $exclude_reserved = false)
+    public static function getClientIp($default = '0.0.0.0', $exclude_reserved = false)
     {
         static $server_keys = null;
 
         if (empty($server_keys)) {
             $server_keys = ['HTTP_CLIENT_IP', 'REMOTE_ADDR'];
             if (C('security.allow_x_headers', false)) {
-                $server_keys = array_merge(['HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'], $server_keys);
+                $server_keys = array_merge(
+                        ['HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_X_REAL_IP', 'HTTP_X_FORWARDED_FOR'],
+                        $server_keys
+                );
             }
         }
+        $clientIp = '';
 
         foreach ($server_keys as $key) {
-            if (!self::getServer($key)) {
+            $clientIp = self::getEnv($key);
+            if (empty($clientIp)) {
                 continue;
-            }
-
-            $ips = explode(',', self::getServer($key));
-            array_walk(
-                    $ips,
-                    function (&$ip) {
-                        $ip = trim($ip);
-                    }
-            );
-
-            $ips = array_filter(
-                    $ips,
-                    function ($ip) use ($exclude_reserved) {
-                        return filter_var(
-                                $ip,
-                                FILTER_VALIDATE_IP,
-                                $exclude_reserved ? FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE : null
-                        );
-                    }
-            );
-
-            if ($ips) {
-                return reset($ips);
+            } else {
+                break;
             }
         }
 
-        return SimpleMVC::value($default);
+        if (empty($clientIp)) {
+            foreach ($server_keys as $key) {
+                $clientIp = self::getServer($key);
+                if (empty($clientIp)) {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        $clientIp = trim($clientIp);
+        if ($clientIp) {
+            return filter_var(
+                    $clientIp,
+                    FILTER_VALIDATE_IP,
+                    $exclude_reserved ? FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE : null
+            );
+        } else {
+            return SimpleMVC::value($default);
+        }
     }
 
     /**
