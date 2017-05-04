@@ -9,34 +9,55 @@
 class SmvcRedisHelper
 {
 
-    const REDIS_EXPIRE_TIME = -1;
-
-    private static $expire = 0;
-
     /**
+     * 某些时候 是不需要自动添加 key前缀的。
      *
-     * @var array
+     * @param $usePrefix
      */
-    private static $instance = array();
+    public function setUsePrefix($usePrefix)
+    {
+        $this->usePrefix = $usePrefix;
+    }
 
-    private $decodedPrefix = 'RH_DECODED:';
-    private $decodedPrefixLen;
 
     /**
-     *
-     * @param int   $index
-     * @param array $config
+     * @param string $alias
+     * @param array  $config ['host'     => '10.10.1.134',
+     *                       'port'     => '6379',
+     *                       'password' => 'redis123',//密码 如果需要的话，直接设置即可
+     *                       'pconnect' => true,
+     *                       'dbIndex'  => 0,
+     *                       'prefix' => 'newimageco:',
+     *                       'timeout' => 0.0,]
      *
      * @return Redis|SmvcRedisHelper
      */
-    public static function getInstance($index = 0, $config = [])
+    public static function getInstance($alias = 'default', $config = [])
     {
-        if (!isset(self::$instance[$index])) {
-            self::$instance[$index] = new self($index, $config);
+        if ($config) {
+            $alias = md5($alias . var_export($config, 1));
         }
 
-        return self::$instance[$index];
+        if (!isset(self::$instance[$alias]) || !self::$instance[$alias] instanceof self) {
+            $dbIndex = null;
+            if (empty($config) && function_exists('C')) {
+                $config = C('REDIS');
+            }
+            if (empty($config)) {
+                self::showError('Redis config missing');
+            }
+            $prefix    = isset($config['prefix']) ? $config['prefix'] : '';
+            if (empty($prefix)) {
+                $prefix = isset($config['prefix']) ? $config['prefix'] : '';
+            }
+            $usePrefix = empty($prefix) ? false : true;
+            $redis = new self($config, $prefix, $usePrefix, $alias);
+            self::$instance[$alias] = $redis;
+        }
+
+        return self::$instance[$alias];
     }
+
 
     /**
      * @param $expire
@@ -51,82 +72,119 @@ class SmvcRedisHelper
         return self::$expire;
     }
 
-    /**
-     * todo 还没有实现
-     *
-     * @param number $uid
-     */
-    public static function instanceById($uid)
+
+    //私有克隆函数，防止外办克隆对象
+    private function __clone()
     {
     }
 
     /**
-     *
-     * @var Redis
-     */
-    private $handle = null;
-
-    /**
-     *
-     * @var array
-     */
-    private $config;
-
-    /**
-     *
-     * @var string
-     */
-    private $prefix;
-
-    /**
      * RedisHelper constructor.
      *
-     * @param       $index
-     * @param array $config
+     * @param      $config
+     * @param      $prefix
+     * @param bool $usePrefix
+     *
+     * @internal param $index
      */
-    private function __construct($index, $config = [])
+    private function __construct($config, $prefix, $usePrefix = true, $alias = 'default')
     {
-        if (empty($config)) {
-            $config = C('REDIS');
-        }
-        if (isset($config['host'])) {
-            $config[0] = $config;
-        }
-        $prefix = isset($config['prefix']) ? $config['prefix'] : '';
-        if (empty($prefix)) {
-            $prefix = 'smvc:';
-        }
-        $this->config           = $config[$index];
+        $this->alias            = $alias;
+        $this->config           = $config;
         $this->prefix           = $prefix;
+        $this->usePrefix        = $usePrefix;
         $this->decodedPrefixLen = strlen($this->decodedPrefix);
     }
 
     /**
      * 连接redis 服务器
      *
+     * @param bool $force
+     *
      * @return bool
      */
-    private function init()
+    private function init($force = false)
     {
-        $result = true;
-        if (null === $this->handle) {
-            $this->handle = new Redis();
-
-            if (isset($this->config['pconnect']) && $this->config['pconnect']) {
-                $result = $this->handle->pconnect($this->config['host'], $this->config['port']);
-            } else {
-                $result = $this->handle->connect($this->config['host'], $this->config['port']);
-            }
-            if ($result) {
-                if (isset($this->config['password']) && $this->config['password']) {
-                    $result = $this->handle->auth($this->config['password']);
+        $host     = null;
+        $port     = null;
+        $password = null;
+        $pconnect = null;
+        $dbIndex  = null;
+        $timeout  = null;
+        if (isset($this->config['dbIndex'])) {
+            $dbIndex = $this->config['dbIndex'];
+        }
+        $needInit = $force;
+        if ($needInit === false) {
+            if (null === $this->handle || !$this->handle instanceof Redis) {
+                $needInit = true;
+            } else { //某些情况下，$this->handle虽然初始化了，但是却ping不通 出现这种情况直接强制初始化
+                $ping = $this->handle->ping();
+                if ($ping !== '+PONG') {
+                    $needInit = true;
                 }
             }
-            if (isset($this->config['database']) && is_int($this->config['database'])) {
-                $result = $this->handle->select($this->config['database']);
+        }
+        $flag = true;
+        if ($needInit) {
+            $this->handle = new Redis();
+
+            if (isset($this->config['pconnect'])) {
+                $pconnect = $this->config['pconnect'];
+            }
+            if (isset($this->config['password'])) {
+                $password = $this->config['password'];
+            }
+            if (isset($this->config['host'])) {
+                $host = $this->config['host'];
+            }
+            if (isset($this->config['port'])) {
+                $port = $this->config['port'];
+            }
+
+            if ($host && $port) {
+                if (bccomp($this->timeout, 0.0)) {
+                    $timeout = isset($this->config['timeout']) ? $this->config['timeout'] : 0.0;
+                }
+                if ($pconnect) {
+                    //使用pconnect 不设置$persistent_id的话，多次new Redis返回的链接相同，如果再有select就会有坑(PS redis扩展要用phpredis)
+                    $flag = $this->handle->pconnect($host, $port, $timeout, $this->alias);
+                } else {
+                    $flag = $this->handle->connect($host, $port, $timeout);
+                }
+                if ($flag) {
+                    if ($password) {
+                        $flag = $this->handle->auth($password);
+                    }
+                }
+
+                if ($flag === false) {
+                    self::showError(
+                            sprintf(
+                                    'connect redis failure on host:%s port:%s dbIndex:%s error:%s',
+                                    $host,
+                                    $port,
+                                    $dbIndex,
+                                    $this->handle->getLastError()
+                            )
+                    );
+                }
+            } else {
+                self::showError(
+                        sprintf(
+                                'init redis failure on host:%s port:%s, prop:%s',
+                                $host,
+                                $port,
+                                var_export($this->config,1)
+                        )
+                );
+                return false;
             }
         }
-        return $result;
+        if ($flag && is_int($dbIndex)) {
+            $flag = $this->handle->select($dbIndex);
+        }
+        return $flag;
     }
 
     /**
@@ -172,14 +230,24 @@ class SmvcRedisHelper
     }
 
     /**
-     * @param $keys
+     *
+     * @param $key
      *
      * @return mixed|null
      */
-    public function delete($keys)
+    public function delete($key)
     {
-        $keys = func_get_args();
-        return $this->del($keys);
+        return $this->del($key);
+    }
+
+    /**
+     * @param $key
+     *
+     * @return mixed|null
+     */
+    public function del($key)
+    {
+        return $this->__call('del', [$key]);
     }
 
     /**
@@ -245,6 +313,28 @@ class SmvcRedisHelper
         $reData = $this->__call('get', [$key]);
         $reData = $this->tryDecodeData($reData);
         return $reData;
+    }
+
+    public function client($name)
+    {
+        $ret = $this->__call('client', [$name]);
+        return $ret;
+    }
+
+    public function select($index)
+    {
+        $ret = $this->__call('select', [$index]);
+        return $ret;
+    }
+
+    public function getProperty()
+    {
+        return [
+                'config'    => $this->config,
+                'alias'     => $this->alias,
+                'prefix'    => $this->prefix,
+                'usePrefix' => $this->usePrefix,
+        ];
     }
 
     public function set($key, $value)
@@ -331,53 +421,51 @@ class SmvcRedisHelper
     }
 
     /**
-     * @param            $Output
-     * @param            $ZSetKeys
-     * @param array|null $Weights
+     * @param            $output
+     * @param            $zSetKeys
+     * @param array|null $weights
      * @param string     $aggregateFunction
      *
      * @return mixed|null
      */
-    public function zUnion($Output, $ZSetKeys, array $Weights = null, $aggregateFunction = 'SUM')
+    public function zUnion($output, $zSetKeys, array $weights = null, $aggregateFunction = 'SUM')
     {
-        $datas = $this->__call('zunion', [$Output, $ZSetKeys, $Weights, $aggregateFunction]);
+        if (is_array($zSetKeys) && $zSetKeys && $this->usePrefix && !empty($this->prefix)) {
+            foreach ($zSetKeys as $index => $key) {
+                $zSetKeys[$index] = $this->prefix . $key;
+            }
+        }
+        $datas = $this->__call('zunion', [$output, $zSetKeys, $weights, $aggregateFunction]);
         return $datas;
     }
 
     /**
-     * @param       $cmd
-     * @param array $args
+     * @param       $name
+     * @param array $param
      *
      * @return mixed|null
      */
-    public function __call($cmd, $args = [])
+    public function __call($name, $param = [])
     {
         $flag = $this->init();
-        if (!$flag) { //init失败直接报错
-            trigger_error('Redis init error', E_USER_ERROR);
-        }
-        if (stripos($args[0], $this->prefix) === 0) {//先去除前缀
-            $args[0] = substr($args[0], strlen($this->prefix));
-        }
-        if (!in_array($cmd, ['script', 'evalSha', 'evaluate'])) {
-            $args[0] = $this->prefix . $args[0];
-        }
-        if ($cmd === 'evalSha' || $cmd === 'evaluate') {
-            array_unshift($args[1], $this->prefix);
-            $args[2] += 1;
-        }
-        if ($cmd == 'zunion') {
-            $keys = isset($args[1]) ? $args[1] : [];
-            if (is_array($keys)) {
-                foreach ($keys as $index => $key) {
-                    $keys[$index] = $this->prefix . $key;
-                }
-                $args[1] = $keys;
+
+        if ($this->usePrefix) {
+            if (stripos($param[0], $this->prefix) === 0) {//先去除前缀
+                $param[0] = substr($param[0], strlen($this->prefix));
+            }
+            if (!isset(self::$rawCommandList[strtolower($name)])) {
+                $param[0] = $this->prefix . $param[0];
             }
         }
 
         if ($flag) {
-            $ret = call_user_func_array([&$this->handle, $cmd], $args);
+            $ret = call_user_func_array([&$this->handle, $name], $param);
+            /*log_write(
+                    '__call:' . var_export(
+                            ['$ret' => $ret, '$name' => $name, '$param' => $param, 'prop' => $this->getProperty()],
+                            1
+                    )
+            );*/
             return $ret;
         } else {
             return null;
@@ -393,6 +481,24 @@ class SmvcRedisHelper
     public function setnx($key, $value)
     {
         $datas = $this->__call('setnx', [$key, $value]);
+
+        return $datas;
+    }
+
+    /**
+     * Set the string value in argument as value of the key, with a time to live.
+     *
+     * @param   string $key
+     * @param   int    $ttl
+     * @param   string $value
+     *
+     * @return  bool    TRUE if the command is successful.
+     * @link    http://redis.io/commands/setex
+     * @example $redis->setex('key', 3600, 'value'); // sets key → value, with 1h TTL.
+     */
+    public function setex($key, $ttl, $value)
+    {
+        $datas = $this->__call('setex', [$key, $ttl, $value]);
 
         return $datas;
     }
@@ -545,6 +651,10 @@ class SmvcRedisHelper
      */
     public function evalSha($scriptSha, $args = array(), $numKeys = 0)
     {
+        if (is_array($args) && $args && $this->usePrefix && !empty($this->prefix)) {
+            array_unshift($args, $this->prefix);
+            $numKeys += 1;
+        }
         $datas = $this->__call('evalSha', [$scriptSha, $args, $numKeys]);
         return $datas;
     }
@@ -558,6 +668,10 @@ class SmvcRedisHelper
      */
     public function evaluate($script, $args = array(), $numKeys = 0)
     {
+        if (is_array($args) && $args && $this->usePrefix && !empty($this->prefix)) {
+            array_unshift($args, $this->prefix);
+            $numKeys += 1;
+        }
         $datas = $this->__call('evaluate', [$script, $args, $numKeys]);
         return $datas;
     }
@@ -818,15 +932,29 @@ SCRIPT;
         return false;
     }
 
+
+    public static function showError($msg, $showErrorType = null, $errorType = null)
+    {
+        if (is_null($showErrorType)) {
+            $showErrorType = self::$showErrorType;
+        }
+        if (is_null($errorType)) {
+            $errorType = self::$errorType;
+        }
+        switch ($showErrorType) {
+            case 1:
+                trigger_error($msg, $errorType);
+                break;
+            default:
+                throw new Exception($msg);
+        }
+    }
+
     public function close()
     {
         $this->__call('quit');
     }
 
-    public function select($index)
-    {
-        return $this->__call('select', [$index]);
-    }
 
     public function type($key)
     {
@@ -836,17 +964,6 @@ SCRIPT;
     public function getMultiple($keys)
     {
         return $this->__call('getMultiple', [$keys]);
-    }
-
-    public function del($keys)
-    {
-        $keys = func_get_args();
-        return $this->__call('del', [$keys]);
-    }
-
-    public function setex($key, $ttl, $value)
-    {
-        return $this->__call('setex', [$key, $ttl, $value]);
     }
 
     public function mset($array)
@@ -1152,5 +1269,72 @@ SCRIPT;
         $args = func_get_args();
         return $this->__call('sUnionStore', [$args]);
     }
+    
+    
+        const REDIS_EXPIRE_TIME = -1;
+
+    private static $expire = 0;
+
+    /**
+     *
+     * @var Redis
+     */
+    private $handle = null;
+
+    /**
+     *
+     * @var array
+     */
+    private $config;
+
+    /**
+     *
+     * @var string
+     */
+    private $prefix;
+
+    /**
+     *
+     * @var RedisHelper
+     */
+    private static $instance = array();
+
+    private $decodedPrefix = 'RH_DECODED:';
+    private $decodedPrefixLen;
+    private $usePrefix = true;
+    private $alias = 'default';
+    private $timeout = 0.0;//链接超时时间
+    private static $showErrorType = 0;// 0:exception 1:trigger_error
+    private static $errorType = E_USER_ERROR;//
+    private static $rawCommandList = [ //key为原始命令，参数都不需要进行特殊处理(eg: 不需要自动添加前缀)
+            'script'     => 1,
+            'evalsha'    => 1,
+            'evaluate'   => 1,
+            'select'     => 1,
+            'auth'       => 1,
+            'save'       => 1,
+            'bgsave'     => 1,
+            'client'     => 1,
+            'close'      => 1,
+            'rawcommand' => 1,
+            'config'     => 1,
+            'dbsize'     => 1,
+            'discard'    => 1,
+            'multi'      => 1,
+            'exec'       => 1,
+            'watch'      => 1,
+            'unwatch'    => 1,
+            'flushdb'    => 1,
+            'flushall'   => 1,
+            'info'       => 1,
+            'keys'       => 1,
+            'lastsave'   => 1,
+            'migrate'    => 1,
+            'ping'       => 1,
+            'psubscribe' => 1,
+            'publish'    => 1,
+            'quit'       => 1,
+            'wait'       => 1,
+    ];
 
 }
