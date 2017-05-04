@@ -2,6 +2,7 @@
 
 /**
  * @author Jeff Liu
+ * Class SmvcStringHelper
  */
 class SmvcStringHelper
 {
