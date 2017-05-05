@@ -47,6 +47,7 @@ class Router
     private static $originAction;
 
     /**
+     * todo 还需要整理
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     public static function doUrlMapping()
@@ -55,21 +56,21 @@ class Router
         if ($urlMappingConf) {
             foreach ($urlMappingConf as $pattern => $mapping) {
                 list($group, $module, $controller, $action) = each(explode('/', $pattern));
-                list($mappingGroup, $mappingModule, $mappingController, $mappingAction) = each(explode('/', $pattern));
-                $originGroup = self::initGroup();
-                if ($group == '*' || $group == $originGroup) {
+                list($mappingGroup, $mappingModule, $mappingController, $mappingAction) = each(explode('/', $mapping));
+                $originGroup = self::parseGroup();
+                if ($group === '*' || $group === $originGroup) {
                     self::mappingGroup($mappingGroup);
                     self::setOriginGroup($originGroup);
-                    $originModule = self::initModule();
-                    if ($module == '*' || $module == $originModule) {
+                    $originModule = self::parseModule();
+                    if ($module === '*' || $module === $originModule) {
                         self::mappingModule($mappingModule);
                         self::setOriginModule($originModule);
-                        $originController = self::initController();
-                        if ($controller == '*' || $controller == $originController) {
+                        $originController = self::parseController();
+                        if ($controller === '*' || $controller === $originController) {
                             self::mappingController($mappingController);
                             self::setOriginController($originController);
-                            $originAction = self::initAction();
-                            if ($action == '*' || $action == $originAction) {
+                            $originAction = self::parseAction();
+                            if ($action === '*' || $action === $originAction) {
                                 self::mappingAction($mappingAction);
                                 self::setOriginAction($originAction);
                             }
@@ -233,23 +234,24 @@ class Router
 
     /**
      * 初始化环境变量
+     *
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     public static function initEnv()
     {
         self::doUrlMapping();
 
-        self::initGroup();
-        self::initModule();
-        self::initController();
-        self::initAction();
+        self::parseGroup();
+        self::parseModule();
+        self::parseController();
+        self::parseAction();
     }
 
     /**
-     * 初始化分组
+     * 解析分组
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
-    private static function initGroup()
+    private static function parseGroup()
     {
         if (empty(self::$group)) {
             $groupParamName = C('groupParamName', 'g');
@@ -369,7 +371,7 @@ class Router
      * 初始化module
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
-    private static function initModule()
+    private static function parseModule()
     {
         if (empty(self::$module)) {
             $moduleParamName = C('moduleParamName', 'm');
@@ -387,7 +389,7 @@ class Router
      * 初始化action
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
-    private static function initController()
+    private static function parseController()
     {
         if (empty(self::$controller)) {
             $controllerParamName = C('controllerParamName', 'c');
@@ -405,7 +407,7 @@ class Router
     /**
      * @return mixed|string
      */
-    private static function initAction()
+    private static function parseAction()
     {
         if (empty(self::$action)) {
             $actionParamName = C('actionParamName', 'a');

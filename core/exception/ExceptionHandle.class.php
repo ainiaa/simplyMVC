@@ -78,7 +78,7 @@ class ExceptionHandle
     }
 
     /**
-     *
+     * 设定错误和异常处理
      */
     public static function init()
     {

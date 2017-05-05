@@ -86,11 +86,11 @@ class Importer
      *
      * @param string $configPath    config目录
      * @param string $configFileExt config文件的后缀
-     * @param bool   $excludEnv 排除环境config
+     * @param bool   $excludEnvFile 排除环境config
      *
      * @return array
      */
-    public static function importConfigFile($configPath, $configFileExt = 'php', $excludEnv = true)
+    public static function importConfigFile($configPath, $configFileExt = 'php', $excludEnvFile = true)
     {
         $finalResult = [];
         if (empty($configPath)) {
@@ -105,14 +105,14 @@ class Importer
 
         if (!empty($configFiles) && is_array($configFiles)) {
             foreach ($configFiles as $configFile) {
-                if ($excludEnv && stripos($configFile, 'env.') === 0) {//环境
+                if ($excludEnvFile && stripos($configFile, 'env.') === 0) {//环境
                     continue;
                 }
                 if (is_file($configFile)) {
                     if (is_readable($configFile)) {
                         $fileHash = md5($configFile);
                         if (!isset(Importer::$loadedFiles[$fileHash])) { //还没有加载过当前config文件 加载当前cofnig文件
-                            
+
                             $currentConf = include $configFile;
                             if (is_array($currentConf)) {
                                 $finalResult += $currentConf;
@@ -277,13 +277,13 @@ class Importer
         //        );
 
         if (!$loadResult) {
-            $helperFile = APP_DIR .  $groupName . '/' . $moduleName . '/helper/' . $helperFileName;
+            $helperFile = APP_DIR . $groupName . '/' . $moduleName . '/helper/' . $helperFileName;
             $loadResult = self::importFileByFullPath($helperFile, false);
 
             if (!$loadResult) { //当前group module下加载controller失败
                 $modules = self::getModuleList($groupName);
                 foreach ($modules as $module) {
-                    $filePath = APP_DIR  . $groupName . '/' . $module . '/helper/' . $helperFileName;
+                    $filePath = APP_DIR . $groupName . '/' . $module . '/helper/' . $helperFileName;
                     $files    = self::getServiceListByGroupAndModule($groupName, $module);
                     if (in_array($filePath, $files, true)) {
                         $loadResult = self::importFileByFullPath($helperFile);

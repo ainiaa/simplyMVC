@@ -2,22 +2,27 @@
 if (!function_exists('C')) {
     function C($key = null, $default = false)
     {
-        return SmvcConf::instance()->get($key, $default);
+        return SmvcConf::getInstance()->get($key, $default);
     }
 }
 
 if (!function_exists('SC')) {
     function SC($key = null, $value = false)
     {
-        return SmvcConf::instance()->set($key, $value);
+        return SmvcConf::getInstance()->set($key, $value);
     }
 }
 
 
 if (!function_exists('LCL')) {
-    function LCL($configFilePath, $configFileExt = 'php')
+    /**
+     * @param        $configFilePath
+     * @param string $configFileExt
+     * @param bool   $excludEnvFile
+     */
+    function LCL($configFilePath, $configFileExt = 'php', $excludEnvFile = true)
     {
-        SmvcConf::instance()->loadConfigFileList($configFilePath, $configFileExt);
+        SmvcConf::getInstance()->loadConfigFileList($configFilePath, $configFileExt, $excludEnvFile);
     }
 }
 
@@ -93,9 +98,9 @@ function xml_encode($data, $root = 'think', $item = 'item', $attr = '', $id = 'i
     $attr = trim($attr);
     $attr = empty($attr) ? '' : " {$attr}";
     $xml  = "<?xml version=\"1.0\" encoding=\"{$encoding}\"?>";
-    $xml .= "<{$root}{$attr}>";
-    $xml .= data_to_xml($data, $item, $id);
-    $xml .= "</{$root}>";
+    $xml  .= "<{$root}{$attr}>";
+    $xml  .= data_to_xml($data, $item, $id);
+    $xml  .= "</{$root}>";
 
     return $xml;
 }
@@ -258,14 +263,14 @@ function make_url($uri_path, $uri_params, $absolute = false)
 {
     $final_url    = '';
     $uri_path_arr = explode('/', $uri_path);
-    $final_url .= sprintf(
+    $final_url    .= sprintf(
             'index.php?g=%s&m=%s&c=%s&a=%s',
             $uri_path_arr[0],
             $uri_path_arr[1],
             $uri_path_arr[2],
             $uri_path_arr[3]
     );
-    $final_url .= '&' . http_build_query($uri_params);
+    $final_url    .= '&' . http_build_query($uri_params);
     if ($absolute) {
         $final_url = get_domain() . $final_url;
     }
@@ -280,19 +285,24 @@ function I($name, $defaultValue = null, $callback = null)
         $key  = implode('.', $name);
     } else {
         $type = 'request';
-        $key = $name[0];
+        $key  = $name[0];
     }
     return Request::getParam($type, $key, $defaultValue, $callback);
 }
 
 if (!function_exists('com_create_guid')) {
-    function com_create_guid() {
-        return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
-                mt_rand( 0, 0xffff ),
-                mt_rand( 0, 0x0fff ) | 0x4000,
-                mt_rand( 0, 0x3fff ) | 0x8000,
-                mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+    function com_create_guid()
+    {
+        return sprintf(
+                '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0x0fff) | 0x4000,
+                mt_rand(0, 0x3fff) | 0x8000,
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff),
+                mt_rand(0, 0xffff)
         );
     }
 }

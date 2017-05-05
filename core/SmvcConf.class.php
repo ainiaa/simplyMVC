@@ -24,7 +24,7 @@ class SmvcConf implements ArrayAccess
     /**
      * @return SmvcConf
      */
-    public static function instance()
+    public static function getInstance()
     {
         if (self::$instance == null) {
             self::$instance = new SmvcConf();
@@ -79,10 +79,12 @@ class SmvcConf implements ArrayAccess
 
         $currentConfData = Importer::loadConfigFile($configFile);
 
-        if (is_array($this->configData)) {
-            $this->configData += $currentConfData;
-        } else {
-            $this->configData = $currentConfData;
+        if (is_array($currentConfData)) {
+            if (is_array($this->configData)) {
+                $this->configData += $currentConfData;
+            } else {
+                $this->configData = $currentConfData;
+            }
         }
 
     }
@@ -90,37 +92,41 @@ class SmvcConf implements ArrayAccess
     /**
      * 初始化config
      *
-     * @param $configPath
-     * @param $configFileExt
+     * @param        $configPath
+     * @param string $configFileExt
+     * @param bool   $excludEnvFile
      */
-    public static function init($configPath, $configFileExt = 'php')
+    public static function init($configPath, $configFileExt = 'php', $excludEnvFile = true)
     {
-        SmvcConf::instance()->loadConfigFileList($configPath, $configFileExt);
+        SmvcConf::getInstance()->loadConfigFileList($configPath, $configFileExt, $excludEnvFile);
     }
 
-    public static function initEnv($envConfigPath, $configFileExt = 'php')
+    /**
+     * @param        $envConfigPath
+     */
+    public static function initEnv($envConfigPath)
     {
-        SmvcConf::instance()->loadConfigFileList($envConfigPath, $configFileExt);
+        SmvcConf::getInstance()->loadConfigFile($envConfigPath);
         if (defined('CURRENT_ENV')) {
             switch (CURRENT_ENV) {
                 case 1://生产环境
-                    $confEnvPath = CONF_DIR . 'env.production.php';
+                    $currentConfEnvFile = CONF_DIR . 'env.production.php';
                     break;
                 case 2://预生产
-                    $confEnvPath = CONF_DIR . 'env.preview.php';
+                    $currentConfEnvFile = CONF_DIR . 'env.preview.php';
                     break;
                 case 3://测试环境
-                    $confEnvPath = CONF_DIR . 'env.preview.php';
+                    $currentConfEnvFile = CONF_DIR . 'env.preview.php';
                     break;
                 case 4://类生产
-                    $confEnvPath = CONF_DIR . 'env.productionlike.php';
+                    $currentConfEnvFile = CONF_DIR . 'env.productionlike.php';
                     break;
                 case 0://开发环境
                 default:
-                    $confEnvPath = CONF_DIR . 'env.testing.php';
+                    $currentConfEnvFile = CONF_DIR . 'env.testing.php';
             }
-            if (is_file($confEnvPath)) {
-                SmvcConf::instance()->loadConfigFileList($confEnvPath, $configFileExt);
+            if (is_file($currentConfEnvFile)) {
+                SmvcConf::getInstance()->loadConfigFile($currentConfEnvFile);
             }
         }
     }
@@ -128,11 +134,11 @@ class SmvcConf implements ArrayAccess
     /**
      * @param        $configPath
      * @param string $configFileExt
-     * @param bool   $excludEnv
+     * @param bool   $excludEnvFile
      */
-    public function loadConfigFileList($configPath, $configFileExt = 'php', $excludEnv = true)
+    public function loadConfigFileList($configPath, $configFileExt = 'php', $excludEnvFile = true)
     {
-        $currentConfData = Importer::importConfigFile($configPath, $configFileExt, $excludEnv);
+        $currentConfData = Importer::importConfigFile($configPath, $configFileExt, $excludEnvFile);
 
         if (is_array($this->configData)) {
             $this->configData += $currentConfData;
@@ -142,7 +148,14 @@ class SmvcConf implements ArrayAccess
     }
 
 
-    public function getfile($index, $configFile = null)
+    /**
+     * @param      $index
+     * @param null $configFile
+     *
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function getFile($index, $configFile = null)
     {
         if (!is_array($this->configFileList) || !array_key_exists($index, $this->configFileList)) {
             $configFile = $this->configPath . $configFile;
@@ -227,7 +240,7 @@ class SmvcConf implements ArrayAccess
      *
      * @return bool|null
      */
-    public static function getWithDot($key, $configData, $default = false)
+    public static function getWithDot($key, $configData, $default = null)
     {
         $finalConfig = null;
         if (strpos($key, '.') !== false) {//包含 '.'
