@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>权限管理-角色菜单关联权限</title>
+    <meta name="Keywords" content="{:C('SITE_KEYWORDS')}"/>
+    <link href="__PUBLIC__/Css/main.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/layout.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/module.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/Wcanal.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/Wnumgoods.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/Waccount.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/Wshop.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/Wshopconfig.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Js/validationEngine/css/validationEngine.jquery.css?v=__VR__" rel="stylesheet"
+          type="text/css"/>
+    <script type="text/javascript" src="__PUBLIC__/Js/jquery-1.7.1.min.js?v=__VR__"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/artDialog4.1.6/jquery.artDialog.js?skin=default"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/artDialog4.1.6/plugins/iframeTools.js?v=__VR__"></script>
+    <script type="text/javascript"
+            src="__PUBLIC__/Js/validationEngine/languages/jquery.validationEngine-zh_CN.js?v=__VR__"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/validationEngine/jquery.validationEngine.js?v=__VR__"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/jquery.form.js?v=__VR__"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/global.js?v=__VR__"></script>
+    <style type="text/css">
+        .Gform.eTicket .Ginput input[type=text]::-webkit-input-placeholder {
+            color: #a8a8a8;
+            font-size: 12px;
+        }
+
+        .Gform.eTicket .Ginput input[type=text]::-moz-placeholder {
+            color: #a8a8a8;
+            font-size: 12px;
+        }
+
+        .Gform.eTicket .Ginput input[type=text]::-moz-placeholder {
+            color: #a8a8a8;
+            font-size: 12px;
+        }
+
+        .Gform.eTicket .Ginput input[type=text]::-ms-input-placeholder {
+            color: #a8a8a8;
+            font-size: 12px;
+        }
+
+        .loadStatus {
+            margin-bottom: 0;
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            function subclick() {
+                if (!$("#privilegeRelate").validationEngine('validate')) {
+                    return false;
+                }
+                $('#smb').unbind('click', subclick);
+                $.post("<?php echo U('Admin/Role/relateMenuPrivilege');?>", $("#privilegeRelate").serialize(), function (d) {
+                    if (d.status == '0') {
+                        result_(d.info);
+                    } else {
+                        success(d.info);
+                    }
+                    $('#smb').bind('click', subclick);
+                }, 'json');
+
+            }
+
+            function result_(contents) {
+                art.dialog({
+                    title: '提示',
+                    width: 400,
+                    content: '<div class="loadTip"><div class="loadStatus tip"><dl><dt>' + contents + '</dt></dl></div></div>',
+                    icon: 'error',
+                    lock: true,
+                    ok: function () {
+                        art.dialog.close();
+                    }
+                })
+            }
+            function success(contents) {
+                art.dialog({
+                    title: "提示",
+                    width: 400,
+                    content: '<div class="loadTip"><div class="loadStatus ok"><dl><dt>' + contents + '</dt></dl></div></div>',
+                    icon: 'succeed',
+                    lock: true,
+                    ok: function () {
+                        window.location.href = '{:U("Admin/Role/index")}';
+                    }
+                })
+            }
+
+            $("#smb").click(subclick);
+        });
+    </script>
+</head>
+<body>
+<div id="wrapper">
+    <include file="./Home/Tpl/Public/Public_header.html"/>
+    <div id="container" class="bgfff">
+        <div id="main" class="rel">
+            <div class="new_sidenav">
+                <include file="Admin:sidenav" leftmenuid="jslb"/>
+            </div>
+            <div class="subcon fn">
+                <div class="main-name fn">
+                    <h4><a href="javascript:history.go(-1);" class="back"><i></i> 角色列表</a> / 角色关联菜单-权限</h4>
+                </div>
+                <form method="post" action="" id="privilegeRelate">
+                    <input type="hidden" name="id" value="{$Think.get.id}"/>
+                    <div class="Wcanal-tab" id="Wcanal-tabon">
+                        <div class="eTicket_form">
+                            <div id="Wform" class="Gform w1">
+                                <ul>
+                                    <li class="Gname"><span>*</span>&nbsp;角色名称</li>
+                                    <li class="Ginput">{$roleInfo.role_name}</li>
+                                </ul>
+                                <ul>
+                                    <li class="Gname"><span>*</span>&nbsp;菜单-权限</li>
+                                    <li class="Ginput">
+                                        <foreach name="menuPrivilegeList" item="menuPrivilege" key="key">
+                                            &nbsp;&nbsp;<input type="checkbox" name="relateMenuPrivilege[]" <if condition="$menuPrivilege.related eq 1 ">checked="checked"</if> value="{$menuPrivilege.mid},{$menuPrivilege.pid}" />{$menuPrivilege.show_tips}
+                                            <if condition="($key % 8) eq 0 and $key neq 0 "><br/></if>
+                                        </foreach>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li class="Gname"></li>
+                                    <li class="Ginput mt5">
+                                        <a href="javascript:void(0);" title="确认" id="smb" class="btn-all w110">确定</a>
+                                        <a href="javascript:location.href='{:U('Admin/Role/index')}';" title="取消" id="reset"
+                                           class="btn-all-del w110 ml10">取消</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<include file="./Home/Tpl/Public/Public_footer.html"/>
+</div>
+<div class="service"></div>
+</body>
+</html>

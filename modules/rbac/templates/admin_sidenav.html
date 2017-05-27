@@ -1,0 +1,28 @@
+<ul id="accordion" class="accordion">
+    <li>
+        <div class="title">权限管理</div>
+    </li>
+    <li>
+        <div class="link"><a href="javascript:void(0);">权限管理</a><i class="downArrow"></i></div>
+        <ul class="submenu">
+            <li id="li-qxlb"><a href="{:U('Admin/Privilege/index')}">权限列表</a></li>
+            <li id="li-cdlb"><a href="{:U('Admin/Menu/index')}">菜单列表</a></li>
+            <li id="li-yhfzlb"><a href="{:U('Admin/UserGroup/index')}">用户分组列表</a></li>
+            <li id="li-ggzylb"><a href="{:U('Admin/PublicResource/index')}">公共资源列表</a></li>
+            <li id="li-jslb"><a href="{:U('Admin/Role/index')}">角色列表</a></li>
+            <li id="li-yhlb"><a href="{:U('Admin/User/index')}">用户列表</a></li>
+        </ul>
+    </li>
+</ul>
+<script>
+    $(function () {
+        var menu_id = "li-" + ("[leftmenuid]" || "ewmbqqd");
+        var _currentMenu = $("#" + menu_id);
+        if (_currentMenu.parent("ul").length > 0) {
+            _currentMenu.parent().parent().addClass('open');
+            _currentMenu.addClass('hover');
+        } else {
+            _currentMenu.parent().addClass('open2');
+        }
+    })
+</script>

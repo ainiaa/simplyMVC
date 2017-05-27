@@ -1,29 +1,25 @@
 <?php
-if (!function_exists('C')) {
-    function C($key = null, $default = false)
-    {
-        return SmvcConf::getInstance()->get($key, $default);
-    }
-}
 
-if (!function_exists('SC')) {
-    function SC($key = null, $value = false)
-    {
-        return SmvcConf::getInstance()->set($key, $value);
-    }
+function C($key = null, $default = false)
+{
+    return SmvcConf::getInstance()->get($key, $default);
 }
 
 
-if (!function_exists('LCL')) {
-    /**
-     * @param        $configFilePath
-     * @param string $configFileExt
-     * @param bool   $excludEnvFile
-     */
-    function LCL($configFilePath, $configFileExt = 'php', $excludEnvFile = true)
-    {
-        SmvcConf::getInstance()->loadConfigFileList($configFilePath, $configFileExt, $excludEnvFile);
-    }
+function SC($key = null, $value = false)
+{
+    return SmvcConf::getInstance()->set($key, $value);
+}
+
+
+/**
+ * @param        $configFilePath
+ * @param string $configFileExt
+ * @param bool   $excludEnvFile
+ */
+function LCL($configFilePath, $configFileExt = 'php', $excludEnvFile = true)
+{
+    SmvcConf::getInstance()->loadConfigFileList($configFilePath, $configFileExt, $excludEnvFile);
 }
 
 /**

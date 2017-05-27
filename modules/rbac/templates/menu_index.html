@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>权限管理-菜单列表</title>
+    <meta name="Keywords" content="{:C('SITE_KEYWORDS')}"/>
+    <link href="__PUBLIC__/Css/main.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/layout.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/module.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Css/Wshopconfig.css?v=__VR__" rel="stylesheet" type="text/css"/>
+    <link href="__PUBLIC__/Js/validationEngine/css/validationEngine.jquery.css?v=__VR__" rel="stylesheet"
+          type="text/css"/>
+    <script type="text/javascript" src="__PUBLIC__/Js/jquery-1.7.1.min.js?v=__VR__"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/global.js?v=__VR__"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/artDialog4.1.6/jquery.artDialog.js?skin=default"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/artDialog4.1.6/plugins/iframeTools.js?v=__VR__"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/citycode.js?v=__VR__"></script>
+    <script type="text/javascript" src="__PUBLIC__/Js/jquery.qrcode.min.js?v=__VR__"></script>
+    <js href="__PUBLIC__/Js/jquery.form.js?v=__VR__"/>
+    <script type="text/javascript">
+        $(document).ready(function (e) {
+
+            //编辑菜单
+            $(".js_edit").click(function (e) {
+                var menuId = $(this).attr('menu_id');
+                window.open("{:U('Admin/Menu/edit')}&id=" + menuId);
+            });
+
+            //关联菜单
+            $(".js_relate").click(function (e) {
+                var menuId = $(this).attr('menu_id');
+                window.open("{:U('Admin/Menu/relatePrivilege')}&id=" + menuId);
+            });
+
+            //删除菜单
+            $(".js_del").click(function () {
+                var menuId = $(this).attr('menu_id');
+                Dialoading("正在提交...");
+                $.getJSON("{:U('Admin/Menu/delete')}&id=" + menuId, function (data) {
+                    Dialoading();
+                    if ((typeof data) == 'boolean') {
+                        location.reload();
+                    } else {
+                        Diasucceed(data, function () {
+                            location.reload()
+                        }, 1)
+                    }
+                });
+            });
+
+            $("#sub_button").click(function () {
+                $("#storeForm").submit();
+            });
+
+        });
+    </script>
+</head>
+<body>
+<div id="wrapper" class="no">
+    <include file="./Home/Tpl/Public/Public_header.html"/>
+
+    <div id="container" class="bgfff">
+        <div id="main" class="rel">
+            <div class="new_sidenav rel">
+                <include file="Admin:sidenav" leftmenuid="cdlb"/>
+            </div>
+            <div class="subcon fn">
+                <div class="main-name fn">
+                    <h4>菜单列表<a class="btn-add first" href="{:U('Admin/Menu/add')}"><i></i>录入新菜单</a>
+                    </h4>
+                </div>
+                <div class="Wcanal-tab" id="Wcanal-tabon">
+                    <div class="Wcanal-tab-list" style="display: block;">
+                        <div class="SearchArea fn">
+                            <form method="get" action="" id="storeForm">
+                                <div class="SearchAreaLeft">
+                                    <!--提交地址-->
+                                    <input type="hidden" name="g" value="{$Think.GROUP_NAME}"/>
+                                    <input type="hidden" name="m" value="{$Think.MODULE_NAME}"/>
+                                    <input type="hidden" name="a" value="{$Think.ACTION_NAME}"/>
+                                    <label>
+                                        <span>菜单名称</span>
+                                        <input type="text" name="menu_name" id="menu_name" value="{$_GET['menu_name']}">
+                                    </label>
+
+                                    <label>
+                                        <span>菜单uri</span>
+                                        <input type="text" name="menu_uri" id="menu_uri" value="{$_GET['menu_uri']}">
+                                    </label>
+                                </div>
+                                <div class="SearchAreaRight">
+                                    <a href="javascript:void(0);" class="searchBtn" id="sub_button">查询</a>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="fn">
+                            <div class="l" style="padding-right:90px;min-width:100%;">
+                                <table cellpadding="0" cellspacing="0" class="B-table">
+                                    <tbody>
+                                    <tr class="th">
+                                        <th width="10%">菜单ID</th>
+                                        <th width="20%">菜单名称</th>
+                                        <th width="20%">父菜单</th>
+                                        <th width="30%">菜单uri</th>
+                                        <th class="choose"><span>操作</span></th>
+                                    </tr>
+                                    <?php if($queryList){
+					   					    foreach($queryList as $v){  ?>
+                                    <tr class="title">
+                                        <td>{$v['id']}</td>
+                                        <td>{$v['menu_name']|default='未填写'}</td>
+                                        <td>{$v['pmenu_name']|default='-'}</td>
+                                        <td>{$v['menu_url']|default='未填写'}</td>
+                                        <td>
+                                            <a href="javascript:void(0);" class="js_edit" menu_id="{$v['id']}">编辑</a>&nbsp;|
+                                            <a href="javascript:void(0);" class="js_relate" menu_id="{$v['id']}">关联权限</a>&nbsp;|
+                                            <a href="javascript:void(0);" class="js_del" menu_id="{$v['id']}"
+                                               menu_name="{$v['menu_name']}">删除</a>
+                                        </td>
+                                    </tr>
+                                    <?php } }else{ ?>
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="nonedata"></div>
+                                        </td>
+                                    </tr>
+                                    <?php } ?>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="page">{$pageShow}</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <include file="./Home/Tpl/Public/Public_footer.html"/>
+</div>
+<div class="service"></div>
+</body>
+<style>
+    .fn .th th {
+        word-break: keep-all;
+    }
+
+    .choose {
+        word-break: keep-all;
+        position: relative;
+
+    }
+
+    .choose span a {
+        padding: 2px 8px;
+        margin-left: 30px;
+        border: 1px solid #c3ddf5;
+        line-height: 24px;
+        background-color: #f3f9ff;
+        color: #2e7dc6;
+    }
+
+    .kejian {
+        z-index: 2;
+        background: #fff;
+        position: absolute;
+        right: 0px;
+        top: 35px;
+        width: 136px;
+        border: 1px solid #e1e1e1;
+        display: none;
+    }
+
+    .none {
+        display: block;
+    }
+
+    .kejian .list {
+        float: left;
+
+    }
+
+    .kejian .list li {
+        list-style: none;
+        float: left;
+        width: 125px;
+        line-height: 24px;
+        padding-left: 12px;
+    }
+
+    .frm_checkbox_label {
+        margin-right: 6px;
+    }
+
+    .icon_change {
+        width: 14px;
+        height: 14px;
+        vertical-align: middle;
+        display: inline-block;
+        border: 1px solid #cccccc;
+    }
+
+    .icon_color, .icon_bk {
+        border: 1px solid red;
+    }
+
+    .btn_last {
+        height: 40px !important;
+        text-align: center;
+        background: #f6f6f6;
+        padding-top: 10px;
+        margin-top: 10px;
+    }
+
+    .btn_save {
+        background: #ed3f41;
+        color: #fff !important;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-right: 10px;
+        display: inline-block;
+    }
+
+    .btn_save:hover {
+        background: #ff6d6f;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .btn_cancel {
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-right: 10px;
+        color: #666666;
+        display: inline-block;
+        border: 1px solid #d1d1d1;
+    }
+
+    .btn_cancel:hover {
+        color: #666666;
+    }
+
+    .screen {
+        display: none;
+    }
+</style>
+</html>

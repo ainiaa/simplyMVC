@@ -2,7 +2,7 @@
 
 /**
  * 数据库相关 DAO
- * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+ * @author  Jeff.Liu<jeff.liu.guo@gmail.com>
  *
  * @version 0.1
  *
@@ -10,6 +10,10 @@
  */
 class BaseDBDAO extends SmvcObject
 {
+
+    const SELECT_TYPE_ALL = 0; // 0：获得所有满足条件的记录
+    const SELECT_TYPE_ONE = 1; // 1：获得一条满足条件的记录
+    const SELECT_TYPE_FIELD = 2; // 2:获得一条满足条件的记录中的某些字段
 
     protected static $writeKey = 'db.master';
     protected static $readKey = 'db.slave';
@@ -404,7 +408,7 @@ class BaseDBDAO extends SmvcObject
      * @param array        $data  The data that will be modified.
      * @param array|string $where The WHERE clause to filter records.
      *
-     * @see http://medoo.in/api/update
+     * @see    http://medoo.in/api/update
      *
      * @return int  The number of rows affected.
      */
@@ -475,8 +479,7 @@ class BaseDBDAO extends SmvcObject
     public function getAll($columns = '*', $where = [])
     {
         $this->setLatestStorageType(self::READ_STORAGE);
-        $d = $this->getStorage();
-        return $d->select($this->realTableName, $columns, $where);
+        return $this->getStorage()->select($this->realTableName, $columns, $where);
     }
 
     /**
@@ -811,13 +814,19 @@ class BaseDBDAO extends SmvcObject
         return true;
     }
 
+    public function execute($query, $type = 1)
+    {
+        return $this->exec($query, $type);
+    }
+
     /**
      * @param     $query
      * @param int $queryType
      *
-     * @return $this
+     * @return mixed
      */
-    public function exec($query, $type = 1){
+    public function exec($query, $type = 1)
+    {
         if ($this->transTimes > 0) { //事务
             $type = self::WRITE_STORAGE;
         } else if (is_null($type)) {
@@ -828,6 +837,99 @@ class BaseDBDAO extends SmvcObject
             }
         }
         return $this->getStorage($type)->exec($query);
+    }
+
+    /**
+     * @author Jeff Liu<liuwy@imageco.com.cn>
+     *
+     * @param $data
+     * @param $where
+     *
+     * @return bool
+     */
+    public function saveData($data, $where)
+    {
+        return $this->update($data, $where);
+    }
+
+    public function getList($where, $field = '')
+    {
+        return $this->getData($this->tableName, $where, self::SELECT_TYPE_ALL, $field);
+    }
+
+
+    public function getListWithLimit($where, $limit, $field = '')
+    {
+        return $this->getData($this->tableName, $where, self::SELECT_TYPE_ALL, $field, '', $limit);
+    }
+
+    /**
+     *
+     * todo 这个还需要进行处理
+     * 通用获得数据的方法
+     *
+     * @author Jeff Liu<liuwy@imageco.com.cn>
+     *
+     * @param string $table
+     * @param array  $where
+     * @param int    $selectType
+     * @param string $field
+     * @param string $order
+     * @param string $limit
+     *
+     * @param bool   $lock
+     *
+     * @return mixed
+     */
+    public function getData(
+            $table = '',
+            $where = array(),
+            $selectType = self::SELECT_TYPE_ALL,
+            $field = '',
+            $order = '',
+            $limit = '',
+            $lock = false
+    ) {
+        if (empty($table)) {
+            $table = $this->tableName;
+        }
+        $this->setTableName($table)->where($where);
+        if ($field) {
+            $this->field($field);
+        }
+        if ($order) {
+            $this->order($order);
+        }
+        if ($limit) {
+            $this->limit($limit);
+        }
+        if ($lock) {
+            $this->lock();
+        }
+        if ($selectType === self::SELECT_TYPE_ALL) {
+            return $this->getAll($field, $where);
+        } elseif ($selectType === self::SELECT_TYPE_ONE) {
+            return $this->getOne($field, $where);
+        } else {
+            return $this->getField($field, $where);
+        }
+    }
+
+    /**
+     * 获得指定的filed信息
+     *
+     * @param $field
+     * @param $where
+     *
+     * @return bool|mixed
+     */
+    public function getField($field, $where)
+    {
+        $data = $this->getOne($field, $where);
+        if (isset($data[$field])) {
+            return $data[$field];
+        }
+        return false;
     }
 
 }

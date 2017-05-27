@@ -261,4 +261,66 @@ class BackendController extends BaseController
         $this->display('login.tpl.html');
     }
 
+    /**
+     * 根据编号获得对一个tipsInfo.
+     *
+     * @author Jeff Liu
+     *
+     * @param $errno
+     *
+     * @return mixed
+     */
+    protected function getMessageInfoByErrno($errno)
+    {
+        return TipsInfoService::getMessageInfoByErrno($errno);
+    }
+
+
+    /**
+     * @author Jeff Liu<liuwy@iamgeco.com.cn>
+     *
+     * @param $errno
+     *
+     * @return array
+     */
+    protected function buildAjaxErrorReturnData($errno)
+    {
+        $messageInfo = $this->getMessageInfoByErrno($errno);
+        $msg         = isset($messageInfo['errorSoftTxt']) ? $messageInfo['errorSoftTxt'] : $errno;
+        $data        = array(
+                'data'   => 'error',
+                'info'   => $msg,
+                'status' => $errno,
+        );
+
+        return $data;
+    }
+
+    /**
+     * Ajax方式返回数据到客户端.
+     *
+     * @param mixed  $data 要返回的数据
+     * @param string $type AJAX返回数据格式
+     */
+    protected function ajaxReturn($data, $type = '', $status = null)
+    {
+        if (method_exists($this, 'beforeAjaxReturn')) {
+            $this->beforeAjaxReturn($data, $type, $status);
+        }
+
+        if (func_num_args() == 1 && is_numeric($data) && $data < 0) {
+            $data = $this->buildAjaxErrorReturnData($data);
+            parent::ajaxReturn($data, $type);
+        } elseif (func_num_args() == 3) {
+            // 3.0的方式
+            $args   = func_get_args();
+            $data   = $args[0];
+            $info   = $args[1];
+            $status = $args[2];
+            parent::ajaxReturn($data, $info, $status);
+        } else {
+            parent::ajaxReturn($data, $type);
+        }
+    }
+
 }
