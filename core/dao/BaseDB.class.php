@@ -863,6 +863,53 @@ class BaseDBDAO extends SmvcObject
         return $this->getData($this->tableName, $where, self::SELECT_TYPE_ALL, $field, '', $limit);
     }
 
+
+    /**
+     * 获取数据表字段信息
+     * @access public
+     * @return array
+     */
+    public function getDbFields(){
+        if(isset($this->options['table'])) {// 动态指定表名
+            $table = $this->options['table'];
+            $needGetFields = $this->needGetFields($table);
+            $fields = false;
+            if ($needGetFields) {
+                $fields     =   $this->db->getFields($table);
+            }
+            return  $fields?array_keys($fields):false;
+        }
+        if($this->fields) {
+            $fields     =  $this->fields;
+            unset($fields['_autoinc'],$fields['_pk'],$fields['_type'],$fields['_version']);
+            return $fields;
+        }
+        return false;
+    }
+
+
+    /**
+     * 指定查询字段 支持字段排除
+     * @access public
+     * @param mixed $field
+     * @param boolean $except 是否排除
+     * @return Model
+     */
+    public function field($field,$except=false){
+        if(true === $field) {// 获取全部字段
+            $fields     =  $this->getDbFields();
+            $field      =  $fields?$fields:'*';
+        }elseif($except) {// 字段排除
+            if(is_string($field)) {
+                $field  =  explode(',',$field);
+            }
+            $fields     =  $this->getDbFields();
+            $field      =  $fields?array_diff($fields,$field):$field;
+        }
+        $this->options['field']   =   $field;
+        return $this;
+    }
+
     /**
      *
      * todo 这个还需要进行处理
@@ -915,21 +962,399 @@ class BaseDBDAO extends SmvcObject
         }
     }
 
-    /**
-     * 获得指定的filed信息
-     *
-     * @param $field
-     * @param $where
-     *
-     * @return bool|mixed
-     */
-    public function getField($field, $where)
+    //    /**
+    //     * 获得指定的filed信息
+    //     *
+    //     * @param $field
+    //     * @param $where
+    //     *
+    //     * @return bool|mixed
+    //     */
+    //    public function getField($field, $where)
+    //    {
+    //        $data = $this->getOne($field, $where);
+    //        if (isset($data[$field])) {
+    //            return $data[$field];
+    //        }
+    //        return false;
+    //    }
+
+    protected $methods = array(
+            'table',
+            'order',
+            'alias',
+            'having',
+            'group',
+            'lock',
+            'distinct',
+            'auto',
+            'filter',
+            'validate',
+            'result',
+            'bind',
+            'token'
+    );
+    protected $options = array();
+
+    public function token($token)
     {
-        $data = $this->getOne($field, $where);
-        if (isset($data[$field])) {
-            return $data[$field];
+        return $this->__call(__FUNCTION__, [$token,]);
+    }
+
+    public function bind($bind)
+    {
+        return $this->__call(__FUNCTION__, [$bind,]);
+    }
+
+    public function result($result)
+    {
+        return $this->__call(__FUNCTION__, [$result,]);
+    }
+
+    public function validate($validate)
+    {
+        return $this->__call(__FUNCTION__, [$validate,]);
+    }
+
+    /**
+     *
+     * @param $filter
+     *
+     * @return $this
+     */
+    public function filter($filter)
+    {
+        return $this->__call(__FUNCTION__, [$filter,]);
+    }
+
+    /**
+     *
+     * @param $auto
+     *
+     * @return $this
+     */
+    public function auto($auto)
+    {
+        return $this->__call(__FUNCTION__, [$auto,]);
+    }
+
+    /**
+     *
+     * @param $distinct
+     *
+     * @return $this
+     */
+    public function distinct($distinct)
+    {
+        return $this->__call(__FUNCTION__, [$distinct,]);
+    }
+
+    /**
+     *
+     * @param $table
+     *
+     * @return $this
+     */
+    public function table($table)
+    {
+        return $this->__call(__FUNCTION__, [$table,]);
+    }
+
+    /**
+     *
+     * @param $orderBy
+     *
+     * @return $this
+     */
+    public function order($orderBy)
+    {
+        return $this->__call(__FUNCTION__, [$orderBy,]);
+    }
+
+    /**
+     *
+     * @param $alias
+     *
+     * @return $this
+     */
+    public function alias($alias)
+    {
+        return $this->__call(__FUNCTION__, [$alias,]);
+    }
+
+    /**
+     *
+     * @param $having
+     *
+     * @return $this
+     */
+    public function having($having)
+    {
+        return $this->__call(__FUNCTION__, [$having,]);
+    }
+
+    /**
+     *
+     * @param $lock
+     *
+     * @return $this
+     */
+    public function lock($lock = true)
+    {
+        return $this->__call(__FUNCTION__, [$lock,]);
+    }
+
+    /**
+     *
+     * @param $group
+     *
+     * @return $this
+     */
+    public function group($group)
+    {
+        return $this->__call(__FUNCTION__, [$group,]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function count()
+    {
+        return $this->__call(__FUNCTION__, []);
+    }
+
+    /**
+     * 利用__call方法实现一些特殊的Model方法
+     *
+     * @access public
+     *
+     * @param string $method 方法名称
+     * @param array  $args   调用参数
+     *
+     * @return mixed $this
+     */
+    /**
+     * 利用__call方法实现一些特殊的Model方法
+     * @access public
+     *
+     * @param string $method 方法名称
+     * @param array  $args   调用参数
+     *
+     * @return mixed  $this
+     */
+    public function __call($method, $args)
+    {
+        if (in_array(strtolower($method), $this->methods, true)) {
+            // 连贯操作的实现
+            $this->options[strtolower($method)] = $args[0];
+            return $this;
+        } elseif (in_array(strtolower($method), array('count', 'sum', 'min', 'max', 'avg'), true)) {
+            // 统计查询的实现
+            $field = isset($args[0]) ? $args[0] : '*';
+            return $this->getField(strtoupper($method) . '(' . $field . ') AS tp_' . $method);
+        } elseif (strtolower(substr($method, 0, 5)) == 'getby') {
+            // 根据某个字段获取记录
+            $field         = parse_name(substr($method, 5));
+            $where[$field] = $args[0];
+            return $this->where($where)->find();
+        } elseif (strtolower(substr($method, 0, 10)) == 'getfieldby') {
+            // 根据某个字段获取记录的某个值
+            $name         = parse_name(substr($method, 10));
+            $where[$name] = $args[0];
+            return $this->where($where)->getField($args[1]);
+        } elseif (isset($this->_scope[$method])) {// 命名范围的单独调用支持
+            return $this->scope($method, $args[0]);
+        } else {
+            throw_exception(__CLASS__ . ':' . $method . L('_METHOD_NOT_EXIST_'));
+            return;
         }
-        return false;
+    }
+
+
+    /**
+     * 数据类型检测
+     * @access protected
+     * @param mixed $data 数据
+     * @param string $key 字段名
+     * @return void
+     */
+    protected function _parseType(&$data,$key) {
+        if(empty($this->options['bind'][':'.$key])){
+            $fieldType = strtolower($this->fields['_type'][$key]);
+            if(false !== strpos($fieldType,'enum')){
+                // 支持ENUM类型优先检测
+            }elseif(false === strpos($fieldType,'bigint') && false !== strpos($fieldType,'int')) {
+                $data[$key]   =  intval($data[$key]);
+            }elseif(false !== strpos($fieldType,'float') || false !== strpos($fieldType,'double')){
+                $data[$key]   =  floatval($data[$key]);
+            }elseif(false !== strpos($fieldType,'bool')){
+                $data[$key]   =  (bool)$data[$key];
+            }
+        }
+    }
+
+
+    /**
+     * 得到完整的数据表名
+     * @access public
+     * @return string
+     */
+    public function getTableName() {
+        if(empty($this->trueTableName)) {
+            $tableName  = !empty($this->tablePrefix) ? $this->tablePrefix : '';
+            if(!empty($this->tableName)) {
+                $tableName .= $this->tableName;
+            }else{
+                $tableName .= parse_name($this->name);
+            }
+            $this->trueTableName    =   strtolower($tableName);
+        }
+        return (!empty($this->dbName)?$this->dbName.'.':'').$this->trueTableName;
+    }
+
+    /**
+     * 分析表达式
+     * @access protected
+     * @param array $options 表达式参数
+     * @return array
+     */
+    protected function _parseOptions($options=array()) {
+        if(is_array($options))
+            $options =  array_merge($this->options,$options);
+
+
+        if(!isset($options['table'])){
+            // 自动获取表名
+            $options['table']   =   $this->getTableName();
+            $fields             =   $this->fields;
+        }else{
+            // 指定数据表 则重新获取字段列表 但不支持类型检测
+            $fields             =   $this->getDbFields();
+        }
+
+        // 查询过后清空sql表达式组装 避免影响下次查询 调换位置是因为 调用table之后不能正确获取对应的数据
+        $this->options  =   array();
+
+        if(!empty($options['alias'])) {
+            $options['table']  .=   ' '.$options['alias'];
+        }
+        // 记录操作的模型名称
+        $options['model']       =   $this->name;
+
+        // 字段类型验证
+        if(isset($options['where']) && is_array($options['where']) && !empty($fields) && !isset($options['join'])) {
+            // 对数组查询条件进行字段类型检查
+            foreach ($options['where'] as $key=>$val){
+                $key            =   trim($key);
+                if(in_array($key,$fields,true)){
+                    if(is_scalar($val)) {
+                        $this->_parseType($options['where'],$key);
+                    }elseif(is_array($val) && isset($_REQUEST[$key]) && is_array($_REQUEST[$key])){
+                        $options['where'][$key]	=	(string)$val;
+                    }
+                }elseif(!is_numeric($key) && '_' != substr($key,0,1) && false === strpos($key,'.') && false === strpos($key,'(') && false === strpos($key,'|') && false === strpos($key,'&')){
+                    unset($options['where'][$key]);
+                }
+            }
+        }
+
+        // 表达式过滤
+        $this->_options_filter($options);
+        return $options;
+    }
+    // 表达式过滤回调方法
+    protected function _options_filter(&$options) {}
+
+    /**
+     * 获取一条记录的某个字段值
+     * @access public
+     *
+     * @param string $field 字段名
+     * @param string $spea  字段数据间隔符号 NULL返回数组
+     *
+     * @return mixed
+     */
+    public function getField($field, $sepa = null)
+    {
+        $options['field'] = $field;
+        $options          = $this->_parseOptions($options);
+        $field            = trim($field);
+        if (strpos($field, ',')) { // 多字段
+            if (!isset($options['limit'])) {
+                $options['limit'] = is_numeric($sepa) ? $sepa : '';
+            }
+            $resultSet = $this->db->select($options);
+            if (!empty($resultSet)) {
+                $_field = explode(',', $field);
+                $field  = array_keys($resultSet[0]);
+                $key    = array_shift($field);
+                $key2   = array_shift($field);
+                $cols   = array();
+                $count  = count($_field);
+                foreach ($resultSet as $result) {
+                    $name = $result[$key];
+                    if (2 == $count) {
+                        $cols[$name] = $result[$key2];
+                    } else {
+                        $cols[$name] = is_string($sepa) ? implode($sepa, $result) : $result;
+                    }
+                }
+                return $cols;
+            }
+        } else {   // 查找一条记录
+            // 返回数据个数
+            if (true !== $sepa) {// 当sepa指定为true的时候 返回所有数据
+                $options['limit'] = is_numeric($sepa) ? $sepa : 1;
+            }
+            $result = $this->getOne('*', $options);
+
+            if (!empty($result)) {
+                if (true !== $sepa && 1 == $options['limit']) {
+                    return reset($result[0]);
+                }
+                $array = [];
+                foreach ($result as $val) {
+                    $array[] = $val[$field];
+                }
+                return $array;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 指定查询条件 支持安全过滤
+     * @access public
+     *
+     * @param mixed $where 条件表达式
+     * @param mixed $parse 预处理参数
+     *
+     * @return BaseDBDAO
+     */
+    public function where($where, $parse = null)
+    {
+        if (!is_null($parse) && is_string($where)) {
+            if (!is_array($parse)) {
+                $parse = func_get_args();
+                array_shift($parse);
+            }
+            $parse = array_map(array($this, 'quote'), $parse);
+            $where = vsprintf($where, $parse);
+        } elseif (is_object($where)) {
+            $where = get_object_vars($where);
+        }
+        if (is_string($where) && '' != $where) {
+            $map            = array();
+            $map['_string'] = $where;
+            $where          = $map;
+        }
+        if (isset($this->options['where'])) {
+            $this->options['where'] = array_merge($this->options['where'], $where);
+        } else {
+            $this->options['where'] = $where;
+        }
+
+        return $this;
     }
 
 }

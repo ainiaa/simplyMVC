@@ -3,7 +3,7 @@
 
 2、autoload 的具体实现   `doing`
 
-   * include path 设置 (model的加载方式)  再Importer::autoLoad 方法中实现  <font color="green">`done`</font>
+   * include path 设置 (model的加载方式)  在Importer::autoLoad 方法中实现  <font color="green">`done`</font>
    * 第三方类库自动加载 加载第三方类的时候需要调用Importer::setIncludePath() 设置路径 如果类不是以 CLASSNAME.php的形式
      还需要调用 Importer::setFileExt() 方法 注册后缀 <font color="green">`done`</font>
    * HMVC 自动加载 `pending`  -- optional
@@ -13,7 +13,7 @@
    * core/SmvcConf.class.php  <font color="green">`done`</font>
    * based on Configula `pending`  -- optional
 
-4、template的具体实现 (使用第三方 smarty )   `doing`  -- optional
+4、template的具体实现 `doing`  -- optional
 
    * 使用 原生态的PHP 作为模板语言  <font color="green">`done`</font>
    * 使用 smarty (太庞大了)  <font color="green">`done`</font>

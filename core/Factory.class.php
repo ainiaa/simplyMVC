@@ -25,7 +25,7 @@ class Factory
      *
      * return XXXService , XXXDAODb ..
      */
-    public static function getInstance($instanceName = null, $quoteObj = [], $params = [], $getNow = false)
+    public static function getInstance($instanceName, $quoteObj = [], $params = [], $getNow = false)
     {
         if (!is_string($instanceName) || $instanceName == '') {
             throw new Exception('$instanceName must be a string!!!');
