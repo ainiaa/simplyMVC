@@ -286,6 +286,112 @@ function I($name, $defaultValue = null, $callback = null)
     return Request::getParam($type, $key, $defaultValue, $callback);
 }
 
+/**
+ * URL重定向
+ * @param string $url 重定向的URL地址
+ * @param integer $time 重定向的等待时间（秒）
+ * @param string $msg 重定向前的提示信息
+ * @return void
+ */
+function redirect($url, $time=0, $msg='') {
+    //多行URL地址支持
+    $url        = str_replace(array("\n", "\r"), '', $url);
+    if (empty($msg))
+        $msg    = "系统将在{$time}秒之后自动跳转到{$url}！";
+    if (!headers_sent()) {
+        // redirect
+        if (0 === $time) {
+            header('Location: ' . $url);
+        } else {
+            header("refresh:{$time};url={$url}");
+            echo($msg);
+        }
+        exit();
+    } else {
+        $str    = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
+        if ($time != 0)
+            $str .= $msg;
+        exit($str);
+    }
+}
+
+/**
+ * 获取和设置语言定义(不区分大小写)
+ * @param string|array $name 语言变量
+ * @param string $value 语言值
+ * @return mixed
+ */
+function L($name=null, $value=null) {
+    static $_lang = array();
+    // 空参数返回所有定义
+    if (empty($name))
+        return $_lang;
+    // 判断语言获取(或设置)
+    // 若不存在,直接返回全大写$name
+    if (is_string($name)) {
+        $name = strtoupper($name);
+        if (is_null($value))
+            return isset($_lang[$name]) ? $_lang[$name] : $name;
+        $_lang[$name] = $value; // 语言定义
+        return;
+    }
+    // 批量定义
+    if (is_array($name))
+        $_lang = array_merge($_lang, array_change_key_case($name, CASE_UPPER));
+    return;
+}
+
+/**
+ * 错误输出
+ * @param mixed $error 错误
+ * @return void
+ */
+function halt($error) {
+    $e = array();
+    if (APP_DEBUG) {
+        //调试模式下输出错误信息
+        if (!is_array($error)) {
+            $trace          = debug_backtrace();
+            $e['message']   = $error;
+            $e['file']      = $trace[0]['file'];
+            $e['line']      = $trace[0]['line'];
+            ob_start();
+            debug_print_backtrace();
+            $e['trace']     = ob_get_clean();
+        } else {
+            $e              = $error;
+        }
+    } else {
+        //否则定向到错误页面
+        $error_page         = C('ERROR_PAGE');
+        if (!empty($error_page)) {
+            redirect($error_page);
+        } else {
+            if (C('SHOW_ERROR_MSG'))
+                $e['message'] = is_array($error) ? $error['message'] : $error;
+            else
+                $e['message'] = C('ERROR_MESSAGE');
+        }
+    }
+    // 包含异常页面模板
+    include C('TMPL_EXCEPTION_FILE');
+    exit;
+}
+
+/**
+ * 自定义异常处理
+ * @param string $msg 异常消息
+ * @param string $type 异常类型 默认为ThinkException
+ * @param integer $code 异常代码 默认为0
+ * @return void
+ */
+function throw_exception($msg, $type='ThinkException', $code=0) {
+    if (class_exists($type, false))
+        throw new $type($msg, $code);
+    else
+        halt($msg);        // 异常类型不存在则输出错误信息字串
+}
+
 if (!function_exists('com_create_guid')) {
     function com_create_guid()
     {

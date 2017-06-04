@@ -260,6 +260,8 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * @param $dbConfig
+     *
+     * @return $this
      */
     private function setTableName($dbConfig)
     {
@@ -267,6 +269,7 @@ class BaseDBDAO extends SmvcObject
             $dbPrefix            = isset($dbConfig['DB_PREFIX']) ? $dbConfig['DB_PREFIX'] : '';
             $this->realTableName = $dbPrefix . $this->tableName;
         }
+        return $this;
     }
 
     /**
@@ -863,50 +866,73 @@ class BaseDBDAO extends SmvcObject
         return $this->getData($this->tableName, $where, self::SELECT_TYPE_ALL, $field, '', $limit);
     }
 
+    /**
+     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     *
+     * @param $tableName
+     *
+     * @return bool
+     */
+    public function needGetFields($tableName)
+    {
+        $tableNameTmp = strtoupper($tableName);
+        if (in_array(
+                $tableNameTmp,
+                ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'SHOW', 'CREATE', 'CALL']
+        )) {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * 获取数据表字段信息
      * @access public
      * @return array
      */
-    public function getDbFields(){
-        if(isset($this->options['table'])) {// 动态指定表名
-            $table = $this->options['table'];
+    public function getDbFields()
+    {
+        if (isset($this->options['table'])) {// 动态指定表名
+            $table         = $this->options['table'];
             $needGetFields = $this->needGetFields($table);
-            $fields = false;
+            $fields        = [];
             if ($needGetFields) {
-                $fields     =   $this->db->getFields($table);
+                $fields = $this->db->getFields($table);
             }
-            return  $fields?array_keys($fields):false;
+            return $fields ? array_keys($fields) : [];
         }
-        if($this->fields) {
-            $fields     =  $this->fields;
-            unset($fields['_autoinc'],$fields['_pk'],$fields['_type'],$fields['_version']);
+        if ($this->fields) {
+            $fields = $this->fields;
+            unset($fields['_autoinc'], $fields['_pk'], $fields['_type'], $fields['_version']);
             return $fields;
         }
-        return false;
+        return [];
     }
 
 
     /**
      * 指定查询字段 支持字段排除
      * @access public
-     * @param mixed $field
+     *
+     * @param mixed   $field
      * @param boolean $except 是否排除
-     * @return Model
+     *
+     * @return BaseDBDAO
      */
-    public function field($field,$except=false){
-        if(true === $field) {// 获取全部字段
-            $fields     =  $this->getDbFields();
-            $field      =  $fields?$fields:'*';
-        }elseif($except) {// 字段排除
-            if(is_string($field)) {
-                $field  =  explode(',',$field);
+    public function field($field, $except = false)
+    {
+        if (true === $field) {// 获取全部字段
+            $fields = $this->getDbFields();
+            $field  = $fields ? $fields : '*';
+        } elseif ($except) {// 字段排除
+            if (is_string($field)) {
+                $field = explode(',', $field);
             }
-            $fields     =  $this->getDbFields();
-            $field      =  $fields?array_diff($fields,$field):$field;
+            $fields = $this->getDbFields();
+            $field  = $fields ? array_diff($fields, $field) : $field;
         }
-        $this->options['field']   =   $field;
+        $this->options['field'] = $field;
         return $this;
     }
 
@@ -1071,6 +1097,11 @@ class BaseDBDAO extends SmvcObject
         return $this->__call(__FUNCTION__, [$orderBy,]);
     }
 
+    public function limit($limit)
+    {
+        return $this->__call(__FUNCTION__, [$limit,]);
+    }
+
     /**
      *
      * @param $alias
@@ -1123,6 +1154,7 @@ class BaseDBDAO extends SmvcObject
         return $this->__call(__FUNCTION__, []);
     }
 
+
     /**
      * 利用__call方法实现一些特殊的Model方法
      *
@@ -1132,15 +1164,6 @@ class BaseDBDAO extends SmvcObject
      * @param array  $args   调用参数
      *
      * @return mixed $this
-     */
-    /**
-     * 利用__call方法实现一些特殊的Model方法
-     * @access public
-     *
-     * @param string $method 方法名称
-     * @param array  $args   调用参数
-     *
-     * @return mixed  $this
      */
     public function __call($method, $args)
     {
@@ -1162,11 +1185,9 @@ class BaseDBDAO extends SmvcObject
             $name         = parse_name(substr($method, 10));
             $where[$name] = $args[0];
             return $this->where($where)->getField($args[1]);
-        } elseif (isset($this->_scope[$method])) {// 命名范围的单独调用支持
-            return $this->scope($method, $args[0]);
         } else {
             throw_exception(__CLASS__ . ':' . $method . L('_METHOD_NOT_EXIST_'));
-            return;
+            return $this;
         }
     }
 
@@ -1174,21 +1195,24 @@ class BaseDBDAO extends SmvcObject
     /**
      * 数据类型检测
      * @access protected
-     * @param mixed $data 数据
-     * @param string $key 字段名
+     *
+     * @param mixed  $data 数据
+     * @param string $key  字段名
+     *
      * @return void
      */
-    protected function _parseType(&$data,$key) {
-        if(empty($this->options['bind'][':'.$key])){
+    protected function _parseType(&$data, $key)
+    {
+        if (empty($this->options['bind'][':' . $key])) {
             $fieldType = strtolower($this->fields['_type'][$key]);
-            if(false !== strpos($fieldType,'enum')){
+            if (false !== strpos($fieldType, 'enum')) {
                 // 支持ENUM类型优先检测
-            }elseif(false === strpos($fieldType,'bigint') && false !== strpos($fieldType,'int')) {
-                $data[$key]   =  intval($data[$key]);
-            }elseif(false !== strpos($fieldType,'float') || false !== strpos($fieldType,'double')){
-                $data[$key]   =  floatval($data[$key]);
-            }elseif(false !== strpos($fieldType,'bool')){
-                $data[$key]   =  (bool)$data[$key];
+            } elseif (false === strpos($fieldType, 'bigint') && false !== strpos($fieldType, 'int')) {
+                $data[$key] = intval($data[$key]);
+            } elseif (false !== strpos($fieldType, 'float') || false !== strpos($fieldType, 'double')) {
+                $data[$key] = floatval($data[$key]);
+            } elseif (false !== strpos($fieldType, 'bool')) {
+                $data[$key] = (bool)$data[$key];
             }
         }
     }
@@ -1199,60 +1223,69 @@ class BaseDBDAO extends SmvcObject
      * @access public
      * @return string
      */
-    public function getTableName() {
-        if(empty($this->trueTableName)) {
-            $tableName  = !empty($this->tablePrefix) ? $this->tablePrefix : '';
-            if(!empty($this->tableName)) {
+    public function getTableName()
+    {
+        if (empty($this->trueTableName)) {
+            $tableName = !empty($this->tablePrefix) ? $this->tablePrefix : '';
+            if (!empty($this->tableName)) {
                 $tableName .= $this->tableName;
-            }else{
+            } else {
                 $tableName .= parse_name($this->name);
             }
-            $this->trueTableName    =   strtolower($tableName);
+            $this->trueTableName = strtolower($tableName);
         }
-        return (!empty($this->dbName)?$this->dbName.'.':'').$this->trueTableName;
+        return (!empty($this->dbName) ? $this->dbName . '.' : '') . $this->trueTableName;
     }
 
     /**
      * 分析表达式
      * @access protected
+     *
      * @param array $options 表达式参数
+     *
      * @return array
      */
-    protected function _parseOptions($options=array()) {
-        if(is_array($options))
-            $options =  array_merge($this->options,$options);
+    protected function _parseOptions($options = array())
+    {
+        if (is_array($options)) {
+            $options = array_merge($this->options, $options);
+        }
 
 
-        if(!isset($options['table'])){
+        if (!isset($options['table'])) {
             // 自动获取表名
-            $options['table']   =   $this->getTableName();
-            $fields             =   $this->fields;
-        }else{
+            $options['table'] = $this->getTableName();
+            $fields           = $this->fields;
+        } else {
             // 指定数据表 则重新获取字段列表 但不支持类型检测
-            $fields             =   $this->getDbFields();
+            $fields = $this->getDbFields();
         }
 
         // 查询过后清空sql表达式组装 避免影响下次查询 调换位置是因为 调用table之后不能正确获取对应的数据
-        $this->options  =   array();
+        $this->options = array();
 
-        if(!empty($options['alias'])) {
-            $options['table']  .=   ' '.$options['alias'];
+        if (!empty($options['alias'])) {
+            $options['table'] .= ' ' . $options['alias'];
         }
         // 记录操作的模型名称
-        $options['model']       =   $this->name;
+        $options['model'] = $this->name;
 
         // 字段类型验证
-        if(isset($options['where']) && is_array($options['where']) && !empty($fields) && !isset($options['join'])) {
+        if (isset($options['where']) && is_array($options['where']) && !empty($fields) && !isset($options['join'])) {
             // 对数组查询条件进行字段类型检查
-            foreach ($options['where'] as $key=>$val){
-                $key            =   trim($key);
-                if(in_array($key,$fields,true)){
-                    if(is_scalar($val)) {
-                        $this->_parseType($options['where'],$key);
-                    }elseif(is_array($val) && isset($_REQUEST[$key]) && is_array($_REQUEST[$key])){
-                        $options['where'][$key]	=	(string)$val;
+            foreach ($options['where'] as $key => $val) {
+                $key = trim($key);
+                if (in_array($key, $fields, true)) {
+                    if (is_scalar($val)) {
+                        $this->_parseType($options['where'], $key);
+                    } elseif (is_array($val) && isset($_REQUEST[$key]) && is_array($_REQUEST[$key])) {
+                        $options['where'][$key] = (string)$val;
                     }
-                }elseif(!is_numeric($key) && '_' != substr($key,0,1) && false === strpos($key,'.') && false === strpos($key,'(') && false === strpos($key,'|') && false === strpos($key,'&')){
+                } elseif (!is_numeric($key) && '_' != substr($key, 0, 1) && false === strpos(
+                                $key,
+                                '.'
+                        ) && false === strpos($key, '(') && false === strpos($key, '|') && false === strpos($key, '&')
+                ) {
                     unset($options['where'][$key]);
                 }
             }
@@ -1262,8 +1295,11 @@ class BaseDBDAO extends SmvcObject
         $this->_options_filter($options);
         return $options;
     }
+
     // 表达式过滤回调方法
-    protected function _options_filter(&$options) {}
+    protected function _options_filter(&$options)
+    {
+    }
 
     /**
      * 获取一条记录的某个字段值
@@ -1320,6 +1356,42 @@ class BaseDBDAO extends SmvcObject
             }
         }
         return null;
+    }
+
+    /**
+     * 获取主键名称
+     * @access public
+     * @return string
+     */
+    public function getPk() {
+        return isset($this->fields['_pk'])?$this->fields['_pk']:$this->pk;
+    }
+
+    /**
+     * 查询数据
+     * @access public
+     * @param mixed $options 表达式参数
+     * @return mixed
+     */
+    public function find($options=array()) {
+        if(is_numeric($options) || is_string($options)) {
+            $where[$this->getPk()]  =   $options;
+            $options                =   array();
+            $options['where']       =   $where;
+        }
+        // 总是查找一条记录
+        $options['limit']   =   1;
+        // 分析表达式
+        $options            =   $this->_parseOptions($options);
+        $resultSet          =   $this->db->select($options);
+        if(false === $resultSet) {
+            return false;
+        }
+        if(empty($resultSet)) {// 查询结果为空
+            return null;
+        }
+        $this->data         =   $resultSet[0];
+        return $this->data;
     }
 
     /**
