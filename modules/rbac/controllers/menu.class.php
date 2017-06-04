@@ -53,23 +53,11 @@ class MenuController extends AdminController
         $id  = I('id');
         $ret = $this->MenuDAO->delete(['id' => $id]);
         if ($ret) {
-            $this->ajaxReturn(
-                    [
-                            'status' => 1,
-                            'info'   => '菜单删除成功'
-                    ],
-                    'JSON'
-            );
+            $data = ['status' => 1,'info'   => '菜单删除成功'];
         } else {
-            $this->ajaxReturn(
-                    [
-                            'status' => 0,
-                            'info'   => '菜单删除失败'
-                    ],
-                    'JSON'
-            );
+            $data = ['status' => 0,'info'   => '菜单删除失败'];
         }
-
+        $this->ajaxReturn($data, 'JSON');
     }
 
     /**
@@ -93,9 +81,9 @@ class MenuController extends AdminController
 
             $res = $this->MenuDAO->add($getPost);
             if ($res) {
-                $this->success('菜单添加成功', ['返回列表页' => U('Admin/Menu/index'),]);
+                $this->success('菜单添加成功', ['返回列表页' => make_url('Admin/Menu/index'),]);
             } else {
-                $this->error('菜单添加失败:' . var_export($res, 1) . ' sql:' . M()->_sql());
+                $this->error('菜单添加失败:' . var_export($res, 1));
             }
         } else {
             $validParents = $this->MenuDAO->getValidParentsById(-1);
@@ -127,7 +115,7 @@ class MenuController extends AdminController
             unset($getPost['id']);
             $res = $this->MenuDAO->saveData($getPost, ['id' => $id]);
             if ($res) {
-                $this->success('菜单修改成功', ['返回列表页' => U('index'),]);
+                $this->success('菜单修改成功', ['返回列表页' => make_url('index'),]);
             } else {
                 $this->error('菜单修改失败:' . var_export($res, 1));
             }
@@ -155,7 +143,7 @@ class MenuController extends AdminController
             if ($id || empty($relatePrivilegeList)){
                 $ret = $this->MenuDAO->relatePrivilege($id, $relatePrivilegeList);
                 if ($ret) {
-                    $this->success('菜单权限关联成功', ['返回列表页' => U('index'),]);
+                    $this->success('菜单权限关联成功', ['返回列表页' => make_url('index'),]);
                 } else {
                     $this->error('菜单权限关联失败：' . 'id missing or relatePrivilege missing');
                 }

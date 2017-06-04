@@ -48,12 +48,11 @@ class Page {
      * 架构函数
      *
      * @access public
-     * @param array $totalRows 总的记录数
-     * @param array $listRows 每页显示记录数
+     * @param int $totalRows 总的记录数
+     * @param int $listRows 每页显示记录数
      * @param array $parameter 分页跳转的参数
      */
-    public function __construct($totalRows, $listRows = '', $parameter = '', 
-        $url = '') {
+    public function __construct($totalRows, $listRows = '', $parameter = '', $url = '') {
         $this->totalRows = $totalRows;
         $this->parameter = $parameter;
         $this->varPage = C('VAR_PAGE') ? C('VAR_PAGE') : 'p';
@@ -117,7 +116,7 @@ class Page {
         // 分析分页参数
         if ($this->url) {
             $depr = C('URL_PATHINFO_DEPR');
-            $url = rtrim(U('/' . $this->url, '', false), $depr) . $depr .
+            $url = rtrim(make_url('/' . $this->url, '', false), $depr) . $depr .
                  '__PAGE__';
         } else {
             if ($this->parameter && is_string($this->parameter)) {
@@ -134,7 +133,7 @@ class Page {
                 }
             }
             $parameter[$p] = '__PAGE__';
-            $url = U('', $parameter);
+            $url = make_url('', $parameter);
         }
         // 上下翻页字符串
         $upRow = $this->nowPage - 1;
@@ -235,7 +234,7 @@ class Page {
         // 分析分页参数
         if($this->url){
             $depr       =   C('URL_PATHINFO_DEPR');
-            $url        =   rtrim(U('/'.$this->url,'',false),$depr).$depr.'__PAGE__';
+            $url        =   rtrim(make_url('/'.$this->url,'',false),$depr).$depr.'__PAGE__';
         }else{
             if($this->parameter && is_string($this->parameter)) {
                 parse_str($this->parameter,$parameter);
@@ -251,7 +250,7 @@ class Page {
                 }
             }
             $parameter[$p]  =   '__PAGE__';
-            $url            =   U('',$parameter);
+            $url            =   make_url('',$parameter);
         }
         //上下翻页字符串
         $upRow          =   $this->nowPage-1;

@@ -50,22 +50,11 @@ class RoleController extends AdminController
         $id  = I('id');
         $ret = $this->RoleDAO->delete(['id' => $id]);
         if ($ret) {
-            $this->ajaxReturn(
-                    [
-                            'status' => 1,
-                            'info'   => '角色删除成功'
-                    ],
-                    'JSON'
-            );
+            $data = ['status' => 1, 'info' => '角色删除成功'];
         } else {
-            $this->ajaxReturn(
-                    [
-                            'status' => 0,
-                            'info'   => '角色删除失败'
-                    ],
-                    'JSON'
-            );
+            $data = ['status' => 0, 'info' => '角色删除失败'];
         }
+        $this->ajaxReturn($data, 'JSON');
 
     }
 
@@ -91,9 +80,9 @@ class RoleController extends AdminController
 
             $res = $this->RoleDAO->add($getPost);
             if ($res) {
-                $this->success('角色添加成功', ['返回列表页' => U('Admin/Role/index'),]);
+                $this->success('角色添加成功', ['返回列表页' => make_url('Admin/Role/index'),]);
             } else {
-                $this->error('角色添加失败:' . var_export($res, 1) . ' sql:' . M()->_sql());
+                $this->error('角色添加失败:' . var_export($res, 1) );
             }
         }
         $this->display();
@@ -121,7 +110,7 @@ class RoleController extends AdminController
             unset($getPost['id']);
             $res = $this->RoleDAO->saveData($getPost, ['id' => $id]);
             if ($res) {
-                $this->success('角色修改成功', ['返回列表页' => U('index'),]);
+                $this->success('角色修改成功', ['返回列表页' => make_url('index'),]);
             } else {
                 $this->error('角色修改失败:' . var_export($res, 1));
             }
@@ -146,7 +135,7 @@ class RoleController extends AdminController
             if ($id || empty($relatePrivilegeList)) {
                 $ret = $this->RoleDAO->relatePrivilege($id, $relatePrivilegeList);
                 if ($ret) {
-                    $this->success('角色菜单权限关联成功', ['返回列表页' => U('index'),]);
+                    $this->success('角色菜单权限关联成功', ['返回列表页' => make_url('index'),]);
                 } else {
                     $this->error('角色菜单权限关联失败：' . 'id missing or relatePrivilege missing');
                 }
@@ -190,7 +179,7 @@ class RoleController extends AdminController
             if ($id || empty($relateMenuPrivilegeList)) {
                 $ret = $this->RoleDAO->relateMenuPrivilege($id, $relateMenuPrivilegeList);
                 if ($ret) {
-                    $this->success('角色权限关联成功', ['返回列表页' => U('index'),]);
+                    $this->success('角色权限关联成功', ['返回列表页' => make_url('index'),]);
                 } else {
                     $this->error('角色权限关联失败：' . 'id missing or relatePrivilege missing');
                 }
@@ -215,7 +204,7 @@ class RoleController extends AdminController
                             break;
                         }
                     }
-                    $item['related']  = $related;
+                    $item['related']   = $related;
                     $item['show_tips'] = sprintf('%s(%s)', $item['menu_name'], $item['priv_name']);
                 }
         );

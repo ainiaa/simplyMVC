@@ -63,7 +63,7 @@ class UserController extends AdminController
             if ($id || empty($relateRoleList)) {
                 $ret = $this->UserInfoDAO->relateUserGroup($id, $relateUserGroupList);
                 if ($ret) {
-                    $this->success('用户关联用户分组成功', ['返回列表页' => U('index'),]);
+                    $this->success('用户关联用户分组成功', ['返回列表页' => make_url('index'),]);
                 } else {
                     $this->error('用户关联用户分组失败：' . 'id missing or relateUserGroup missing');
                 }
@@ -107,7 +107,7 @@ class UserController extends AdminController
             if ($id || empty($relateRoleList)) {
                 $ret = $this->UserInfoDAO->relateRole($id, $relateRoleList);
                 if ($ret) {
-                    $this->success('用户关联角色成功', ['返回列表页' => U('index'),]);
+                    $this->success('用户关联角色成功', ['返回列表页' => make_url('index'),]);
                 } else {
                     $this->error('用户关联角色失败：' . 'id missing or relateRole missing');
                 }

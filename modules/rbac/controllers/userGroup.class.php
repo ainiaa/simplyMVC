@@ -50,22 +50,11 @@ class UserGroupController extends AdminController
         $id  = I('id');
         $ret = $this->UserGroupDAO->delete(['id' => $id]);
         if ($ret) {
-            $this->ajaxReturn(
-                    [
-                            'status' => 1,
-                            'info'   => '用户分组删除成功'
-                    ],
-                    'JSON'
-            );
+            $data = ['status' => 1, 'info' => '用户分组删除成功'];
         } else {
-            $this->ajaxReturn(
-                    [
-                            'status' => 0,
-                            'info'   => '用户分组删除失败'
-                    ],
-                    'JSON'
-            );
+            $data = ['status' => 0, 'info' => '用户分组删除失败'];
         }
+        $this->ajaxReturn($data, 'JSON');
 
     }
 
@@ -86,9 +75,9 @@ class UserGroupController extends AdminController
 
             $res = $this->UserGroupDAO->add($getPost);
             if ($res) {
-                $this->success('用户分组添加成功', ['返回列表页' => U('index'),]);
+                $this->success('用户分组添加成功', ['返回列表页' => make_url('index'),]);
             } else {
-                $this->error('用户分组添加失败:' . var_export($res, 1) . ' sql:' . M()->_sql());
+                $this->error('用户分组添加失败:' . var_export($res, 1));
             }
         }
         $this->display();
@@ -112,7 +101,7 @@ class UserGroupController extends AdminController
             unset($getPost['id']);
             $res = $this->UserGroupDAO->saveData($getPost, ['id' => $id]);
             if ($res) {
-                $this->success('用户分组修改成功', ['返回列表页' => U('index'),]);
+                $this->success('用户分组修改成功', ['返回列表页' => make_url('index'),]);
             } else {
                 $this->error('用户分组修改失败:' . var_export($res, 1));
             }
@@ -131,13 +120,13 @@ class UserGroupController extends AdminController
     public function relateRole()
     {
         if (IS_POST) {
-            $data            = I('post.');
-            $id              = isset($data['id']) ? $data['id'] : '';
+            $data           = I('post.');
+            $id             = isset($data['id']) ? $data['id'] : '';
             $relateRoleList = isset($data['relateRole']) ? $data['relateRole'] : '';
             if ($id || empty($relateRoleList)) {
                 $ret = $this->UserGroupDAO->relateRole($id, $relateRoleList);
                 if ($ret) {
-                    $this->success('角色权限关联成功', ['返回列表页' => U('index'),]);
+                    $this->success('角色权限关联成功', ['返回列表页' => make_url('index'),]);
                 } else {
                     $this->error('角色权限关联失败：' . 'id missing or relateRoleList missing');
                 }
@@ -149,8 +138,8 @@ class UserGroupController extends AdminController
         if (!is_numeric($id)) {
             $this->error('id missing');
         }
-        $roleList          = $this->RoleDAO->getData();
-        $userGroupInfo     = $this->UserGroupDAO->getOne($id);
+        $roleList        = $this->RoleDAO->getData();
+        $userGroupInfo   = $this->UserGroupDAO->getOne($id);
         $relatedRoleList = $this->UserGroupDAO->getRealatedRole($id);
         array_walk(
                 $roleList,

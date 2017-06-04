@@ -49,22 +49,12 @@ class PublicResourceController extends AdminController
         $id  = I('id');
         $ret = $this->PublicResourceDAO->delete(['id' => $id]);
         if ($ret) {
-            $this->ajaxReturn(
-                    [
-                            'status' => 1,
-                            'info'   => '公共资源删除成功'
-                    ],
-                    'JSON'
-            );
+            $data = ['status' => 1, 'info' => '公共资源删除成功'];
         } else {
-            $this->ajaxReturn(
-                    [
-                            'status' => 0,
-                            'info'   => '公共资源删除失败'
-                    ],
-                    'JSON'
-            );
+            $data = ['status' => 0, 'info' => '公共资源删除失败'];
         }
+
+        $this->ajaxReturn($data, 'JSON');
 
     }
 
@@ -93,9 +83,9 @@ class PublicResourceController extends AdminController
 
             $res = $this->PublicResourceDAO->add($getPost);
             if ($res) {
-                $this->success('公共资源添加成功', ['返回列表页' => U('Admin/Role/index'),]);
+                $this->success('公共资源添加成功', ['返回列表页' => make_url('Admin/Role/index'),]);
             } else {
-                $this->error('公共资源添加失败:' . var_export($res, 1) . ' sql:' . M()->_sql());
+                $this->error('公共资源添加失败:' . var_export($res, 1) );
             }
         }
         $this->display();
@@ -110,8 +100,8 @@ class PublicResourceController extends AdminController
     {
         if (IS_POST) {
             // 获取表单数据
-            $getPost   = I('post.');
-            $id        = $getPost['id'];
+            $getPost       = I('post.');
+            $id            = $getPost['id'];
             $resource_name = I('post.resource_name');
             $resource_url  = I('post.resource_url');
             $resource_type = I('post.resource_type');
@@ -128,7 +118,7 @@ class PublicResourceController extends AdminController
             unset($getPost['id']);
             $res = $this->PublicResourceDAO->saveData($getPost, ['id' => $id]);
             if ($res) {
-                $this->success('公共资源修改成功', ['返回列表页' => U('index'),]);
+                $this->success('公共资源修改成功', ['返回列表页' => make_url('index'),]);
             } else {
                 $this->error('公共资源修改失败:' . var_export($res, 1));
             }

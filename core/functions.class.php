@@ -255,7 +255,7 @@ function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = fals
  *
  * @return string
  */
-function make_url($uri_path, $uri_params, $absolute = false)
+function make_url($uri_path, $uri_params = '', $absolute = false)
 {
     $final_url    = '';
     $uri_path_arr = explode('/', $uri_path);
@@ -266,7 +266,10 @@ function make_url($uri_path, $uri_params, $absolute = false)
             $uri_path_arr[2],
             $uri_path_arr[3]
     );
-    $final_url    .= '&' . http_build_query($uri_params);
+    if ($uri_params) {
+        $final_url    .= '&' . http_build_query($uri_params);
+    }
+
     if ($absolute) {
         $final_url = get_domain() . $final_url;
     }
