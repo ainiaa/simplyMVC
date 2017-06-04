@@ -23,18 +23,11 @@ class MenuDAO extends RedisDBBase
     {
         $rIdList   = [];
         $menu      = $this->getOne(['menu_url' => $url]);
-        $sql       = 'SELECT `id` FROM `tp_privilege` WHERE `priv_name`="access_menu" AND `priv_type`="MENU" LIMIT 1';
-        $privilege = $this->query($sql);
+        $privilege = $this->table('tp_privilege')->getOne(['priv_name'=>'access_menu', 'priv_type' => 'MENU']);
         $mId       = isset($menu['id']) ? $menu['id'] : '';
-        $pid       = isset($privilege['id']) ? $privilege['id'] : '';
+        $pId       = isset($privilege['id']) ? $privilege['id'] : '';
         if ($mId) {
-            $sql  = sprintf(
-                    'SELECT rid FROM `tp_role_menu_privilege_relation` WHERE `mid`=%d AND `pid`=%d',
-                    $mId,
-                    $pid
-            );
-            $data = $this->query($sql);
-
+            $data = $this->table('tp_role_menu_privilege_relation')->getList(['mid' =>$mId, 'pid' => $pId]);
             if ($data) {
                 foreach ($data as $index => $datum) {
                     $rIdList[] = $datum['rid'];
@@ -93,8 +86,7 @@ class MenuDAO extends RedisDBBase
      */
     public function getRealatedPrivilege($id)
     {
-        $sql  = 'SELECT `pid` FROM `tp_menu_privilege_relation` WHERE `mid`=' . $id;
-        $res  = $this->query($sql);
+        $res = $this->getData('tp_menu_privilege_relation', ['mid' =>$id]);
         $data = [];
         if ($res && is_array($res)) {
             foreach ($res as $info) {

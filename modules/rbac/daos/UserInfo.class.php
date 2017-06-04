@@ -8,7 +8,7 @@
  */
 class UserInfoDAO extends BaseDBDAO
 {
-    protected $tableName = 'tuser_info';
+    protected $tableName = 'tp_user';
 
     public function getUserRoleGroup($userId)
     {

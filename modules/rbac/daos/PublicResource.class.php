@@ -18,7 +18,7 @@ class PublicResourceDAO extends RedisDBBase
      * @param        $url
      * @param string $type
      *
-     * @return bool
+     * @return array
      */
     public function getPublicResource($url, $type = 'menu')
     {
