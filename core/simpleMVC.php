@@ -111,7 +111,7 @@ class SimpleMVC
      */
     private static function initConf()
     {
-        SmvcConf::initEnv(CONF_DIR .'env.php');
+        SmvcConf::initEnv('env.php');
         SmvcConf::init(CONF_DIR, 'php');
     }
 

@@ -1,10 +1,11 @@
 <?php
 
+use Medoo\Medoo;
 /**
  * 数据库相关 DAO
  * @author  Jeff.Liu<jeff.liu.guo@gmail.com>
  *
- * @version 0.1
+ * @version 0.5
  *
  * Class BaseDBDAO
  */
@@ -27,13 +28,13 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 读操作对应的storage
-     * @var medoo
+     * @var Medoo
      **/
     protected $readerStorage = null;
 
     /**
      * 写操作对应的storage
-     * @var medoo
+     * @var Medoo
      */
     protected $writerStorage = null;
 
@@ -238,7 +239,7 @@ class BaseDBDAO extends SmvcObject
     /**
      * 初始化写
      * @author Jeff Liu
-     * @return medoo
+     * @return Medoo
      */
     public function initWriteStorage()
     {
@@ -270,7 +271,7 @@ class BaseDBDAO extends SmvcObject
     {
         $configSha = md5(json_encode($dbConfig));
         if (!isset($this->dbInstance[$configSha])) {
-            $this->dbInstance[$configSha] = new medoo(
+            $this->dbInstance[$configSha] = new Medoo(
                     [
                             'database_type' => $dbConfig['DB_TYPE'],
                             'database_name' => $dbConfig['DB_NAME'],
@@ -300,7 +301,7 @@ class BaseDBDAO extends SmvcObject
     }
 
     /**
-     * @return medoo
+     * @return Medoo
      */
     public function initReadStorage()
     {
@@ -377,7 +378,7 @@ class BaseDBDAO extends SmvcObject
     /**
      * @param $type
      *
-     * @return medoo
+     * @return Medoo
      */
     public function getStorage($type = null)
     {
@@ -392,7 +393,7 @@ class BaseDBDAO extends SmvcObject
     }
 
     /**
-     * @return medoo
+     * @return Medoo
      */
     public function getWriteStorage()
     {
@@ -404,7 +405,7 @@ class BaseDBDAO extends SmvcObject
     }
 
     /**
-     * @return medoo
+     * @return Medoo
      */
     public function getReadStorage()
     {
@@ -515,7 +516,11 @@ class BaseDBDAO extends SmvcObject
     public function getOne($where = [], $columns = '*')
     {
         $this->setLatestStorageType(self::READ_STORAGE);
-        return $this->select($columns, null, $where);
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        unset($where['table']);
+        unset($where['model']);
+        return $this->getStorage()->get($tableName, $columns, $where);
     }
 
     /**
@@ -581,7 +586,13 @@ class BaseDBDAO extends SmvcObject
     {
         $where     = $this->_parseOptions($where);
         $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
-        return $this->getStorage()->select($tableName, $join, $columns, $where);
+        unset($where['table']);
+        unset($where['model']);
+        if (is_null($join)) {
+            return $this->getStorage()->select($tableName, $columns, $where);
+        } else {
+            return $this->getStorage()->select($tableName, $join, $columns, $where);
+        }
     }
 
 

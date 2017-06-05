@@ -70,7 +70,6 @@ class SmvcConf implements ArrayAccess
      */
     private function loadConfigFile($configFile = null)
     {
-
         if ($configFile == null) {
             $configFile = $this->configPath . 'config.php';
         } else {
@@ -110,20 +109,20 @@ class SmvcConf implements ArrayAccess
         if (defined('CURRENT_ENV')) {
             switch (CURRENT_ENV) {
                 case 1://生产环境
-                    $currentConfEnvFile = CONF_DIR . 'env.production.php';
+                    $currentConfEnvFile = 'env.production.php';
                     break;
                 case 2://预生产
-                    $currentConfEnvFile = CONF_DIR . 'env.preview.php';
+                    $currentConfEnvFile = 'env.preview.php';
                     break;
                 case 3://测试环境
-                    $currentConfEnvFile = CONF_DIR . 'env.preview.php';
+                    $currentConfEnvFile = 'env.preview.php';
                     break;
                 case 4://类生产
-                    $currentConfEnvFile = CONF_DIR . 'env.productionlike.php';
+                    $currentConfEnvFile = 'env.productionlike.php';
                     break;
                 case 0://开发环境
                 default:
-                    $currentConfEnvFile = CONF_DIR . 'env.testing.php';
+                    $currentConfEnvFile = 'env.testing.php';
             }
             if (is_file($currentConfEnvFile)) {
                 SmvcConf::getInstance()->loadConfigFile($currentConfEnvFile);

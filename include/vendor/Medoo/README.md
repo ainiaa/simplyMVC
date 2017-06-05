@@ -1,49 +1,85 @@
-## [Medoo](http://medoo.in)
+![](https://cloud.githubusercontent.com/assets/1467904/19835326/ca62bc36-9ebd-11e6-8b37-7240d76319cd.png)
+
+## [Medoo](https://medoo.in)
+
+[![Total Downloads](https://poser.pugx.org/catfan/medoo/downloads)](https://packagist.org/packages/catfan/medoo)
+[![Latest Stable Version](https://poser.pugx.org/catfan/medoo/v/stable)](https://packagist.org/packages/catfan/medoo)
+[![License](https://poser.pugx.org/catfan/medoo/license)](https://packagist.org/packages/catfan/medoo)
 
 > The Lightest PHP database framework to accelerate development
 
-### Main Features
+## Main Features
 
-* **Lightweight** - Only 14KB with one file.
+* **Lightweight** - 32KB around with only one file.
 
 * **Easy** - Extremely easy to learn and use, friendly construction.
 
-* **Powerful** - Support various common and complex SQL queries.
+* **Powerful** - Supports various common and complex SQL queries, data mapping, and prevent SQL injection.
 
-* **Compatible** - Support various SQL database, including MySQL, MSSQL, SQLite, MariaDB, Sybase, Oracle, PostgreSQL and more.
+* **Compatible** - Supports all SQL databases, including MySQL, MSSQL, SQLite, MariaDB, Sybase, Oracle, PostgreSQL and more.
 
-* **Security** - Prevent SQL injection.
+* **Friendly** - Works well with every PHP frameworks, like Laravel, Codeigniter, Yii, Slim, and framework which supports singleton extension.
 
 * **Free** - Under MIT license, you can use it anywhere if you want.
 
-### Get Started
+## Requirement
+
+PHP 5.4+ and PDO extension installed
+
+## Get Started
+
+### Install via composer
+
+Add Medoo to composer.json configuration file.
+```
+$ composer require catfan/Medoo
+```
+
+And update the composer
+```
+$ composer update
+```
 
 ```php
-// Include Medoo (configured)
-require_once 'medoo.php';
+// If you installed via composer, just use this code to requrie autoloader on the top of your projects.
+require 'vendor/autoload.php';
+
+// Using Medoo namespace
+use Medoo\Medoo;
 
 // Initialize
-$database = new medoo();
-
-// Enjoy
-$database->insert('account', [
-    'user_name' => 'foo'
-    'email' => 'foo@bar.com',
-    'age' => 25,
-    'lang' => ['en', 'fr', 'jp', 'cn']
-]);
-
-// Or initialize via independent configuration
-$database = new medoo([
+$database = new Medoo([
     'database_type' => 'mysql',
     'database_name' => 'name',
     'server' => 'localhost',
     'username' => 'your_username',
-    'password' => 'your_password',
+    'password' => 'your_password'
 ]);
+
+// Enjoy
+$database->insert('account', [
+    'user_name' => 'foo',
+    'email' => 'foo@bar.com'
+]);
+
+$data = $database->select('account', [
+    'user_name',
+    'email'
+], [
+    'user_id' => 50
+]);
+
+echo json_encode($data);
+
+// [
+//     {
+//         "user_name" : "foo",
+//         "email" : "foo@bar.com",
+//     }
+// ]
 ```
 
-### Contribution Guides
+## Contribution Guides
 
 For most of time, Medoo is using develop branch for adding feature and fixing bug, and the branch will be merged into master branch while releasing a public version. For contribution, submit your code to the develop branch, and start a pull request into it.
 
@@ -51,12 +87,12 @@ On develop branch, each commits are started with `[fix]`, `[feature]` or `[updat
 
 Keep it simple and keep it clear.
 
-### Liscense
+## License
 
-Medoo is under the MIT License.
+Medoo is under the MIT license.
 
-### Links
+## Links
 
-* Official website: [http://medoo.in](http://medoo.in)
+* Official website: [https://medoo.in](https://medoo.in)
 
-* Documentation: [http://medoo.in/doc](http://medoo.in/doc)
+* Documentation: [https://medoo.in/doc](https://medoo.in/doc)

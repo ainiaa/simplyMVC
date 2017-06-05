@@ -377,6 +377,7 @@ function halt($error) {
         }
     }
     // 包含异常页面模板
+    var_export($error);exit;
     include C('TMPL_EXCEPTION_FILE');
     exit;
 }

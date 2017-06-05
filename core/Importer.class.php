@@ -105,7 +105,8 @@ class Importer
 
         if (!empty($configFiles) && is_array($configFiles)) {
             foreach ($configFiles as $configFile) {
-                if ($excludEnvFile && stripos($configFile, 'env.') === 0) {//环境
+                $configFileName = basename($configFile);
+                if ($excludEnvFile && stripos($configFileName, 'env.') === 0) {//环境
                     continue;
                 }
                 if (is_file($configFile)) {
