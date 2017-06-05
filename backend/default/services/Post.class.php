@@ -19,7 +19,7 @@ class PostService extends BaseService
 
     public function getOnePost($where)
     {
-        return $this->PostDAO->getOne('*', $where);
+        return $this->PostDAO->getOne($where);
     }
 
     public function addPost($data)

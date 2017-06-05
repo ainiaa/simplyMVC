@@ -97,7 +97,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
      * 获得cache主键
      * @return string
      */
-    private function getPK()
+    public function getPK()
     {
         return $this->realTableName . ':' . $this->uId;
     }
@@ -162,98 +162,85 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
     }
 
     /**
-     * 更新数据(必须包含Pk字段)
+     * 更新数据 Usage: $model = D('XXXModel'); $where = array( 'node_id' =>
+     * $node_id, 'id' => $id, ); $model->updateByPk($data, $where);
+     * //where只能包含pk和sk PS： 请不要使用 字符串形式的。 格式要统一
      *
-     * @param array $currentData
-     * @param array $pinfo
+     * @author Jeff Liu<liuwy@imageco.com.cn>
+     *
+     * @param array $data
+     * @param array $options
      *
      * @return int
      */
-    public function updateByPk($currentData, $pinfo = [])
+    public function updateByPk($data, $options = array())
     {
-        $pk = $currentData[$this->pk];
-        if (count($this->defaultValue) !== count($currentData)) {    //不完整完整字段, 合并更新
-            $where = sprintf('%s=%s', $this->pk, $currentData[$this->pk]);
+        $pkAndSk = $this->getPkAndSk($data, $options);
+        $pk      = $pkAndSk['pk'];
+        $sk      = $pkAndSk['sk'];
+        $this->init($pk);
 
+        if (count($this->defaultValue) !== count($data)) { // 不完整完整字段, 合并更新
             if ($this->isMulit()) {
-                $originData = $this->get($currentData[$this->pk], $currentData[$this->sk]);
-                $where      = sprintf(' AND %s="%s"', $this->sk, $currentData[$this->sk]);
-                unset($currentData[$this->pk], $currentData[$this->sk]);
+                $odatas = $this->get($pk, $sk);
             } else {
-                $originData = $this->getByPk($pk);
-                unset($currentData[$this->pk]);
+                $odatas = $this->getByPk($pk);
             }
-
-            $ret = parent::update($currentData, $where);
-
-            if ($originData) {
-                $currentData = array_merge($originData, $currentData);
-                unset($originData);
+            if (empty($odatas)) {
+                $data = array_merge($this->defaultValue, $data);
+            } else {
+                $data = array_merge($this->defaultValue, $odatas, $data);
+                unset($odatas);
             }
-        } else {
-            $ret = parent::update($currentData, $pinfo);
         }
 
-        $key = $this->getPK();
-
-        if ($this->isMulit()) {
-            $sk = $currentData[$this->sk];
-
-            $tmp                    = $this->localCache[$key];
-            $tmp[$sk]               = $currentData;
-            $this->localCache[$key] = $tmp;
-
-            $this->redis->hMset($key, [$sk => $currentData]);
-
-            unset($sk, $tmp);
-        } else {
-            $this->localCache[$key] = $currentData;
-            $this->redis->hMset($key, $currentData);
+        $ret = parent::where($options)->save($data); // 保存数据到db
+        if ($ret) { // 保存成功
+            $key = $this->getStorageKey($pk);
+            if ($this->isMulit()) {
+                $tmp                    = $this->LocalCache[$key];
+                $tmp[$sk]               = $data;
+                $this->LocalCache[$key] = $tmp;
+                $this->redis->hSet($key, $sk, $data);
+                unset($sk, $tmp);
+            } else {
+                $this->LocalCache[$key][$pk] = $data;
+                $this->redis->hSet($key, $pk, $data);
+            }
+            unset($data, $key);
         }
 
-        unset($currentData, $key);
         return $ret;
     }
-
 
     /**
      * 按照主键获取数据
      *
-     * @param mixed $pk
-     * @param array $pinfo
+     * @author Jeff Liu<liuwy@imageco.com.cn>
+     *
+     * @param string $pk
      *
      * @return array|mixed
      */
-    public function getByPk($pk, $pinfo = [])
+    public function getByPk($pk)
     {
-        if (is_array($pk)) {
-            unset($pinfo);
-            return $this->getBySk($pk);
-        } else {
-            $this->uId = $pk;
-            $key       = $this->getPK();
-            if (!isset($this->localCache[$key])) {
+        $key = $this->getStorageKey($pk);
+        if (isset($this->LocalCache[$key])) { // 本地缓存数据
+            return $this->LocalCache[$key];
+        } else { // 尝试从redis 或者 db 中读取数据
+            if ($this->needUseCache()) {
                 $this->init($pk);
-                if ($this->isMulit()) {
-                    $datas = $this->redis->hGetAll($key);
-                } else {
-                    $datas = $this->redis->hGets($key);
-                }
-                if (!$datas) {
-                    $datas = parent::getByPk($pk);
-
-                    if ($datas) {
+                $datas = $this->redis->hGetAll($key);
+                if (!isset($datas[$pk])) { // 尝试从mysql中读取数据
+                    $datas = parent::getByPk($pk); // 数据结构已经处理好了
+                    if ($datas) { // 将mysql中的数据缓存到redis和本地缓存中
+                        $this->LocalCache[$key] = $datas;
                         $this->redis->hMset($key, $datas);
                     }
-
-                    return $datas;
-                } else {
-                    $this->localCache[$key] = $datas;
-
-                    return $datas;
                 }
+                return $datas;
             } else {
-                return $this->localCache[$key];
+                return $this->getOne([$this->_pk => $pk]);
             }
         }
     }

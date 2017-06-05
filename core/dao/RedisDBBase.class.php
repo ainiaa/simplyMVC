@@ -359,7 +359,7 @@ class RedisDBBase extends BaseDBDAO
                 }
                 return $datas;
             } else {
-                return $this->getOne([$this->_pk => $pk]);
+                return $this->getOne( [$this->_pk => $pk]);
             }
         }
     }

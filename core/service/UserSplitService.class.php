@@ -23,11 +23,9 @@ class UserSplitService extends BaseService
 
     public function getUserSplit($uId)
     {
-        $where = [
-                'id' => $uId
-        ];
+        $where = ['id' => $uId];
 
-        return $this->UserSplitDBDAO->getOne('*', $where);
+        return $this->UserSplitDBDAO->getOne($where);
     }
 
     /**

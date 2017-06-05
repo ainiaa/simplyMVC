@@ -9,7 +9,7 @@ class CategoryDAO extends BaseDBDAO
 
     public function getValidParents($id)
     {
-        $currentInfo = $this->getOne('*', ['id' => $id]);
+        $currentInfo = $this->getOne(['id' => $id]);
         $query       = sprintf(
                 'SELECT * FROM `%s` WHERE`path` NOT LIKE \'%%,%s,%%\' ',
                 'smvc_category',
@@ -25,6 +25,6 @@ class CategoryDAO extends BaseDBDAO
 
     public function getCategoryInfo($id)
     {
-        return $this->getOne('*', ['id' => $id]);
+        return $this->getOne(['id' => $id]);
     }
 }

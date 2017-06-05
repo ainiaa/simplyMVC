@@ -16,13 +16,14 @@ class AdminService extends BaseService
 
     /**
      * @author Jeff Liu
+     *
      * @param $userName
      *
      * @return array
      */
     public function getAdminInfoByUserName($userName)
     {
-        $adminInfo = $this->AdminDAO->getOne(array('user_name', 'password', 'email'),array('user_name' => $userName));
+        $adminInfo = $this->AdminDAO->getOne(array('user_name' => $userName), array('user_name', 'password', 'email'));
         return $adminInfo;
     }
 

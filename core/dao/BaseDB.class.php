@@ -17,11 +17,13 @@ class BaseDBDAO extends SmvcObject
 
     protected static $writeKey = 'db.master';
     protected static $readKey = 'db.slave';
-
-    protected $tableName = '';
-    protected $realTableName = '';
-
+    protected $name = '';// 模型名称
+    protected $dbName = '';// 数据库名称
+    protected $connection = '';//数据库配置
+    protected $tableName = '';// 数据表名（不包含表前缀）
+    protected $realTableName = '';// 实际数据表名（包含表前缀）
     protected $defaultValue = [];
+    protected $tablePrefix = '';// 数据表前缀
 
     /**
      * 读操作对应的storage
@@ -47,6 +49,8 @@ class BaseDBDAO extends SmvcObject
     protected $pk = null;
     protected $sk = null;
 
+    protected $fields = [];// 字段信息
+
     /**
      * 事务指令数
      * @var int
@@ -71,7 +75,33 @@ class BaseDBDAO extends SmvcObject
      */
     protected $connected = false;
 
-    public function __construct()
+    protected $data = [];
+
+    protected $methods = [
+            'table',
+            'order',
+            'alias',
+            'having',
+            'group',
+            'lock',
+            'distinct',
+            'auto',
+            'filter',
+            'validate',
+            'result',
+            'bind',
+            'token'
+    ];
+    protected $options = [];
+
+    /**
+     *
+     *
+     * @param string $name
+     * @param string $tablePrefix
+     * @param string $connection
+     */
+    public function __construct($name = '', $tablePrefix = '', $connection = '')
     {
         parent::__construct();
 
@@ -83,7 +113,39 @@ class BaseDBDAO extends SmvcObject
             self::$readKey = 'db.slave';
         }
 
+        // 获取模型名称
+        if (!empty($name)) {
+            if (strpos($name, '.')) { // 支持 数据库名.模型名的 定义
+                list($this->dbName, $this->name) = explode('.', $name);
+            } else {
+                $this->name = $name;
+            }
+        } elseif (empty($this->name)) {
+            $this->name = $this->getModelName();
+        }
+        // 设置表前缀
+        if (is_null($tablePrefix)) {// 前缀为Null表示没有前缀
+            $this->tablePrefix = '';
+        } elseif ('' != $tablePrefix) {
+            $this->tablePrefix = $tablePrefix;
+        } else {
+            $this->tablePrefix = $this->tablePrefix ? $this->tablePrefix : C('DB_PREFIX');
+        }
+
         $this->connect(false); //先初始化一个读取db实例  todo 真的有这个必要吗？？
+    }
+
+    /**
+     * 得到当前的数据对象名称
+     * @access public
+     * @return string
+     */
+    public function getModelName()
+    {
+        if (empty($this->name)) {
+            $this->name = substr(get_class($this), 0, -5);
+        }
+        return $this->name;
     }
 
 
@@ -308,8 +370,8 @@ class BaseDBDAO extends SmvcObject
     public function add($data)
     {
         $this->setLatestStorageType(self::WRITE_STORAGE);
-
-        return $this->getStorage()->insert($this->realTableName, $data);
+        $tableName = $this->getTableName();
+        return $this->getStorage()->insert($tableName, $data);
     }
 
     /**
@@ -382,7 +444,7 @@ class BaseDBDAO extends SmvcObject
     public function multiAdd($data)
     {
         $this->setLatestStorageType(self::WRITE_STORAGE);
-        array_unshift($data, $this->realTableName);
+        array_unshift($data, $this->getTableName());
 
         return call_user_func_array([$this->getStorage(), 'insert'], $data);
     }
@@ -418,8 +480,9 @@ class BaseDBDAO extends SmvcObject
     public function update($data, $where = '')
     {
         $this->setLatestStorageType(self::WRITE_STORAGE);
-
-        return $this->getStorage()->update($this->realTableName, $data, $where);
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->getStorage()->update($tableName, $data, $where);
     }
 
     /**
@@ -444,15 +507,15 @@ class BaseDBDAO extends SmvcObject
      * 获得数据
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
-     * @param array|string $columns
      * @param              array
+     * @param array|string $columns
      *
      * @return array Return the data of the column.
      */
-    public function getOne($columns, $where = [])
+    public function getOne($where = [], $columns = '*')
     {
         $this->setLatestStorageType(self::READ_STORAGE);
-        return $this->getStorage()->get($this->realTableName, $columns, $where);
+        return $this->select($columns, null, $where);
     }
 
     /**
@@ -482,7 +545,7 @@ class BaseDBDAO extends SmvcObject
     public function getAll($columns = '*', $where = [])
     {
         $this->setLatestStorageType(self::READ_STORAGE);
-        return $this->getStorage()->select($this->realTableName, $columns, $where);
+        return $this->select($columns, null, $where);
     }
 
     /**
@@ -511,8 +574,14 @@ class BaseDBDAO extends SmvcObject
     public function getAllWithJoin($join, $columns, $where = [])
     {
         $this->setLatestStorageType(self::READ_STORAGE);
+        return $this->select($columns, $join, $where);
+    }
 
-        return $this->getStorage()->select($this->realTableName, $join, $columns, $where);
+    protected function select($columns, $join, $where)
+    {
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->getStorage()->select($tableName, $join, $columns, $where);
     }
 
 
@@ -529,7 +598,7 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::WRITE_STORAGE);
 
-        return $this->getStorage()->delete($this->realTableName, $where);
+        return $this->getStorage()->delete($this->getTableName(), $where);
     }
 
     /**
@@ -557,7 +626,7 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->count($this->realTableName, $where);
+        return $this->getStorage()->count($this->getTableName(), $where);
     }
 
     /**
@@ -570,7 +639,7 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->max($this->realTableName, $column, $where);
+        return $this->getStorage()->max($this->getTableName(), $column, $where);
     }
 
     /**
@@ -583,7 +652,7 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->min($this->realTableName, $column, $where);
+        return $this->getStorage()->min($this->getTableName(), $column, $where);
     }
 
     /**
@@ -596,7 +665,7 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->avg($this->realTableName, $column, $where);
+        return $this->getStorage()->avg($this->getTableName(), $column, $where);
     }
 
     /**
@@ -609,7 +678,7 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->sum($this->realTableName, $column, $where);
+        return $this->getStorage()->sum($this->getTableName(), $column, $where);
     }
 
     /**
@@ -621,7 +690,7 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->has($this->realTableName, $where);
+        return $this->getStorage()->has($this->getTableName(), $where);
     }
 
     /**
@@ -634,7 +703,7 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->has($this->realTableName, $join, $where);
+        return $this->getStorage()->has($this->getTableName(), $join, $where);
     }
 
     /**
@@ -824,7 +893,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * @param     $query
-     * @param int $queryType
+     * @param int $type
      *
      * @return mixed
      */
@@ -857,13 +926,13 @@ class BaseDBDAO extends SmvcObject
 
     public function getList($where, $field = '')
     {
-        return $this->getData($this->tableName, $where, self::SELECT_TYPE_ALL, $field);
+        return $this->getData('', $where, self::SELECT_TYPE_ALL, $field);
     }
 
 
     public function getListWithLimit($where, $limit, $field = '')
     {
-        return $this->getData($this->tableName, $where, self::SELECT_TYPE_ALL, $field, '', $limit);
+        return $this->getData('', $where, self::SELECT_TYPE_ALL, $field, '', $limit);
     }
 
     /**
@@ -885,6 +954,81 @@ class BaseDBDAO extends SmvcObject
         return true;
     }
 
+    /**
+     * 字段和表名处理添加`
+     * @access protected
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    protected function parseKey(&$key)
+    {
+        $key = trim($key);
+        if (!preg_match('/[,\'\"\*\(\)`.\s]/', $key)) {
+            $key = '`' . $key . '`';
+        }
+        return $key;
+    }
+
+    /**
+     * @param $field
+     *
+     * @return bool
+     */
+    protected function needChangeCase($field)
+    {
+        $pattern = '|^[A-Z_]+$|';
+        preg_match_all($pattern, $field, $matches);
+        if (isset($matches[0]) && $matches[0]) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 取得数据表的字段信息
+     * @access public
+     *
+     * @param $tableName
+     *
+     * @return array
+     */
+    public function getFields($tableName)
+    {
+        $info = [];
+        if (stripos($tableName, '__none__') === false) {
+            $tableName = $this->parseKey($tableName);
+            preg_match('|\w+|', $tableName, $tableNameList); //去掉表别名
+            if (isset($tableNameList[0])) {
+                $tableName = $tableNameList[0];
+            }
+            $result = $this->getStorage()->query('SHOW COLUMNS FROM ' . $tableName);
+            if ($result) {
+                foreach ($result as $key => $val) {
+                    $needChangeCase = $this->needChangeCase($val['Field']);
+                    if ($needChangeCase) {//首字母大写转成小写 因为mycat会将field转为大写，这里转成小写
+                        $field = strtolower($val['Field']);
+                    } else {
+                        $field = $val['Field'];
+                    }
+
+                    $info[$field] = [
+                            'name'    => $field,
+                            'type'    => $val['Type'],
+                            'notnull' => (bool)($val['Null'] === ''), // not null is empty, null is yes
+                            'default' => $val['Default'],
+                            'primary' => (strtolower($val['Key']) == 'pri'),
+                            'autoinc' => (strtolower($val['Extra']) == 'auto_increment'),
+                    ];
+                }
+            }
+        }
+
+        return $info;
+    }
+
 
     /**
      * 获取数据表字段信息
@@ -898,7 +1042,7 @@ class BaseDBDAO extends SmvcObject
             $needGetFields = $this->needGetFields($table);
             $fields        = [];
             if ($needGetFields) {
-                $fields = $this->db->getFields($table);
+                $fields = $this->getFields($table);
             }
             return $fields ? array_keys($fields) : [];
         }
@@ -936,6 +1080,23 @@ class BaseDBDAO extends SmvcObject
         return $this;
     }
 
+    protected function _parseTable($options)
+    {
+        if (isset($options['table'])) { // 自动获取表名
+            $table = $options['table'];
+        } else if (isset($this->options['table'])) {
+            $table = $this->options['table'];
+        } else {
+            $table = $this->getTableName();
+        }
+
+        if (!empty($options['alias'])) {
+            $table .= ' ' . $options['alias'];
+        }
+
+        return $table;
+    }
+
     /**
      *
      * todo 这个还需要进行处理
@@ -956,7 +1117,7 @@ class BaseDBDAO extends SmvcObject
      */
     public function getData(
             $table = '',
-            $where = array(),
+            $where = [],
             $selectType = self::SELECT_TYPE_ALL,
             $field = '',
             $order = '',
@@ -964,9 +1125,9 @@ class BaseDBDAO extends SmvcObject
             $lock = false
     ) {
         if (empty($table)) {
-            $table = $this->tableName;
+            $table = $this->_parseTable($where);
         }
-        $this->setTableName($table)->where($where);
+        $this->table($table);
         if ($field) {
             $this->field($field);
         }
@@ -979,48 +1140,18 @@ class BaseDBDAO extends SmvcObject
         if ($lock) {
             $this->lock();
         }
+        $where = $this->_parseOptions($where);
+
         if ($selectType === self::SELECT_TYPE_ALL) {
             return $this->getAll($field, $where);
         } elseif ($selectType === self::SELECT_TYPE_ONE) {
-            return $this->getOne($field, $where);
+            return $this->getOne($where, $field);
         } else {
             return $this->getField($field, $where);
         }
     }
 
-    //    /**
-    //     * 获得指定的filed信息
-    //     *
-    //     * @param $field
-    //     * @param $where
-    //     *
-    //     * @return bool|mixed
-    //     */
-    //    public function getField($field, $where)
-    //    {
-    //        $data = $this->getOne($field, $where);
-    //        if (isset($data[$field])) {
-    //            return $data[$field];
-    //        }
-    //        return false;
-    //    }
 
-    protected $methods = array(
-            'table',
-            'order',
-            'alias',
-            'having',
-            'group',
-            'lock',
-            'distinct',
-            'auto',
-            'filter',
-            'validate',
-            'result',
-            'bind',
-            'token'
-    );
-    protected $options = array();
 
     public function token($token)
     {
@@ -1171,7 +1302,7 @@ class BaseDBDAO extends SmvcObject
             // 连贯操作的实现
             $this->options[strtolower($method)] = $args[0];
             return $this;
-        } elseif (in_array(strtolower($method), array('count', 'sum', 'min', 'max', 'avg'), true)) {
+        } elseif (in_array(strtolower($method), ['count', 'sum', 'min', 'max', 'avg'], true)) {
             // 统计查询的实现
             $field = isset($args[0]) ? $args[0] : '*';
             return $this->getField(strtoupper($method) . '(' . $field . ') AS tp_' . $method);
@@ -1225,16 +1356,16 @@ class BaseDBDAO extends SmvcObject
      */
     public function getTableName()
     {
-        if (empty($this->trueTableName)) {
+        if (empty($this->realTableName)) {
             $tableName = !empty($this->tablePrefix) ? $this->tablePrefix : '';
             if (!empty($this->tableName)) {
                 $tableName .= $this->tableName;
             } else {
                 $tableName .= parse_name($this->name);
             }
-            $this->trueTableName = strtolower($tableName);
+            $this->realTableName = strtolower($tableName);
         }
-        return (!empty($this->dbName) ? $this->dbName . '.' : '') . $this->trueTableName;
+        return (!empty($this->dbName) ? $this->dbName . '.' : '') . $this->realTableName;
     }
 
     /**
@@ -1245,7 +1376,7 @@ class BaseDBDAO extends SmvcObject
      *
      * @return array
      */
-    protected function _parseOptions($options = array())
+    protected function _parseOptions($options = [])
     {
         if (is_array($options)) {
             $options = array_merge($this->options, $options);
@@ -1303,10 +1434,10 @@ class BaseDBDAO extends SmvcObject
 
     /**
      * 获取一条记录的某个字段值
-     * @access public
+     * @access   public
      *
      * @param string $field 字段名
-     * @param string $spea  字段数据间隔符号 NULL返回数组
+     * @param null   $sepa
      *
      * @return mixed
      */
@@ -1319,13 +1450,13 @@ class BaseDBDAO extends SmvcObject
             if (!isset($options['limit'])) {
                 $options['limit'] = is_numeric($sepa) ? $sepa : '';
             }
-            $resultSet = $this->db->select($options);
+            $resultSet = $this->getList($options);
             if (!empty($resultSet)) {
                 $_field = explode(',', $field);
                 $field  = array_keys($resultSet[0]);
                 $key    = array_shift($field);
                 $key2   = array_shift($field);
-                $cols   = array();
+                $cols   = [];
                 $count  = count($_field);
                 foreach ($resultSet as $result) {
                     $name = $result[$key];
@@ -1342,7 +1473,7 @@ class BaseDBDAO extends SmvcObject
             if (true !== $sepa) {// 当sepa指定为true的时候 返回所有数据
                 $options['limit'] = is_numeric($sepa) ? $sepa : 1;
             }
-            $result = $this->getOne('*', $options);
+            $result = $this->getOne($options);
 
             if (!empty($result)) {
                 if (true !== $sepa && 1 == $options['limit']) {
@@ -1363,34 +1494,38 @@ class BaseDBDAO extends SmvcObject
      * @access public
      * @return string
      */
-    public function getPk() {
-        return isset($this->fields['_pk'])?$this->fields['_pk']:$this->pk;
+    public function getPk()
+    {
+        return isset($this->fields['_pk']) ? $this->fields['_pk'] : $this->pk;
     }
 
     /**
      * 查询数据
      * @access public
+     *
      * @param mixed $options 表达式参数
+     *
      * @return mixed
      */
-    public function find($options=array()) {
-        if(is_numeric($options) || is_string($options)) {
-            $where[$this->getPk()]  =   $options;
-            $options                =   array();
-            $options['where']       =   $where;
+    public function find($options = [])
+    {
+        if (is_numeric($options) || is_string($options)) {
+            $where[$this->getPk()] = $options;
+            $options               = [];
+            $options['where']      = $where;
         }
         // 总是查找一条记录
-        $options['limit']   =   1;
+        $options['limit'] = 1;
         // 分析表达式
-        $options            =   $this->_parseOptions($options);
-        $resultSet          =   $this->db->select($options);
-        if(false === $resultSet) {
+        $options   = $this->_parseOptions($options);
+        $resultSet = $this->getOne($options);
+        if (false === $resultSet) {
             return false;
         }
-        if(empty($resultSet)) {// 查询结果为空
+        if (empty($resultSet)) {// 查询结果为空
             return null;
         }
-        $this->data         =   $resultSet[0];
+        $this->data = $resultSet;
         return $this->data;
     }
 
@@ -1410,13 +1545,13 @@ class BaseDBDAO extends SmvcObject
                 $parse = func_get_args();
                 array_shift($parse);
             }
-            $parse = array_map(array($this, 'quote'), $parse);
+            $parse = array_map([$this, 'quote'], $parse);
             $where = vsprintf($where, $parse);
         } elseif (is_object($where)) {
             $where = get_object_vars($where);
         }
         if (is_string($where) && '' != $where) {
-            $map            = array();
+            $map            = [];
             $map['_string'] = $where;
             $where          = $map;
         }

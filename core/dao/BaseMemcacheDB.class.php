@@ -80,7 +80,7 @@ abstract class BaseMemcacheDBDAO extends BaseDBDAO
      * 获得cache主键
      * @return string
      */
-    private function getPK()
+    public function getPK()
     {
         return $this->realTableName . ':' . $this->uId;
     }
