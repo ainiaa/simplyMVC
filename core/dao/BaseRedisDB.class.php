@@ -10,18 +10,31 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
     /**
      * @var LocalCache
      */
-    private $localCache;
+    private $LocalCache;
 
     protected $uId;
 
     protected $storager;
-
+    // 默认数据
     protected $defaultValue = [];
 
+    // 这个必须唯一 否则存储会有问题
+    protected $_pk;
+    protected $_pk_auto = false;//pk为自动增长
+
+    // 主键（不同于db的pk，这个主要用来存储的时候 作为 key的一部分。)
+    protected $_sk;
+    // 外键(和$_pk组合 可以唯一定位一条数据)
+
+    protected $useRedisCacheFlag = null;
+    // 这个变量不能自己设置 会根据配置项 自己设定好的
+
+    protected $useCache = 'redis'; // 1:redis 2:other
+
     /**
-     * @var Redis
+     * @var SmvcRedisHelper
      */
-    protected $redis;
+    protected $Redis;
 
     /**
      * 构造函数
@@ -32,7 +45,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
     public function __construct($mode = null, $uid = null)
     {
         parent::__construct();
-        $this->localCache = LocalCache::getData($this->tableName);
+        $this->LocalCache = LocalCache::getData($this->tableName);
         $this->uId        = LocalCache::getData('uId');
     }
 
@@ -48,7 +61,7 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
     {
         $this->uId = $uid;
 
-        if (empty($this->redis)) {
+        if (empty($this->Redis)) {
             $redisConf = C('redis', []);
             if (empty($redisConf)) {
                 $redisConf = [
@@ -57,11 +70,11 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
                         'pconnect' => false,
                 ];
             }
-            $this->redis = new Redis();
+            $this->Redis = new Redis();
             if (isset($redisConf['pconnect']) && $redisConf['pconnect']) {
-                $this->redis->pconnect($redisConf['host'], $redisConf['port']);
+                $this->Redis->pconnect($redisConf['host'], $redisConf['port']);
             } else {
-                $this->redis->connect($redisConf['host'], $redisConf['port']);
+                $this->Redis->connect($redisConf['host'], $redisConf['port']);
             }
         }
 
@@ -133,27 +146,27 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             $this->init($pkValue);
 
             $datas = array_merge($this->defaultValue, $datas);
-            $ret   = parent::add($datas);
+            $ret   = BaseDBDAO::add($datas);
 
             if ($ret > 0) {
                 $key = $this->getPK();
                 if ($this->isMulit()) {
                     $sk = $datas[$this->sk];
-                    if (isset($this->localCache[$key])) {
-                        $tem                    = $this->localCache[$key];
+                    if (isset($this->LocalCache[$key])) {
+                        $tem                    = $this->LocalCache[$key];
                         $tem[$sk]               = $datas;
-                        $this->localCache[$key] = $tem;
+                        $this->LocalCache[$key] = $tem;
                     }
 
-                    if ($this->redis->exists($key)) {
-                        $this->redis->hMset($key, [$sk => $datas]);
+                    if ($this->Redis->exists($key)) {
+                        $this->Redis->hMset($key, [$sk => $datas]);
                     }
                 } else {
-                    $this->localCache[$key] = $datas;
-                    $this->redis->hMset($key, $datas);
+                    $this->LocalCache[$key] = $datas;
+                    $this->Redis->hMset($key, $datas);
                 }
             } else {
-                $this->errorInfo(__METHOD__, func_get_args());
+                $this->errorInfo(__METHOD__, func_get_args(), 'addData failure');
             }
             return $ret;
         } else {
@@ -162,11 +175,47 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
     }
 
     /**
+     * 获得 pk sk的值
+     *
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
+     *
+     * @param array $data
+     * @param array $options
+     *
+     * @return array
+     */
+    private function getPkAndSk($data = array(), $options = array())
+    {
+        $pk = null;
+        if (isset($data[$this->_pk])) {
+            $pk = $data[$this->_pk];
+        } else if (isset($options[$this->_pk])) {
+            $pk = $options[$this->_pk];
+        }
+        $sk = null;
+        if (isset($data[$this->_sk])) {
+            $sk = $data[$this->_sk];
+        } else if (isset($options[$this->_sk])) {
+            $sk = $options[$this->_sk];
+        }
+
+        if (is_null($pk)) {
+            $this->errorInfo(__METHOD__, func_get_args(), 'pk is null');
+        }
+        if ($this->isMulit() && is_null($sk)) {
+            $this->errorInfo(__METHOD__, func_get_args(), 'sk is null');
+        }
+
+        return ['pk' => $pk, 'sk' => $sk];
+
+    }
+
+    /**
      * 更新数据 Usage: $model = D('XXXModel'); $where = array( 'node_id' =>
      * $node_id, 'id' => $id, ); $model->updateByPk($data, $where);
      * //where只能包含pk和sk PS： 请不要使用 字符串形式的。 格式要统一
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
      *
      * @param array $data
      * @param array $options
@@ -194,29 +243,72 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             }
         }
 
-        $ret = parent::where($options)->save($data); // 保存数据到db
+        BaseDBDAO::where($options);
+        $ret = BaseDBDAO::save($data); // 保存数据到db
         if ($ret) { // 保存成功
             $key = $this->getStorageKey($pk);
             if ($this->isMulit()) {
                 $tmp                    = $this->LocalCache[$key];
                 $tmp[$sk]               = $data;
                 $this->LocalCache[$key] = $tmp;
-                $this->redis->hSet($key, $sk, $data);
+                $this->Redis->hSet($key, $sk, $data);
                 unset($sk, $tmp);
             } else {
                 $this->LocalCache[$key][$pk] = $data;
-                $this->redis->hSet($key, $pk, $data);
+                $this->Redis->hSet($key, $pk, $data);
             }
             unset($data, $key);
         }
 
         return $ret;
     }
+    /**
+     * 获得cache主键
+     *
+     * @param $pk
+     *
+     * @return string
+     */
+    public function getStorageKey($pk)
+    {
+        return $this->getTableName(). ':' . $pk;
+    }
+
+    /**
+     * 是否使用redis缓存
+     *
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
+     * @return bool
+     */
+    public function needUseCache()
+    {
+        if (is_null($this->useRedisCacheFlag)) {
+            $useRedisCache           = C('useRedisCache');
+            $this->useRedisCacheFlag = false;
+            if ($useRedisCache) {
+                $useRedisCacheControl = C('useRedisCacheControl');
+                if ($useRedisCacheControl == 'config') {
+                    $tableName           = $this->getTableName();
+                    $redisCacheTableList = C('redisCacheTableList');
+                    if (isset($redisCacheTableList[$tableName]) && $redisCacheTableList[$tableName]) {
+                        $this->useRedisCacheFlag = true;
+                    } else {
+                        $this->useRedisCacheFlag = false;
+                    }
+                } else if ($useRedisCacheControl == 'model') {
+                    if ($this->useCache == 'redis') {
+                        $this->useRedisCacheFlag = true;
+                    }
+                }
+            }
+        }
+        return $this->useRedisCacheFlag;
+    }
 
     /**
      * 按照主键获取数据
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $pk
      *
@@ -230,12 +322,12 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
         } else { // 尝试从redis 或者 db 中读取数据
             if ($this->needUseCache()) {
                 $this->init($pk);
-                $datas = $this->redis->hGetAll($key);
+                $datas = $this->Redis->hGetAll($key);
                 if (!isset($datas[$pk])) { // 尝试从mysql中读取数据
                     $datas = parent::getByPk($pk); // 数据结构已经处理好了
                     if ($datas) { // 将mysql中的数据缓存到redis和本地缓存中
                         $this->LocalCache[$key] = $datas;
-                        $this->redis->hMset($key, $datas);
+                        $this->Redis->hMset($key, $datas);
                     }
                 }
                 return $datas;
@@ -273,30 +365,30 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
             $this->init($pk);
             $sk  = $condition[$this->sk];
             $key = $this->getPK();
-            $ret = parent::deleteByPk($condition);
+            $ret = BaseDBDAO::deleteByPk($condition);
 
             if ($ret > 0) {
                 //清除缓存
-                $this->redis->hdel($key, $sk);
+                $this->Redis->hdel($key, $sk);
 
-                if (isset($this->localCache[$key])) {   //清除本地缓存
-                    $tem = $this->localCache[$key];
+                if (isset($this->LocalCache[$key])) {   //清除本地缓存
+                    $tem = $this->LocalCache[$key];
                     unset($tem[$sk]);
-                    $this->localCache[$key] = $tem;
+                    $this->LocalCache[$key] = $tem;
                 }
             } else {
-                $this->errorInfo(__METHOD__, func_get_args());
+                $this->errorInfo(__METHOD__, func_get_args(), 'delete failure');
             }
         } else {
             $this->init($condition);
             $key = $this->getPK();
-            $ret = parent::deleteByPk($condition);
+            $ret = BaseDBDAO::deleteByPk($condition);
 
             if ($ret > 0) {
-                $this->redis->delete($key);
-                unset($this->localCache[$key]);
+                $this->Redis->delete($key);
+                unset($this->LocalCache[$key]);
             } else {
-                $this->errorInfo(__METHOD__, func_get_args());
+                $this->errorInfo(__METHOD__, func_get_args(), 'delete failure');
             }
         }
 
@@ -304,17 +396,24 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
     }
 
     /**
-     * 错误信息记录
+     * todo 错误信息记录
+     *
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
      *
      * @param $method
      * @param $params
+     * @param $msg
      */
-    private function errorInfo($method, $params)
+    private function errorInfo($method, $params, $msg)
     {
         $class = get_called_class();
-        list(, $method) = explode('::', $method);
-        $methodInfo = $class . '->' . $method . '(' . var_export($params, 1) . ')';
-        echo $methodInfo;
+        list (, $method) = explode('::', $method);
+        $methodInfo = $class . '->' . $method . '(' . var_export($params, 1) . '); msg:' . $msg;
+        if (defined('PHP_OS') && strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            error_log($methodInfo . PHP_EOL, 3, '/tmp/redis.op.log');
+        } else {
+            error_log($methodInfo . PHP_EOL, 3, 'd:/redis.op.log');
+        }
     }
 
     /**
@@ -348,41 +447,41 @@ abstract class BaseRedisDBDAO extends BaseDBDAO
 
             $key = $this->getPK();
 
-            if (!isset($this->localCache[$key])) {
-                $datas = $this->redis->hGetAll($key);
+            if (!isset($this->LocalCache[$key])) {
+                $datas = $this->Redis->hGetAll($key);
 
                 if (!$datas) {
-                    $datas = parent::getByPk($uid);
+                    $datas = BaseDBDAO::getByPk($uid);
                     if ($datas) {   //fix local & redis cache
-                        $this->redis->hMset($key, $datas);
-                        $this->localCache[$key] = $datas;
+                        $this->Redis->hMset($key, $datas);
+                        $this->LocalCache[$key] = $datas;
                     }
                 } else {   //fix local cache
-                    $this->localCache[$key] = $datas;
+                    $this->LocalCache[$key] = $datas;
                 }
 
                 return isset($datas[$sk]) ? $datas[$sk] : null;
             } else {
-                return isset($this->localCache[$key][$sk]) ? $this->localCache[$key][$sk] : null;
+                return isset($this->LocalCache[$key][$sk]) ? $this->LocalCache[$key][$sk] : null;
             }
         } else {
             $this->init($infos);
 
             $key = $this->getPK();
-            if (!isset($this->localCache[$key])) {
-                $datas = $this->redis->hGetAll($key);
+            if (!isset($this->LocalCache[$key])) {
+                $datas = $this->Redis->hGetAll($key);
 
                 if (!$datas) {
-                    $datas = parent::getByPk($infos);
+                    $datas = BaseDBDAO::getByPk($infos);
                     if ($datas) {    //fix local & redis cache
-                        $this->redis->hMset($key, $datas);
-                        $this->localCache[$key] = $datas;
+                        $this->Redis->hMset($key, $datas);
+                        $this->LocalCache[$key] = $datas;
                     }
                 } else {    //fix local cache
-                    $this->localCache[$key] = $datas;
+                    $this->LocalCache[$key] = $datas;
                 }
             } else {
-                $datas = $this->localCache[$key];
+                $datas = $this->LocalCache[$key];
             }
         }
         unset($infos);

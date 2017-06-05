@@ -935,6 +935,11 @@ class BaseDBDAO extends SmvcObject
         return $this->update($data, $where);
     }
 
+    public function save($data, $where = [])
+    {
+        $this->update($data, $where);
+    }
+
     public function getList($where, $field = '')
     {
         return $this->getData('', $where, self::SELECT_TYPE_ALL, $field);
