@@ -21,5 +21,5 @@ return [
         CORE_DIR . 'functions.class.php',
         CORE_DIR . 'exception/ExceptionHandle.class.php',
         VENDOR_DIR . '/FirePHP.class.php',
-        VENDOR_DIR . '/Medoo/medoo.php',
+        VENDOR_DIR . '/Medoo/Medoo.php',
 ];
