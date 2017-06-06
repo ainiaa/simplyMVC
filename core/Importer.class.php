@@ -39,10 +39,10 @@ class Importer
                     Importer::$loadedFiles[$file_hash] = $finalPath;
                 }
             } else {
-                trigger_error('file_is_not_readable:' . $finalPath, E_USER_ERROR);
+                throw_exception('file_is_not_readable:' . $finalPath);
             }
         } else {
-            trigger_error('file_no_exists : ' . $finalPath, E_USER_ERROR);
+            throw_exception('file_no_exists:' . $finalPath);
         }
     }
 
@@ -69,13 +69,13 @@ class Importer
                 $loadResult = true;
             } else {
                 if ($showError) {
-                    trigger_error('file_is_not_readable' . $filePath, E_USER_ERROR);
+                    throw_exception('file_is_not_readable:' . $filePath);
                 }
             }
         } else {
             if ($showError) {
-                debug_print_backtrace();exit;
-                trigger_error('file_no_exists:' . $filePath, E_USER_ERROR);
+                debug_print_backtrace();
+                throw_exception('file_no_exists:' . $filePath);
             }
         }
         return $loadResult;
@@ -114,7 +114,6 @@ class Importer
                     if (is_readable($configFile)) {
                         $fileHash = md5($configFile);
                         if (!isset(Importer::$loadedFiles[$fileHash])) { //还没有加载过当前config文件 加载当前cofnig文件
-
                             $currentConf = include $configFile;
                             if (is_array($currentConf)) {
                                 $finalResult += $currentConf;
@@ -122,10 +121,10 @@ class Importer
                             Importer::$loadedFiles[$fileHash] = $configFile;
                         }
                     } else {
-                        trigger_error('file_is_not_readable' . $configFile, E_USER_ERROR);
+                        throw_exception('file_is_not_readable:' . $configFile);
                     }
                 } else {
-                    trigger_error('file_no_exists' . $configFile, E_USER_ERROR);
+                    throw_exception('file_no_exists:' . $configFile);
                 }
             }
         }
@@ -213,8 +212,7 @@ class Importer
         $serviceFileName = $serviceName . $serviceFileSuffer;
 
         $serviceFile = APP_DIR . $groupName . '/' . $moduleName . '/services/' . ucfirst($serviceFileName);
-        //echo $model_file,':',var_export(is_file($model_file));exit;
-        $loadResult = self::importFileByFullPath($serviceFile);
+        $loadResult  = self::importFileByFullPath($serviceFile);
         if (!$loadResult) { //当前group module下加载controller失败
             $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
@@ -270,13 +268,6 @@ class Importer
         //首先加载core目录下的helper
         $helperFile = CORE_DIR . 'helper/' . $helperFileName;
         $loadResult = self::importFileByFullPath($helperFile, false);
-        //        SmvcDebugHelper::instance()->debug(
-        //                array(
-        //                        'info'  => $helperFile,
-        //                        'label' => '$helperFile ' . __METHOD__,
-        //                        'level' => 'info'
-        //                )
-        //        );
 
         if (!$loadResult) {
             $helperFile = APP_DIR . $groupName . '/' . $moduleName . '/helper/' . $helperFileName;
@@ -501,7 +492,7 @@ class Importer
                 $files                                  = glob($groupBasePath . '*');
                 $finalFileStruct[$groupName]['_FILES_'] = $files;
                 foreach ($files as $file) {
-                    if (is_dir($file)) { //当期group下的一个module
+                    if (is_dir($file)) { //当前group下的一个module
                         $moduleName     = basename($file);
                         $moduleBasePath = $groupBasePath . $moduleName . '/';
                         $moduleFiles    = glob($moduleBasePath . '*');
@@ -531,7 +522,6 @@ class Importer
      */
     public static function autoLoad($className)
     {
-        echo '$className:', $className, '<br />';
         $controllerSuffer    = 'Controller';
         $controllerSufferLen = strlen($controllerSuffer);
         $daoSuffer           = 'DAO';
@@ -562,15 +552,27 @@ class Importer
                 // 根据自动加载路径设置进行尝试搜索
                 $includePath    = get_include_path();
                 $paths          = explode(PATH_SEPARATOR, $includePath);
-                $fileExtensions = ['.class.php', '.php'];
+                $fileExtensions = C('autoLoadFileExtensions');
+                if (empty($fileExtensions)) {
+                    $fileExtensions = ['.class.php', '.php'];
+                } else if (!is_array($fileExtensions)) {
+                    $fileExtensions = [$fileExtensions];
+                }
+
+                $tryFileList = [];
+
                 foreach ($paths as $path) {
-                    // TODO 如果加载类成功则返回 这个需要完善。。。 文件名后缀需要整理
                     foreach ($fileExtensions as $fileExtension) {
-                        $fullFilePath = $path . '/' . $className . $fileExtension;
+                        $fullFilePath  = $path . '/' . $className . $fileExtension;
+                        $tryFileList[] = $fullFilePath;
                         if (self::importFileByFullPath($fullFilePath, false)) {
                             break;
                         }
                     }
+                }
+                throw_exception('class ' . $className . ' not find in below path:' . var_export($tryFileList, 1));
+                if (defined('APP_DEBUG') && APP_DEBUG) {
+                    file_debug(['class' => $className, 'msg' => 'not found', '$tryFileList' => $tryFileList]);
                 }
             }
         }
@@ -595,10 +597,10 @@ class Importer
                     self::$loadedFiles[$fileHash] = $filePath;
                 }
             } else {
-                trigger_error('file_is_not_readable' . $filePath, E_USER_ERROR);
+                throw_exception('file_is_not_readable' . $filePath);
             }
         } else {
-            trigger_error('file_no_exists:' . $filePath, E_USER_ERROR);
+            throw_exception('file_no_exists:' . $filePath);
         }
         return $loadResult;
     }
@@ -647,40 +649,17 @@ class Importer
     }
 
     /**
-     * todo 这个也可以放到配置文件中
      * @return array
      */
     public static function fileMapping()
     {
-        return [
-            // phpseclib /Crypt
-                'Crypt_AES'                 => VENDOR_DIR . 'phpseclib/Crypt/AES.php',
-                'Crypt_Base'                => VENDOR_DIR . 'phpseclib/Crypt/Base.php',
-                'Crypt_Blowfish'            => VENDOR_DIR . 'phpseclib/Crypt/Blowfish.php',
-                'Crypt_DES'                 => VENDOR_DIR . 'phpseclib/Crypt/DES.php',
-                'Crypt_Hash'                => VENDOR_DIR . 'phpseclib/Crypt/Hash.php',
-                'Crypt_RC2'                 => VENDOR_DIR . 'phpseclib/Crypt/RC2.php',
-                'Crypt_RC4'                 => VENDOR_DIR . 'phpseclib/Crypt/RC4.php',
-                'Crypt_Rijndael'            => VENDOR_DIR . 'phpseclib/Crypt/Rijndael.php',
-                'Crypt_RSA'                 => VENDOR_DIR . 'phpseclib/Crypt/RSA.php',
-                'Crypt_TripleDES'           => VENDOR_DIR . 'phpseclib/Crypt/TripleDES.php',
-                'Crypt_Twofish'             => VENDOR_DIR . 'phpseclib/Crypt/Twofish.php',
-            // phpseclib /File
-                'File_ANSI'                 => VENDOR_DIR . 'phpseclib/File/ANSI.php',
-                'File_ANSI1'                => VENDOR_DIR . 'phpseclib/File/ASN1.php',
-                'File_X509'                 => VENDOR_DIR . 'phpseclib/File/X509.php',
-            //phpseclib /Math
-                'Math_BigInteger'           => VENDOR_DIR . 'phpseclib/Math/BigInteger.php',
-            //phpseclib /Net
-                'Net_SCP'                   => VENDOR_DIR . 'phpseclib/Net/SCP.php',
-                'Net_SFTP'                  => VENDOR_DIR . 'phpseclib/Net/SFTP.php',
-                'Net_SSH1'                  => VENDOR_DIR . 'phpseclib/Net/SSH1.php',
-                'Net_SSH2'                  => VENDOR_DIR . 'phpseclib/Net/SSH2.php',
-            //phpseclib /Net/SFTP
-                'Net_SFTP_Stream'           => VENDOR_DIR . 'phpseclib/Net/SFTP/Stream.php',
-            //phpseclib /System
-                'System_SSH_Agent_Identity' => VENDOR_DIR . 'phpseclib/System/SSH/Agent.php',
-        ];
+        $fileMapping = C('fileMapping');
+        if (empty($fileMapping)) {
+            $fileMapping = [];
+        } else if (is_scalar($fileMapping)) {
+            $fileMapping = [$fileMapping];
+        }
+        return $fileMapping;
     }
 
     /**

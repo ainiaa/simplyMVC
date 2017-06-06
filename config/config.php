@@ -23,4 +23,5 @@ return [
                 'auto_literal'    => true, // Smarty3新特性
         ],
         'open_rw'           => false,//开启读写分离
+        'autoLoadFileExtensions' => ['.class.php', '.php'],//自动加载文后缀
 ];

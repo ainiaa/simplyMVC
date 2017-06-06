@@ -18,7 +18,7 @@ class SmvcFileLogger extends SmvcBaseLogger
 
     protected  $dateFormat = ''; //日期格式
     protected $defaultDateFormat = 'Y-m-d H:i:s';
-    protected $defaultLogLevel = 'debug';
+    protected $defaultLevel = 'debug';
     protected $logLevel = '';
     /**
      * Path to the log file
@@ -46,7 +46,7 @@ class SmvcFileLogger extends SmvcBaseLogger
     public function __construct($info = [ /*'logDir' => '', 'level' => 'debug'*/])
     {
         parent::__construct($info);
-        $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLogLevel;
+        $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLevel;
         $logDir         = isset($info['logDir']) ? $info['logDir'] : '';
         $logDir         = rtrim($logDir, '\\/');
         if (!file_exists($logDir)) {

@@ -2,7 +2,7 @@
 
 /**
  *
- * fileLog
+ * SmvcSocketLogger
  *
  * Finally, a light, permissions-checking logging class.
  *
@@ -18,7 +18,7 @@ class SmvcSocketLogger extends SmvcBaseLogger
 
     protected $dateFormat = ''; //日期格式
     protected $defaultDateFormat = 'Y-m-d H:i:s';
-    protected $defaultLogLevel = 'debug';
+    protected $defaultLevel = 'debug';
     protected $logLevel = '';
 
     /**
@@ -58,7 +58,7 @@ class SmvcSocketLogger extends SmvcBaseLogger
     ) {
         parent::__construct($info);
 
-        $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLogLevel;
+        $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLevel;
         if (!empty($info)) {
             $this->host           = empty($info["host"]) ? $this->host : $info["host"];
             $this->port           = empty($info["port"]) ? $this->port : $info["port"];
@@ -73,16 +73,21 @@ class SmvcSocketLogger extends SmvcBaseLogger
      */
     private function initSocket()
     {
-        $old          = error_reporting(0);
-        $errNo        = 0;
-        $errMsg       = '';
-        $this->handle = fsockopen($this->host, $this->port, $errNo, $errMsg, $this->connectTimeout);
-        error_reporting($old);
+        if (empty($this->handle)) {
+            $old          = error_reporting(0);
+            $errNo        = 0;
+            $errMsg       = '';
+            $this->handle = fsockopen($this->host, $this->port, $errNo, $errMsg, $this->connectTimeout);
+            error_reporting($old);
+        }
+
         if ($this->handle) {
             stream_set_blocking($this->handle, 0); //0非阻塞模式
             stream_set_timeout($this->handle, $this->sendTimeout);
         } else {
-            throw new RuntimeException($this->host . ':' . $this->port . ' could not be connected written to. Check that appropriate permissions have been set.');
+            throw new RuntimeException(
+                    $this->host . ':' . $this->port . ' could not be connected written to. Check that appropriate permissions have been set.'
+            );
         }
     }
 
@@ -93,6 +98,7 @@ class SmvcSocketLogger extends SmvcBaseLogger
     {
         if ($this->handle) {
             fclose($this->handle);
+            $this->handle = null;
         }
     }
 
@@ -122,8 +128,6 @@ class SmvcSocketLogger extends SmvcBaseLogger
                 $data = var_export($message, 1);
             }
             fwrite($this->handle, $data);
-            fclose($this->handle);
-            unset($this->buffer);
         }
     }
 }

@@ -2,16 +2,8 @@
 
 /**
  *
- * fileLog
- *
+ * SmvcLoggerInterface
  * Finally, a light, permissions-checking logging class.
- *
- * Usage:
- * $log = new SmvcLogger('/var/log/', 'debug');
- * $log->info('Returned a million search results'); //Prints to the log file
- * $log->error('Oh dear.'); //Prints to the log file
- * $log->debug('x = 5'); //Prints nothing due to current severity threshhold
- *
  */
 interface SmvcLoggerInterface
 {

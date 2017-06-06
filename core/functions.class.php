@@ -267,7 +267,7 @@ function make_url($uri_path, $uri_params = '', $absolute = false)
             $uri_path_arr[3]
     );
     if ($uri_params) {
-        $final_url    .= '&' . http_build_query($uri_params);
+        $final_url .= '&' . http_build_query($uri_params);
     }
 
     if ($absolute) {
@@ -298,16 +298,20 @@ function I($name, $defaultValue = null, $callback = null)
 
 /**
  * URL重定向
- * @param string $url 重定向的URL地址
+ *
+ * @param string  $url  重定向的URL地址
  * @param integer $time 重定向的等待时间（秒）
- * @param string $msg 重定向前的提示信息
+ * @param string  $msg  重定向前的提示信息
+ *
  * @return void
  */
-function redirect($url, $time=0, $msg='') {
+function redirect($url, $time = 0, $msg = '')
+{
     //多行URL地址支持
-    $url        = str_replace(array("\n", "\r"), '', $url);
-    if (empty($msg))
-        $msg    = "系统将在{$time}秒之后自动跳转到{$url}！";
+    $url = str_replace(array("\n", "\r"), '', $url);
+    if (empty($msg)) {
+        $msg = "系统将在{$time}秒之后自动跳转到{$url}！";
+    }
     if (!headers_sent()) {
         // redirect
         if (0 === $time) {
@@ -318,89 +322,105 @@ function redirect($url, $time=0, $msg='') {
         }
         exit();
     } else {
-        $str    = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-        if ($time != 0)
+        $str = "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
+        if ($time != 0) {
             $str .= $msg;
+        }
         exit($str);
     }
 }
 
 /**
  * 获取和设置语言定义(不区分大小写)
- * @param string|array $name 语言变量
- * @param string $value 语言值
+ *
+ * @param string|array $name  语言变量
+ * @param string       $value 语言值
+ *
  * @return mixed
  */
-function L($name=null, $value=null) {
+function L($name = null, $value = null)
+{
     static $_lang = array();
     // 空参数返回所有定义
-    if (empty($name))
+    if (empty($name)) {
         return $_lang;
+    }
     // 判断语言获取(或设置)
     // 若不存在,直接返回全大写$name
     if (is_string($name)) {
         $name = strtoupper($name);
-        if (is_null($value))
+        if (is_null($value)) {
             return isset($_lang[$name]) ? $_lang[$name] : $name;
+        }
         $_lang[$name] = $value; // 语言定义
         return;
     }
     // 批量定义
-    if (is_array($name))
+    if (is_array($name)) {
         $_lang = array_merge($_lang, array_change_key_case($name, CASE_UPPER));
+    }
     return;
 }
 
 /**
  * 错误输出
+ *
  * @param mixed $error 错误
+ *
  * @return void
  */
-function halt($error) {
+function halt($error)
+{
     $e = array();
     if (defined('APP_DEBUG') && APP_DEBUG) {
         //调试模式下输出错误信息
         if (!is_array($error)) {
-            $trace          = debug_backtrace();
-            $e['message']   = $error;
-            $e['file']      = $trace[0]['file'];
-            $e['line']      = $trace[0]['line'];
+            $trace        = debug_backtrace();
+            $e['message'] = $error;
+            $e['file']    = $trace[0]['file'];
+            $e['line']    = $trace[0]['line'];
             ob_start();
             debug_print_backtrace();
-            $e['trace']     = ob_get_clean();
+            $e['trace'] = ob_get_clean();
         } else {
-            $e              = $error;
+            $e = $error;
         }
     } else {
         //否则定向到错误页面
-        $error_page         = C('ERROR_PAGE');
+        $error_page = C('ERROR_PAGE');
         if (!empty($error_page)) {
             redirect($error_page);
         } else {
-            if (C('SHOW_ERROR_MSG'))
+            if (C('SHOW_ERROR_MSG')) {
                 $e['message'] = is_array($error) ? $error['message'] : $error;
-            else
+            } else {
                 $e['message'] = C('ERROR_MESSAGE');
+            }
         }
     }
     // 包含异常页面模板
-    var_export($error);exit;
+    var_export($error);
+    exit;
     include C('TMPL_EXCEPTION_FILE');
     exit;
 }
 
 /**
  * 自定义异常处理
- * @param string $msg 异常消息
- * @param string $type 异常类型 默认为ThinkException
+ *
+ * @param string  $msg  异常消息
+ * @param string  $type 异常类型 默认为ThinkException
  * @param integer $code 异常代码 默认为0
+ *
  * @return void
  */
-function throw_exception($msg, $type='ThinkException', $code=0) {
-    if (class_exists($type, false))
+function throw_exception($msg, $type = 'Exception', $code = 0)
+{
+    if (class_exists($type, false)) {
         throw new $type($msg, $code);
-    else
-        halt($msg);        // 异常类型不存在则输出错误信息字串
+    } else {
+        halt($msg);// 异常类型不存在则输出错误信息字串
+    }
 }
 
 /**
@@ -409,15 +429,46 @@ function throw_exception($msg, $type='ThinkException', $code=0) {
 function get_current_url()
 {
     $REQUEST_SCHEME = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
-    $HTTP_HOST = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    $HTTP_HOST      = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
     $SERVER_PORT    = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : '';
-    $REQUEST_URI = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+    $REQUEST_URI    = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
     if ($SERVER_PORT == 80) {
         $url = sprintf('%s://%s%s', $REQUEST_SCHEME, $HTTP_HOST, $REQUEST_URI);
     } else {
-        $url = sprintf('%s://%s:%s%s',$REQUEST_SCHEME,$HTTP_HOST,$SERVER_PORT,$REQUEST_URI);
+        $url = sprintf('%s://%s:%s%s', $REQUEST_SCHEME, $HTTP_HOST, $SERVER_PORT, $REQUEST_URI);
     }
     return $url;
+}
+
+/**
+ * @param        $params
+ * @param string $label
+ * @param string $fileName
+ * @param string $filePath
+ */
+function file_debug($params, $label = '', $fileName = '', $filePath = '')
+{
+    if (empty($filePath)) {
+        if (defined('PHP_OS') && strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            $filePath = '/tmp/';
+        } else {
+            $filePath = 'd:/';
+        }
+    }
+
+    if (empty($fileName)) {
+        if (empty($label)) {
+            $fileName = 'file_debug.log';
+        } else {
+            $fileName = $label;
+        }
+    }
+
+    $file = $filePath . $fileName;
+    if (!is_scalar($params)) {
+        $params = var_export($params, 1);
+    }
+    error_log('[date:]' . date('Y-m-d H:i:s') . '|' . $label . ':' . $params . PHP_EOL, 3, $file);
 }
 
 if (!function_exists('com_create_guid')) {

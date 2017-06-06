@@ -11,7 +11,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
 
     protected $dateFormat = ''; //日期格式
     protected $defaultDateFormat = 'Y-m-d H:i:s';
-    protected $defaultLogLevel = 'debug';
+    protected $defaultLevel = 'debug';
     protected $logLevel = '';
 
     /**
@@ -27,7 +27,7 @@ class SmvcBaseLogger implements SmvcLoggerInterface
      */
     public function __construct($info = [/*'logDir' => '', 'level' => 'debug'*/] )
     {
-        $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLogLevel;
+        $this->logLevel = isset($info['level']) ? $info['level'] : $this->defaultLevel;
     }
 
     /**
