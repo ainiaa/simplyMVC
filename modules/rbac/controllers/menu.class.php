@@ -9,6 +9,11 @@ class MenuController extends AdminController
 {
 
     /**
+     * @var MenuService
+     */
+    protected $MenuService;
+
+    /**
      * @var MenuDAO
      */
     private $MenuDAO;
@@ -23,9 +28,8 @@ class MenuController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function index()
+    public function indexAction()
     {
-        $perPageNum = 20;
         $where      = [];
         if (isset($_GET['menu_name']) && $_GET['menu_name']) {
             $where['menu_name'] = ['LIKE', '%' . $_GET['menu_name'] . '%'];
@@ -33,13 +37,10 @@ class MenuController extends AdminController
         if (isset($_GET['menu_url']) && $_GET['menu_url']) {
             $where['menu_url'] = ['LIKE', '%' . $_GET['priv_type'] . '%'];
         }
-        $count     = $this->MenuDAO->getCount($where);
-        $Page      = new Page($count, $perPageNum); // 实例化分页类 传入总记录数和每页显示的记录数
-        $pageShow  = $Page->show(); // 分页显示输出
-        $limit     = $Page->firstRow . ',' . $Page->listRows;
-        $queryList = $this->MenuDAO->getFullData($where, $limit);
+        $pageInfo  = $this->MenuService->getPageInfo($where);
+        $queryList = $this->MenuDAO->getFullData($where, $pageInfo['limit']);
         $this->assign('queryList', $queryList);
-        $this->assign('pageShow', $pageShow);
+        $this->assign('pageShow', $pageInfo['pageShow']);
         $this->display();
     }
 
@@ -48,14 +49,14 @@ class MenuController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function delete()
+    public function deleteAction()
     {
         $id  = I('id');
         $ret = $this->MenuDAO->delete(['id' => $id]);
         if ($ret) {
-            $data = ['status' => 1,'info'   => '菜单删除成功'];
+            $data = ['status' => 1, 'info' => '菜单删除成功'];
         } else {
-            $data = ['status' => 0,'info'   => '菜单删除失败'];
+            $data = ['status' => 0, 'info' => '菜单删除失败'];
         }
         $this->ajaxReturn($data, 'JSON');
     }
@@ -65,7 +66,7 @@ class MenuController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function add()
+    public function addAction()
     {
         if (IS_POST) {
             // 获取表单数据
@@ -98,7 +99,7 @@ class MenuController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function edit()
+    public function editAction()
     {
         if (IS_POST) {
             // 获取表单数据
@@ -132,15 +133,15 @@ class MenuController extends AdminController
     /**
      * 关联权限
      * @author Jeff.Liu<liuwy@imageco.com.cn>
-     * @date 2017/05/27
+     * @date   2017/05/27
      */
-    public function relatePrivilege()
+    public function relatePrivilegeAction()
     {
         if (IS_POST) {
-            $data = I('post.');
-            $id = isset($data['id']) ? $data['id'] : '';
+            $data                = I('post.');
+            $id                  = isset($data['id']) ? $data['id'] : '';
             $relatePrivilegeList = isset($data['relatePrivilege']) ? $data['relatePrivilege'] : '';
-            if ($id || empty($relatePrivilegeList)){
+            if ($id || empty($relatePrivilegeList)) {
                 $ret = $this->MenuDAO->relatePrivilege($id, $relatePrivilegeList);
                 if ($ret) {
                     $this->success('菜单权限关联成功', ['返回列表页' => make_url('index'),]);
@@ -151,19 +152,23 @@ class MenuController extends AdminController
                 $this->error('菜单权限关联失败：' . 'id missing or relatePrivilege missing');
             }
         }
-        $id            = I('id');
-        $privilegeList = $this->PrivilegeDAO->getList(['priv_type' => 'MENU']);
-        $menuInfo      = $this->MenuDAO->getOne($id);
+        $id               = I('id');
+        $privilegeList    = $this->PrivilegeDAO->getList(['priv_type' => 'MENU']);
+        $menuInfo         = $this->MenuDAO->getOne($id);
         $relatedPriviList = $this->MenuDAO->getRealatedPrivilege($id);
-        array_walk($privilegeList, function (&$item) use($relatedPriviList){
-            if (in_array($item['id'], $relatedPriviList)) {
-                $item['related'] = 1;
-            } else {
-                $item['related'] = 0;
-            }
-        });
+        array_walk(
+                $privilegeList,
+                function (&$item) use ($relatedPriviList) {
+                    if (in_array($item['id'], $relatedPriviList)) {
+                        $item['related'] = 1;
+                    } else {
+                        $item['related'] = 0;
+                    }
+                }
+        );
         $this->assign('privilegeList', $privilegeList);
         $this->assign('menuInfo', $menuInfo);
         $this->display();
     }
+
 }

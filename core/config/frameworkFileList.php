@@ -13,6 +13,7 @@ return [
         CORE_DIR . 'session/SessionException.class.php',
         CORE_DIR . 'controller/Base.class.php',
         CORE_DIR . 'dao/BaseDB.class.php',
+        CORE_DIR . 'dao/RedisDBBase.class.php',
         CORE_DIR . 'dao/UserSplitDBDAO.class.php',
         CORE_DIR . 'service/Base.class.php',
         CORE_DIR . 'service/UserSplitService.class.php',

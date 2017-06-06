@@ -23,7 +23,7 @@ class RoleController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function index()
+    public function indexAction()
     {
         $perPageNum = 20;
         $where      = [];
@@ -45,7 +45,7 @@ class RoleController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function delete()
+    public function deleteAction()
     {
         $id  = I('id');
         $ret = $this->RoleDAO->delete(['id' => $id]);
@@ -63,7 +63,7 @@ class RoleController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function add()
+    public function addAction()
     {
         if (IS_POST) {
             // 获取表单数据
@@ -93,7 +93,7 @@ class RoleController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function edit()
+    public function editAction()
     {
         if (IS_POST) {
             // 获取表单数据
@@ -126,7 +126,7 @@ class RoleController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function relatePrivilege()
+    public function relatePrivilegeAction()
     {
         if (IS_POST) {
             $data                = I('post.');
@@ -170,7 +170,7 @@ class RoleController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function relateMenuPrivilege()
+    public function relateMenuPrivilegeAction()
     {
         if (IS_POST) {
             $data                    = I('post.');

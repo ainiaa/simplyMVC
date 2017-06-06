@@ -39,7 +39,7 @@ class Factory
                 $proxy         = new FactoryProxy();
                 $proxy->class  = $instanceName;
                 $proxy->params = $params;
-                if (!empty($quoteObj) && is_array($quoteObj)) {
+                if ($quoteObj && is_array($quoteObj)) {
                     if (!is_object($quoteObj[0])) {
                         throw new Exception('$quoteObj[0] must be object!!!');
                     }
@@ -56,6 +56,11 @@ class Factory
             }
         }
         return self::$instances[$instanceid];
+    }
+
+    public static function initPropert()
+    {
+
     }
 
     /**
@@ -81,13 +86,19 @@ class Factory
         $daoRedisSuffixLen   = strlen($daoRedisSuffix);
         if (substr($name, -$controllerSuffixLen) === $controllerSuffix) {
             if (class_exists($name)) {
-                $action = new $name();
-                foreach ($action as $eachParamKey => $eachParamValue) {
-                    if (substr($eachParamKey, -$serviceSuffixLen) === $serviceSuffix) {
-                        $action->$eachParamKey = self::getInstance($eachParamKey, [$action, $eachParamKey]);
+                $reflectionClass = new ReflectionClass($name);
+                $action          = new $name();
+                $properts        = $reflectionClass->getProperties();
+                foreach ($properts as $prop) {
+                    $prop               = $prop->getName();
+                    $reflectionProperty = $reflectionClass->getProperty($prop);
+                    $reflectionProperty->setAccessible(true);
+                    if (substr($prop, -$serviceSuffixLen) === $serviceSuffix) {
+                        $reflectionProperty->setValue($action, self::getInstance($prop, [$action, $prop]));
                     } else {
-                        if (isset($constructparams[$eachParamKey])) {
-                            $action->$eachParamKey = $constructparams[$eachParamKey];
+                        if (isset($constructparams[$prop])) {
+                            $reflectionProperty->setAccessible(true);
+                            $reflectionProperty->setValue($action, $constructparams[$prop]);
                         }
                     }
                 }
@@ -97,19 +108,25 @@ class Factory
                 throw new Exception('Class: ' . $name . ' is not exists!');
             }
         } else if (substr($name, -$serviceSuffixLen) === $serviceSuffix) {
-            $serviceObject = self::getRealObject($name, $constructparams);
-            foreach ($serviceObject as $eachParamKey1 => $eachParamValue1) {
-                if (is_null($eachParamValue1)) {
-                    if (substr($eachParamKey1, -$daoDBSuffixLen) === $daoDBSuffix || substr(
-                                    $eachParamKey1,
-                                    -$daoRedisSuffixLen
-                            ) === $daoRedisSuffix || substr($eachParamKey1, -$daoSuffixLen) == $daoSuffix
-                    ) {
-                        $serviceObject->$eachParamKey1 = self::getInstance(
-                                $eachParamKey1,
-                                [$serviceObject, $eachParamKey1]
-                        );
-                    }
+//            $serviceObject   = self::getRealObject($name, $constructparams);
+            $serviceObject = new $name();
+            $reflectionClass = new ReflectionClass($name);
+            $properts        = $reflectionClass->getProperties();
+            foreach ($properts as $prop) {
+                $propertName  = $prop->getName();
+                $getInstance = false;
+                if (substr($propertName, -$daoDBSuffixLen) === $daoDBSuffix) {
+                    $getInstance = true;
+                } else if (substr($propertName, -$daoRedisSuffixLen) === $daoRedisSuffix) {
+                    $getInstance = true;
+                } else if (substr($propertName, -$daoSuffixLen) == $daoSuffix) {
+                    $getInstance = true;
+                }
+
+                if ($getInstance) {
+                    $reflectionProperty = $reflectionClass->getProperty($propertName);
+                    $reflectionProperty->setAccessible(true);
+                    $reflectionProperty->setValue($serviceObject, self::getInstance($propertName, [$serviceObject, $propertName]));
                 }
             }
             self::callSpecialMethod($serviceObject, '_initialize', $name);

@@ -41,7 +41,7 @@ class SmvcRedisHelper
         if (!isset(self::$instance[$alias]) || !self::$instance[$alias] instanceof self) {
             $dbIndex = null;
             if (empty($config) && function_exists('C')) {
-                $config = C('REDIS');
+                $config = C('redis');
             }
             if (empty($config)) {
                 self::showError('Redis config missing');

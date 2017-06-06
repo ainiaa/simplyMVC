@@ -11,7 +11,7 @@ return [
         'VAR_CONTROLLER'       => 'c', //controller在url中对应的key
         'URL_MODULE_MAP'       => '', //？？？
         'URL_CASE_INSENSITIVE' => false, //URL是否区分大小写
-        'APP_GROUP_LIST'       => 'frontend,backend', //所有的分组列表
+        'APP_GROUP_LIST'       => 'frontend,backend,modules', //所有的分组列表
         'VAR_PATHINFO'         => 'r', //URL里面兼容模式参数
         'URL_HTML_SUFFIX'      => '.html', //rewrite模式下 html后缀
         'VAR_URL_PARAMS'       => '_URL_', //在 $_GET中保持整个url的key

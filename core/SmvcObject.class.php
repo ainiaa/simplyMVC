@@ -27,6 +27,7 @@ class SmvcObject
      */
     public function __set($name, $value)
     {
+        echo 'set $name:',$name,'<br>';
         if (property_exists($this, $name)) {
             $this->$name = $value;
         }
@@ -42,6 +43,7 @@ class SmvcObject
      */
     public function __get($name)
     {
+        echo 'get $name:',$name,'<br>';
         if (isset($this->$name)) {
             return $this->$name;
         } else {
@@ -138,5 +140,10 @@ class SmvcObject
     public function getError()
     {
         return $this->_errors;
+    }
+
+    public function getProperts()
+    {
+        return get_object_vars($this);
     }
 }

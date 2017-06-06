@@ -16,7 +16,7 @@ class PrivilegeController extends AdminController
     /**
      *
      */
-    public function index()
+    public function indexAction()
     {
         $perPageNum = 20;
         $where      = [];
@@ -41,7 +41,7 @@ class PrivilegeController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function delPriv()
+    public function delPrivAction()
     {
         $id  = I('id');
         $ret = $this->PrivilegeDAO->delete(['id' =>$id]);
@@ -70,7 +70,7 @@ class PrivilegeController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function add()
+    public function addAction()
     {
         if (IS_POST) {
             // 获取表单数据
@@ -100,7 +100,7 @@ class PrivilegeController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function edit()
+    public function editAction()
     {
         if (IS_POST) {
             // 获取表单数据

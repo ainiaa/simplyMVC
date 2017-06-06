@@ -28,7 +28,7 @@ class UserController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function index()
+    public function indexAction()
     {
         $perPageNum = 20;
         $where      = [];
@@ -54,7 +54,7 @@ class UserController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function relateUserGroup()
+    public function relateUserGroupAction()
     {
         if (IS_POST) {
             $data                = I('post.');
@@ -98,7 +98,7 @@ class UserController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function relateRole()
+    public function relateRoleAction()
     {
         if (IS_POST) {
             $data           = I('post.');

@@ -276,6 +276,13 @@ function make_url($uri_path, $uri_params = '', $absolute = false)
     return $final_url;
 }
 
+/**
+ * @param      $name
+ * @param null $defaultValue
+ * @param null $callback
+ *
+ * @return mixed
+ */
 function I($name, $defaultValue = null, $callback = null)
 {
     $name = explode('.', $name);
@@ -351,7 +358,7 @@ function L($name=null, $value=null) {
  */
 function halt($error) {
     $e = array();
-    if (APP_DEBUG) {
+    if (defined('APP_DEBUG') && APP_DEBUG) {
         //调试模式下输出错误信息
         if (!is_array($error)) {
             $trace          = debug_backtrace();
@@ -394,6 +401,23 @@ function throw_exception($msg, $type='ThinkException', $code=0) {
         throw new $type($msg, $code);
     else
         halt($msg);        // 异常类型不存在则输出错误信息字串
+}
+
+/**
+ *
+ */
+function get_current_url()
+{
+    $REQUEST_SCHEME = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http';
+    $HTTP_HOST = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    $SERVER_PORT    = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : '';
+    $REQUEST_URI = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+    if ($SERVER_PORT == 80) {
+        $url = sprintf('%s://%s%s', $REQUEST_SCHEME, $HTTP_HOST, $REQUEST_URI);
+    } else {
+        $url = sprintf('%s://%s:%s%s',$REQUEST_SCHEME,$HTTP_HOST,$SERVER_PORT,$REQUEST_URI);
+    }
+    return $url;
 }
 
 if (!function_exists('com_create_guid')) {

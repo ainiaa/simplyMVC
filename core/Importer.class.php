@@ -74,6 +74,7 @@ class Importer
             }
         } else {
             if ($showError) {
+                debug_print_backtrace();exit;
                 trigger_error('file_no_exists:' . $filePath, E_USER_ERROR);
             }
         }
@@ -530,7 +531,7 @@ class Importer
      */
     public static function autoLoad($className)
     {
-        //        echo '$className:', $className, '<br />';
+        echo '$className:', $className, '<br />';
         $controllerSuffer    = 'Controller';
         $controllerSufferLen = strlen($controllerSuffer);
         $daoSuffer           = 'DAO';

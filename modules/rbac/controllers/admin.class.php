@@ -5,7 +5,7 @@
  * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/05/27
  */
-class AdminController extends BackendController
+class AdminController extends ModulesController
 {
 
     public function _initialize()

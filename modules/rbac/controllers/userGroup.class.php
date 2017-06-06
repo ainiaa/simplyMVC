@@ -23,7 +23,7 @@ class UserGroupController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function index()
+    public function indexAction()
     {
         $perPageNum = 20;
         $where      = [];
@@ -45,7 +45,7 @@ class UserGroupController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function delete()
+    public function deleteAction()
     {
         $id  = I('id');
         $ret = $this->UserGroupDAO->delete(['id' => $id]);
@@ -63,7 +63,7 @@ class UserGroupController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function add()
+    public function addAction()
     {
         if (IS_POST) {
             // 获取表单数据
@@ -88,7 +88,7 @@ class UserGroupController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function edit()
+    public function editAction()
     {
         if (IS_POST) {
             // 获取表单数据
@@ -117,7 +117,7 @@ class UserGroupController extends AdminController
      * @author Jeff.Liu<liuwy@imageco.com.cn>
      * @date   2017/05/27
      */
-    public function relateRole()
+    public function relateRoleAction()
     {
         if (IS_POST) {
             $data           = I('post.');
