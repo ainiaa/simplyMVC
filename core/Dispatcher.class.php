@@ -20,9 +20,8 @@ class Dispatcher
         if (!$checkResult) {//路由检测失败
             throw new Exception('route deny!!!');
         } else {
-            //设置  usersplit
-            self::setRuntimeConst();  //todo 设置为 Const不太好。可以添加一个 request Context
 
+            //设置  usersplit
             $uId = self::getUserId();
             LocalCache::setData('uId', $uId);
             if (C('useUserSplit', false) && $uId) {//是否使用分库功能 切 正确的获得了uid
@@ -88,13 +87,6 @@ class Dispatcher
         //前置操作
         self::postDispatch(['controller' => $controller, 'action'     => $actionName, 'params'     => $params]); //todo 需要重新实现
         return true;
-    }
-
-    /**
-     * 设置运行时 常量 todo 还需要处理
-     */
-    private static function setRuntimeConst()
-    {
     }
 
     /**

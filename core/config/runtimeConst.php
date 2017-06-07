@@ -42,3 +42,7 @@ if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '<')) { //判断php的版本�
 !defined('IS_AJAX') && define('IS_AJAX', SimpleMVC::isAjax());
 
 !defined('USE_ALLINONE_CACHE') && define('USE_ALLINONE_CACHE', false);//是否使用文件缓存
+
+define('PHP_SELF', htmlentities(isset($_SERVER['PHP_SELF']) ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME']));
+define('SHARE_TEMP_PATH', ROOT_DIR . 'temp/');
+define('SHARE_DATA_PATH', ROOT_DIR . 'data/');

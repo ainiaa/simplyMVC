@@ -633,22 +633,6 @@ class Importer
         }
     }
 
-    /**
-     * 加载基础文件
-     *
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     * @date   2014-04-15
-     */
-    public static function loadFramewrok()
-    {
-        //初始化autoload 配置项
-        $baseFileList = SimpleMVC::getBaseFileList();
-        if (is_array($baseFileList)) {
-            foreach ($baseFileList as $file) {
-                Importer::importFileByFullPath($file);
-            }
-        }
-    }
 
     /**
      * @return array

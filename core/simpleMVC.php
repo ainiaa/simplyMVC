@@ -7,16 +7,11 @@
  */
 header('Content-Type:text/html;charset=utf-8');
 
-include CORE_DIR. '/config/runtimeConst.php';
+include CORE_DIR . '/config/runtimeConst.php';
 include CORE_DIR . 'Importer.class.php';
-
-define('PHP_SELF', htmlentities(isset($_SERVER['PHP_SELF']) ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME']));
-define('SHARE_TEMP_PATH', ROOT_DIR . 'temp/');
-define('SHARE_DATA_PATH', ROOT_DIR . 'data/');
 
 class SimpleMVC
 {
-
     private static $frameFileAllInOne;
 
     /**
@@ -27,9 +22,7 @@ class SimpleMVC
         //初始化
         self::init();
 
-        /**
-         * 解析url
-         */
+        //解析url
         Router::parseUrl();
 
         Dispatcher::dispatch();
@@ -57,7 +50,7 @@ class SimpleMVC
             foreach ($baseFileList as $file) {
                 $currentContent = php_strip_whitespace($file);
                 $currentContent = trim(substr($currentContent, 5)); //去掉<?php
-                if ('?>' == substr($currentContent, -2)) {
+                if ('?>' === substr($currentContent, -2)) {
                     $currentContent = substr($currentContent, 0, -2);
                 }
                 $content .= $currentContent;
@@ -100,6 +93,7 @@ class SimpleMVC
 
     /**
      * 设置异常处理
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
      */
     public static function initExceptionHandle()
     {
@@ -108,6 +102,7 @@ class SimpleMVC
 
     /**
      * 加载必须配置文件
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
      */
     private static function initConf()
     {
@@ -117,15 +112,24 @@ class SimpleMVC
 
     /**
      * 初始化框架文件（加载）
-     * @author Jeff Liu
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
      */
     private static function loadFramewrok()
     {
-        if (defined('USE_ALLINONE_CACHE') && USE_ALLINONE_CACHE && file_exists(self::$frameFileAllInOne)) {
-            Importer::importFileByFullPath(self::$frameFileAllInOne);
-        } else if (method_exists('Importer', 'loadFramewrok')) {
-            Importer::loadFramewrok();
-        } else {
+        $needLoadFileOneByOne   = true;//单文件加载
+        $needCreateAllInOneFile = false;//
+        if (defined('USE_ALLINONE_CACHE') && USE_ALLINONE_CACHE) {
+            if (file_exists(self::$frameFileAllInOne) && is_readable(self::$frameFileAllInOne)) {
+                $loadResult = Importer::importFileByFullPath(self::$frameFileAllInOne);
+                if ($loadResult) {
+                    $needLoadFileOneByOne = false;
+                } else {
+                    $needLoadFileOneByOne   = true;
+                    $needCreateAllInOneFile = true;
+                }
+            }
+        }
+        if ($needLoadFileOneByOne) {
             $baseFileList = self::getBaseFileList();
             if (is_array($baseFileList)) {
                 foreach ($baseFileList as $file) {
@@ -134,7 +138,7 @@ class SimpleMVC
             }
         }
 
-        if (defined('USE_ALLINONE_CACHE') && USE_ALLINONE_CACHE) {
+        if ($needCreateAllInOneFile) {
             self::createBaseFileCache();
         }
     }
@@ -179,9 +183,9 @@ class SimpleMVC
                 ) == 'xmlhttprequest'
         ) {
             $isAjax = true;
-        } elseif (!empty($_POST[VAR_AJAX_SUBMIT])) {
+        } elseif (isset($_POST[VAR_AJAX_SUBMIT]) && $_POST[VAR_AJAX_SUBMIT]) {
             $isAjax = true;
-        } elseif (!empty($_GET[VAR_AJAX_SUBMIT])) {
+        } elseif (isset($_GET[VAR_AJAX_SUBMIT]) && $_GET[VAR_AJAX_SUBMIT]) {
             $isAjax = true;
         }
 
@@ -208,9 +212,7 @@ class SimpleMVC
         $_GET     = array_merge($_GET, $info);
         $_REQUEST = array_merge($_REQUEST, $info);
 
-        /**
-         * 解析url
-         */
+        //解析url
         Router::parseUrl();
 
         Dispatcher::dispatch();
