@@ -541,8 +541,6 @@ class Importer
             $serviceName = substr_replace($className, '', -$serviceSufferLen);
             self::loadService(lcfirst($serviceName));
         } else if ($helperSuffer === substr($className, -$helperSufferLen)) { //辅助类
-            //TODO 需要考虑 group moduel 里面的helper？？？  分组下面需要有吗？？？
-            //            $helperName = substr_replace($className, '', -$helperSufferLen);
             self::loadHelper(lcfirst($className));
         } else {
 
@@ -561,18 +559,23 @@ class Importer
 
                 $tryFileList = [];
 
+                $found = false;
+
                 foreach ($paths as $path) {
                     foreach ($fileExtensions as $fileExtension) {
                         $fullFilePath  = $path . '/' . $className . $fileExtension;
                         $tryFileList[] = $fullFilePath;
                         if (self::importFileByFullPath($fullFilePath, false)) {
+                            $found = true;
                             break;
                         }
                     }
                 }
-                throw_exception('class ' . $className . ' not find in below path:' . var_export($tryFileList, 1));
-                if (defined('APP_DEBUG') && APP_DEBUG) {
-                    file_debug(['class' => $className, 'msg' => 'not found', '$tryFileList' => $tryFileList]);
+                if (!$found) {
+                    throw_exception('class ' . $className . ' not find in below path:' . var_export($tryFileList, 1));
+                    if (defined('APP_DEBUG') && APP_DEBUG) {
+                        file_debug(['class' => $className, 'msg' => 'not found', '$tryFileList' => $tryFileList]);
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@ return [
                 CORE_DIR . 'i18n',
                 CORE_DIR . 'helper',
                 CORE_DIR . 'session',
+                CORE_DIR . 'exception',
                 INCLUDE_DIR . 'vendor'
         ],
         'defaultLocal'             => 'en_us',//默认语言
