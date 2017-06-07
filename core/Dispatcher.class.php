@@ -49,7 +49,6 @@ class Dispatcher
         //前置操作
         self::preDispatch(['controller' => $controller, 'actionName' => $actionName, 'params' => $params]);
 
-        //这一块使用反射是不是太重了？？？
         try {
             //执行当前操作
             $method = new ReflectionMethod($controller, $actionName);
@@ -85,7 +84,7 @@ class Dispatcher
         }
 
         //前置操作
-        self::postDispatch(['controller' => $controller, 'action'     => $actionName, 'params'     => $params]); //todo 需要重新实现
+        self::postDispatch(['controller' => $controller, 'action' => $actionName, 'params' => $params]); //todo 需要重新实现
         return true;
     }
 
