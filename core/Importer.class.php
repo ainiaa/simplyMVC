@@ -625,7 +625,6 @@ class Importer
         //设置加载路径
         $autoloadPath = C('autoLoadPath');
         if ($autoloadPath) {
-            $autoloadPath = explode(',', $autoloadPath);
             $autoloadPath = implode(PATH_SEPARATOR, $autoloadPath);
             Importer::setIncludePath($autoloadPath);
         }

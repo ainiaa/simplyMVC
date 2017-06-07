@@ -17,14 +17,14 @@ return [
                 'flash_auto_expire'      => true,
                 'flash_expire_after_get' => true,
                 'post_cookie_name'       => '',
-                'redis'                  => array(
+                'redis'                  => [
                         'host'     => '127.0.0.1',
                         'port'     => '3306',
                         'pconnect' => false,
-                ),
-                'file'                   => array(
+                ],
+                'file'                   => [
                         'path' => 'e:/tmp/',
-                ),
+                ],
                 'memcached'              => [
                         'host' => '127.0.0.1',
                         'port' => '11211',
