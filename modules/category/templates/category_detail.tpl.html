@@ -1,0 +1,45 @@
+<link type="text/css" href="./public/assets/line-control/1.1.0/css/editor.css" rel="stylesheet"/>
+<link rel="stylesheet" href="./public/assets/font-awesome/4.5.0/css/font-awesome.min.css">
+<!--row-->
+<div class="row">
+    <div class="box col-md-12">
+        <div class="box-inner">
+            <div data-original-title="" class="box-header well">
+                <h2><i class="glyphicon glyphicon-edit"></i> Form Elements</h2>
+                <div class="box-icon">
+                    <a class="btn btn-setting btn-round btn-default" href="#"><i
+                            class="glyphicon glyphicon-cog"></i></a>
+                    <a class="btn btn-minimize btn-round btn-default" href="#"><i
+                            class="glyphicon glyphicon-chevron-up"></i></a>
+                    <a class="btn btn-close btn-round btn-default" href="#"><i
+                            class="glyphicon glyphicon-remove"></i></a>
+                </div>
+            </div>
+            <div class="box-content" style="display: block;">
+                    <div class="form-group has-success col-xs-9">
+                        <label for="inputSuccess1" class="control-label">父类名称：</label>
+                        {$parentCategoryInfo.name}
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <div class="form-group has-success col-xs-9">
+                        <label for="inputSuccess1" class="control-label">分类名称：</label>
+                        {$categoryInfo.name}
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <div>
+                        <label for="desc" class="control-label">分类描述</label>
+                        {$categoryInfo.desc}
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+            </div>
+        </div>
+    </div>
+    <!--/span-->
+</div>
+<!--/row-->

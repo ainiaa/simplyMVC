@@ -1,6 +1,7 @@
 <?php
 
 use Medoo\Medoo;
+
 /**
  * 数据库相关 DAO
  * @author  Jeff.Liu<jeff.liu.guo@gmail.com>
@@ -1011,7 +1012,7 @@ class BaseDBDAO extends SmvcObject
      *
      * @return array
      */
-    public function getFields($tableName)
+    private function _getDbFields($tableName)
     {
         $info = [];
         if (stripos($tableName, '__none__') === false) {
@@ -1058,7 +1059,7 @@ class BaseDBDAO extends SmvcObject
             $needGetFields = $this->needGetFields($table);
             $fields        = [];
             if ($needGetFields) {
-                $fields = $this->getFields($table);
+                $fields = $this->_getDbFields($table);
             }
             return $fields ? array_keys($fields) : [];
         }
