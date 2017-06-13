@@ -251,26 +251,35 @@ function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = fals
 /**
  * @param      $uri_path
  * @param      $uri_params
- * @param bool $absolute
+ * @param bool $with_domain
  *
  * @return string
  */
-function make_url($uri_path, $uri_params = '', $absolute = false)
+function make_url($uri_path, $uri_params = '', $with_domain = false)
 {
     $final_url    = '';
-    $uri_path_arr = explode('/', $uri_path);
+    $uri_path     = explode('/', $uri_path);
+    $uri_path     = array_reverse($uri_path);
+    $uri_path     = array_combine(['action', 'controller', 'module', 'group'], $uri_path);
+    $default_path = [
+            'action'     => C('defaultAction'),
+            'controller' => C('defaultController'),
+            'module'     => C('defaultModule'),
+            'group'      => C('defaultGroup')
+    ];
+    $uri_path     = array_merge($default_path, $uri_path);
     $final_url    .= sprintf(
             'index.php?g=%s&m=%s&c=%s&a=%s',
-            $uri_path_arr[0],
-            $uri_path_arr[1],
-            $uri_path_arr[2],
-            $uri_path_arr[3]
+            $uri_path['group'],
+            $uri_path['module'],
+            $uri_path['controller'],
+            $uri_path['action']
     );
     if ($uri_params) {
         $final_url .= '&' . http_build_query($uri_params);
     }
 
-    if ($absolute) {
+    if ($with_domain) {
         $final_url = get_domain() . $final_url;
     }
     return $final_url;
