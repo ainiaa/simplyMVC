@@ -37,6 +37,8 @@ class CategoryBaseController extends BaseController
 
     /**
      * @param mixed $breadCrumbTpl
+     *
+     * @return $this
      */
     public function setBreadCrumbTpl($breadCrumbTpl)
     {
@@ -60,6 +62,8 @@ class CategoryBaseController extends BaseController
 
     /**
      * @param mixed $layout
+     *
+     * @return $this
      */
     public function setLayout($layout)
     {
@@ -80,7 +84,7 @@ class CategoryBaseController extends BaseController
     /**
      * @param mixed $headerTpl
      *
-     * @return BackendController
+     * @return $this
      */
     public function setHeaderTpl($headerTpl)
     {
@@ -101,7 +105,7 @@ class CategoryBaseController extends BaseController
     /**
      * @param mixed $topbarTpl
      *
-     * @return BackendController
+     * @return $this
      */
     public function setTopbarTpl($topbarTpl)
     {
@@ -122,7 +126,7 @@ class CategoryBaseController extends BaseController
     /**
      * @param mixed $leftMenuTpl
      *
-     * @return BackendController
+     * @return $this
      */
     public function setLeftMenuTpl($leftMenuTpl)
     {
@@ -143,7 +147,7 @@ class CategoryBaseController extends BaseController
     /**
      * @param mixed $mainTpl
      *
-     * @return BackendController
+     * @return $this
      */
     public function setMainTpl($mainTpl)
     {
@@ -164,7 +168,7 @@ class CategoryBaseController extends BaseController
     /**
      * @param mixed $footerTpl
      *
-     * @return BackendController
+     * @return $this
      */
     public function setFooterTpl($footerTpl)
     {
@@ -222,7 +226,7 @@ class CategoryBaseController extends BaseController
         $this->initTplComponent();
 
         $sessionInfo = Session::instance()->get('userInfo');
-        if (empty($sessionInfo) && (!isset($_GET['a']) || $_GET['a'] != 'login')) { //这个需要修改
+        if (empty($sessionInfo) && (!isset($_GET['a']) || $_GET['a'] != 'login')) { //todo 这个需要修改
             $this->loginAction();
             exit;
         }
@@ -230,7 +234,7 @@ class CategoryBaseController extends BaseController
 
     /**
      * 登录
-     * @author Jeff Liu
+     * @author Jeff. Liu<jeff.liu.guo@gmail.com>
      */
     public function loginAction()
     {

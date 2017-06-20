@@ -279,6 +279,7 @@ class BaseDBDAO extends SmvcObject
                             'server'        => $dbConfig['DB_HOST'],
                             'username'      => $dbConfig['DB_USER'],
                             'password'      => $dbConfig['DB_PASS'],
+                            'logging'       => isset($dbConfig['LOGGING']) ? $dbConfig['LOGGING'] : false,
                     ]
             );
         }
@@ -484,6 +485,7 @@ class BaseDBDAO extends SmvcObject
         $this->setLatestStorageType(self::WRITE_STORAGE);
         $where     = $this->_parseOptions($where);
         $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        unset($where['table']);
         return $this->getStorage()->update($tableName, $data, $where);
     }
 
@@ -1416,7 +1418,7 @@ class BaseDBDAO extends SmvcObject
             $options['table'] .= ' ' . $options['alias'];
         }
         // 记录操作的模型名称
-        $options['model'] = $this->name;
+        //        $options['model'] = $this->name;
 
         // 字段类型验证
         if (isset($options['where']) && is_array($options['where']) && !empty($fields) && !isset($options['join'])) {
@@ -1579,6 +1581,11 @@ class BaseDBDAO extends SmvcObject
         }
 
         return $this;
+    }
+
+    public function log()
+    {
+        return $this->getStorage()->log();
     }
 
 }

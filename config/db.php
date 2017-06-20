@@ -13,6 +13,7 @@ return [
                                 'DB_TYPE'   => 'mysql',
                                 'DB_USER'   => 'root',
                                 'DB_PASS'   => 'root',
+                                'LOGGING'   => true,
                         ],
                 ],
                 'master' => [//主库
@@ -24,6 +25,7 @@ return [
                                 'DB_TYPE'   => 'mysql',
                                 'DB_USER'   => 'root',
                                 'DB_PASS'   => 'root',
+                                'LOGGING'   => true,
                         ],
                         [//第二个主库
                                 'DB_HOST'   => 'localhost', //数据库HOST
@@ -33,6 +35,7 @@ return [
                                 'DB_TYPE'   => 'mysql',
                                 'DB_USER'   => 'root',
                                 'DB_PASS'   => 'root',
+                                'LOGGING'   => true,
                         ],
                 ],
                 'slave'  => [//从库
@@ -45,6 +48,7 @@ return [
                                         'DB_TYPE'   => 'mysql',
                                         'DB_USER'   => 'root',
                                         'DB_PASS'   => 'root',
+                                        'LOGGING'   => true,
                                 ],
                                 [
                                         'DB_HOST'   => 'localhost', //数据库HOST
@@ -54,6 +58,7 @@ return [
                                         'DB_TYPE'   => 'mysql',
                                         'DB_USER'   => 'root',
                                         'DB_PASS'   => 'root',
+                                        'LOGGING'   => true,
                                 ],
                         ],
                         1 => [//第二个master对应的slave
@@ -65,6 +70,7 @@ return [
                                         'DB_TYPE'   => 'mysql',
                                         'DB_USER'   => 'root',
                                         'DB_PASS'   => 'root',
+                                        'LOGGING'   => true,
                                 ],
                                 [
                                         'DB_HOST'   => 'localhost', //数据库HOST
@@ -74,6 +80,7 @@ return [
                                         'DB_TYPE'   => 'mysql',
                                         'DB_USER'   => 'root',
                                         'DB_PASS'   => 'root',
+                                        'LOGGING'   => true,
                                 ],
                         ],
 

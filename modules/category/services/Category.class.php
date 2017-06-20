@@ -85,7 +85,8 @@ class CategoryService
      */
     public function updateCategory($data, $where)
     {
-        return $this->CategoryDAO->update($data, $where);
+        $return = $this->CategoryDAO->update($data, $where);
+        return $return;
     }
 
     /**
@@ -119,7 +120,7 @@ class CategoryService
      *
      * @return string
      */
-    public function generateCategorySelector($id = -1, $selectedId = 0, $labelName = 'category_id', $labelId = null)
+    public function generateCategorySelector($id = -1, $selectedId = 0, $labelName = 'pid', $labelId = null)
     {
         $validParents = $this->getValidParents($id);
         if (empty($labelId)) {

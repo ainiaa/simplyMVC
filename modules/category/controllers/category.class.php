@@ -23,7 +23,7 @@ class CategoryController extends CategoryBaseController
 
         $this->setMainTpl('category_list.tpl.html');
         $this->assign('title', 'Simply MVC backend - table list');
-        $this->assign('tableHeaderList', ['name', 'desc', 'parent_id', 'path', 'depth']);
+        $this->assign('tableHeaderList', ['id', 'name', 'desc', 'parent_id', 'path', 'depth']);
 
         $this->display();
     }
@@ -103,13 +103,13 @@ class CategoryController extends CategoryBaseController
             if (IS_POST) {
                 $name           = I('post.name');
                 $desc           = I('post.desc');
-                $parentId       = I('post.parent_id');
+                $parentId       = I('post.pid');
                 $parentCategory = $this->CategoryService->getCategoryInfo($parentId);
-                //todo 需要校验parentId的合法性
-                $data = ['name' => $name, 'desc' => $desc, 'parent_id' => $parentId];
+                $data           = ['name' => $name, 'desc' => $desc];
                 if ($parentCategory) {
-                    $data['path']  = $parentCategory['path'] . $parentId . ',';
-                    $data['depth'] = (int)$parentCategory['depth'] + 1;
+                    $data['path']      = $parentCategory['path'] . $parentId . ',';
+                    $data['depth']     = (int)$parentCategory['depth'] + 1;
+                    $data['parent_id'] = $parentId;
                 } else {
                     $data['path']  = ',0,';
                     $data['depth'] = 1;
@@ -137,11 +137,13 @@ class CategoryController extends CategoryBaseController
                     $this->assign('id', $id);
                     $this->display();
                 } else {
-                    //todo 分类不存在
+                    $error = 'category id:' . $id . ' not found!';
+                    $this->displayError($error);
                 }
             }
         } else {
-            //todo id传递有问题
+            $error = 'category id:' . $id . ' is missing!';
+            $this->displayError($error);
         }
     }
 
