@@ -52,7 +52,7 @@ class ExceptionHandle
                 if (defined('LOG_RECORD') && LOG_RECORD) {
                     Logger::getInstance()->log(['msg' => $errorStr, 'level' => SmvcLoggerInterface::LOG_ERROR]);
                 }
-                function_exists('halt') ? halt($errorStr) : exit('ERROR:' . $errorStr); //todo halt方法不存在
+                function_exists('halt') ? halt($errorStr) : exit('ERROR:' . $errorStr);
                 break;
             case E_STRICT:
             case E_USER_WARNING:

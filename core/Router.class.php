@@ -104,7 +104,6 @@ class Router
     }
 
     /**
-     * todo
      * URL组装 支持不同URL模式
      *
      * @param array $info
@@ -113,7 +112,10 @@ class Router
      */
     public static function buildUrl($info)
     {
-        return '';
+        $uri_path    = SmvcArrayHelper::get($info, 'uri_path', '');
+        $uri_params  = SmvcArrayHelper::get($info, 'uri_params', []);
+        $with_domain = SmvcArrayHelper::get($info, 'with_domain', false);
+        return make_url($uri_path, $uri_params, $with_domain);
     }
 
     /**
@@ -482,12 +484,13 @@ class Router
 
 
     /**
-     * TODO
-     *
      * @param array $info
+     *
+     * @return mixed
      */
     public static function getParams($info = [])
     {
+        return SmvcArrayHelper::get($info, 'uri_params', []);
     }
 
 

@@ -3,8 +3,7 @@
 /**
  *
  * 用于include文件
- * @author Jeff Liu
- * TODO 在加载非当前group，module下的controller的时候 还需要注意 对应model和dao初始化问题。。。
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 class Importer
 {

@@ -8,6 +8,7 @@
  */
 class SmvcRedisHelper
 {
+    const TRY_CONNECT_TIMES = 3;
 
     /**
      * 某些时候 是不需要自动添加 key前缀的。
@@ -127,64 +128,77 @@ class SmvcRedisHelper
         }
         $flag = true;
         if ($needInit) {
-            $this->handle = new Redis();
+            $flag = $this->tryConnect();
+        }
+        if ($flag && is_int($dbIndex)) {
+            $flag = $this->handle->select($dbIndex);
+        }
 
-            if (isset($this->config['pconnect'])) {
-                $pconnect = $this->config['pconnect'];
-            }
-            if (isset($this->config['password'])) {
-                $password = $this->config['password'];
-            }
-            if (isset($this->config['host'])) {
-                $host = $this->config['host'];
-            }
-            if (isset($this->config['port'])) {
-                $port = $this->config['port'];
-            }
+        return $flag;
+    }
 
-            if ($host && $port) {
-                if (bccomp($this->timeout, 0.0)) {
-                    $timeout = isset($this->config['timeout']) ? $this->config['timeout'] : 0.0;
-                }
+    private function tryConnect()
+    {
+        $this->handle = new Redis();
+        $pconnect     = false;
+        $host         = '';
+        $port         = '';
+        $password     = '';
+        if (isset($this->config['pconnect'])) {
+            $pconnect = $this->config['pconnect'];
+        }
+        if (isset($this->config['password'])) {
+            $password = $this->config['password'];
+        }
+        if (isset($this->config['host'])) {
+            $host = $this->config['host'];
+        }
+        if (isset($this->config['port'])) {
+            $port = $this->config['port'];
+        }
+
+        if ($host && $port) {
+            $timeout        = isset($this->config['timeout']) ? $this->config['timeout'] : $this->timeout;
+            $retryTimes     = isset($this->config['retryTimes']) ? $this->config['retryTimes'] : 3;
+            $currRetryTimes = 0;
+            do {
                 if ($pconnect) {
                     //使用pconnect 不设置$persistent_id的话，多次new Redis返回的链接相同，如果再有select就会有坑(PS redis扩展要用phpredis)
                     $flag = $this->handle->pconnect($host, $port, $timeout, $this->alias);
                 } else {
                     $flag = $this->handle->connect($host, $port, $timeout);
                 }
-                if ($flag) {
-                    if ($password) {
-                        $flag = $this->handle->auth($password);
-                    }
-                }
+                $currRetryTimes++;
+            } while (!$flag && $currRetryTimes < $retryTimes);
 
-                if ($flag === false) {
-                    self::showError(
-                            sprintf(
-                                    'connect redis failure on host:%s port:%s dbIndex:%s error:%s',
-                                    $host,
-                                    $port,
-                                    $dbIndex,
-                                    $this->handle->getLastError()
-                            )
-                    );
+            if ($flag) {
+                if ($password) {
+                    $flag = $this->handle->auth($password);
                 }
-            } else {
+            }
+
+            if ($flag === false) {
                 self::showError(
                         sprintf(
-                                'init redis failure on host:%s port:%s, prop:%s',
+                                'connect redis failure on host:%s port:%s error:%s',
                                 $host,
                                 $port,
-                                var_export($this->config,1)
+                                $this->handle->getLastError()
                         )
                 );
-                return false;
             }
+            return $flag;
+        } else {
+            self::showError(
+                    sprintf(
+                            'init redis failure on host:%s port:%s, prop:%s',
+                            $host,
+                            $port,
+                            var_export($this->config, 1)
+                    )
+            );
+            return false;
         }
-        if ($flag && is_int($dbIndex)) {
-            $flag = $this->handle->select($dbIndex);
-        }
-        return $flag;
     }
 
     /**
@@ -1303,7 +1317,7 @@ SCRIPT;
     private $decodedPrefixLen;
     private $usePrefix = true;
     private $alias = 'default';
-    private $timeout = 0.0;//链接超时时间
+    private $timeout = 2.5;//链接超时时间
     private static $showErrorType = 0;// 0:exception 1:trigger_error
     private static $errorType = E_USER_ERROR;//
     private static $rawCommandList = [ //key为原始命令，参数都不需要进行特殊处理(eg: 不需要自动添加前缀)
