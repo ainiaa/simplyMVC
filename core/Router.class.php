@@ -738,16 +738,13 @@ class Router
      */
     public static function getProtocol()
     {
-        if (self::getServer('HTTPS') == 'on' or self::getServer('HTTPS') == 1 or self::getServer(
-                        'SERVER_PORT'
-                ) == 443 or (C(
-                                'security.allow_x_headers',
-                                false
-                        ) and self::getServer('HTTP_X_FORWARDED_PROTO') == 'https') or (C(
-                                'security.allow_x_headers',
-                                false
-                        ) and self::getServer('HTTP_X_FORWARDED_PORT') == 443)
-        ) {
+        $isHttpsOn              = self::getServer('HTTPS') == 'on';
+        $isHttps                = self::getServer('HTTPS') == 1;
+        $is443                  = self::getServer('SERVER_PORT') == 443;
+        $allow_x_headers        = C('security.allow_x_headers', false);
+        $HTTP_X_FORWARDED_PORT  = self::getServer('HTTP_X_FORWARDED_PORT') == 443;
+        $HTTP_X_FORWARDED_PROTO = self::getServer('HTTP_X_FORWARDED_PROTO') == 'https';
+        if ($isHttpsOn || $isHttps || $is443 || ($allow_x_headers && $HTTP_X_FORWARDED_PROTO) or ($allow_x_headers && $HTTP_X_FORWARDED_PORT)) {
             return 'https';
         }
 
