@@ -15,7 +15,7 @@ class SimpleMVC
     private static $frameFileAllInOne;
 
     /**
-     * @author Jeff Liu
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     public static function startup()
     {
@@ -169,54 +169,6 @@ class SimpleMVC
         }
     }
 
-    /**
-     * 判断当前请求是否为ajax请求
-     *
-     * @access public
-     * @author Jeff Liu
-     */
-    public static function isAjax()
-    {
-        $isAjax = false;
-        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower(
-                        $_SERVER['HTTP_X_REQUESTED_WITH']
-                ) == 'xmlhttprequest'
-        ) {
-            $isAjax = true;
-        } elseif (isset($_POST[VAR_AJAX_SUBMIT]) && $_POST[VAR_AJAX_SUBMIT]) {
-            $isAjax = true;
-        } elseif (isset($_GET[VAR_AJAX_SUBMIT]) && $_GET[VAR_AJAX_SUBMIT]) {
-            $isAjax = true;
-        }
-
-        return $isAjax;
-    }
-
-    public static function value($value)
-    {
-        if ($value instanceof Closure) {
-            return $value();
-        } else {
-            return $value;
-        }
-    }
-
-    /**
-     * 站内跳转 (不会重新发起一次新的请求.而是根据url 重新解析url，然后再次dispatch)
-     *
-     * @param $url
-     */
-    public static function redirect($url)
-    {
-        parse_str($url, $info);
-        $_GET     = array_merge($_GET, $info);
-        $_REQUEST = array_merge($_REQUEST, $info);
-
-        //解析url
-        Router::parseUrl();
-
-        Dispatcher::dispatch();
-    }
 }
 
 //启动框架

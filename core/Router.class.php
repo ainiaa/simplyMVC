@@ -47,7 +47,6 @@ class Router
     private static $originAction;
 
     /**
-     * todo 还需要整理
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     public static function doUrlMapping()
@@ -242,7 +241,6 @@ class Router
     public static function initEnv()
     {
         self::doUrlMapping();
-
         self::parseGroup();
         self::parseModule();
         self::parseController();
@@ -263,7 +261,6 @@ class Router
                 self::$group = C('defaultGroup', 'frontend');
             }
         }
-
         return self::$group;
     }
 

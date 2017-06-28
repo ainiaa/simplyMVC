@@ -1017,13 +1017,13 @@ SCRIPT;
     public function lPush($key, $args = null)
     {
         $args = func_get_args();
-        return $this->__call('lPush', [$args]);
+        return $this->__call('lPush', $args);
     }
 
     public function rPush($key, $args)
     {
         $args = func_get_args();
-        return $this->__call('rPush', [$args]);
+        return $this->__call('rPush', $args);
     }
 
     public function lRange($key, $start, $end)
@@ -1106,19 +1106,19 @@ SCRIPT;
     public function sAdd($key, $args)
     {
         $args = func_get_args();
-        return $this->__call('sAdd', [$args]);
+        return $this->__call('sAdd', $args);
     }
 
     public function sRem($key, $args)
     {
         $args = func_get_args();
-        return $this->__call('sRem', [$args]);
+        return $this->__call('sRem', $args);
     }
 
     public function sRemove($key, $args)
     {
         $args = func_get_args();
-        return $this->__call('sRemove', [$args]);
+        return $this->__call('sRemove', $args);
     }
 
 
@@ -1165,7 +1165,7 @@ SCRIPT;
     public function zAdd($key, $args)
     {
         $args = func_get_args();
-        return $this->__call('zAdd', [$args]);
+        return $this->__call('zAdd', $args);
     }
 
     public function zRange($key, $start, $end, $withscores = null)
@@ -1181,13 +1181,13 @@ SCRIPT;
     public function zRem($key, $args)
     {
         $args = func_get_args();
-        return $this->__call('zRem', [$args]);
+        return $this->__call('zRem', $args);
     }
 
     public function zDelete($key, $args)
     {
         $args = func_get_args();
-        return $this->__call('zDelete', [$args]);
+        return $this->__call('zDelete', $args);
     }
 
     public function zRangeByScore($key, $start, $end, array $options = [])
@@ -1263,25 +1263,25 @@ SCRIPT;
     public function sInter($args)
     {
         $args = func_get_args();
-        return $this->__call('sInter', [$args]);
+        return $this->__call('sInter', $args);
     }
 
     public function sInterStore($args)
     {
         $args = func_get_args();
-        return $this->__call('sInterStore', [$args]);
+        return $this->__call('sInterStore', $args);
     }
 
     public function sUnion($args)
     {
         $args = func_get_args();
-        return $this->__call('sUnion', [$args]);
+        return $this->__call('sUnion', $args);
     }
 
     public function sUnionStore($dstKey, $args)
     {
         $args = func_get_args();
-        return $this->__call('sUnionStore', [$args]);
+        return $this->__call('sUnionStore', $args);
     }
     
     

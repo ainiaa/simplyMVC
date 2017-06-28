@@ -55,7 +55,7 @@ class Request
      * @param null $defaultValue
      * @param null $callback
      *
-     * @return array|null
+     * @return mixed
      */
     public static function getParam($type, $key, $defaultValue = null, $callback = null)
     {
@@ -64,25 +64,25 @@ class Request
                 $return = self::getParamBase($_GET, $key, $defaultValue);
                 break;
             case 'post':
-                $return =  self::getParamBase($_POST, $key, $defaultValue);
+                $return = self::getParamBase($_POST, $key, $defaultValue);
                 break;
             case 'request':
-                $return =  self::getParamBase($_REQUEST, $key, $defaultValue);
+                $return = self::getParamBase($_REQUEST, $key, $defaultValue);
                 break;
             case 'cookie':
-                $return =  self::getParamBase($_COOKIE, $key, $defaultValue);
+                $return = self::getParamBase($_COOKIE, $key, $defaultValue);
                 break;
             case 'server':
-                $return =  self::getParamBase($_SERVER, $key, $defaultValue);
+                $return = self::getParamBase($_SERVER, $key, $defaultValue);
                 break;
             case 'session':
-                $return =  self::getParamBase($_SESSION, $key, $defaultValue);
+                $return = self::getParamBase($_SESSION, $key, $defaultValue);
                 break;
             case 'env':
-                $return =  self::getParamBase($_ENV, $key, $defaultValue);
+                $return = self::getParamBase($_ENV, $key, $defaultValue);
                 break;
             default:
-                $return =  null;
+                $return = null;
         }
         if ($callback && is_callable($callback)) {
             return $callback($return);
@@ -145,7 +145,7 @@ class Request
     /**
      * @param string $key
      *
-     * @return null|string
+     * @return mixed
      */
     public static function getGet($key = '*')
     {
@@ -155,7 +155,7 @@ class Request
     /**
      * @param string $key
      *
-     * @return null|string
+     * @return mixed
      */
     public static function getPost($key = '*')
     {
@@ -165,7 +165,7 @@ class Request
     /**
      * @param string $key
      *
-     * @return null|string
+     * @return mixed
      */
     public static function getRequest($key = '*')
     {
@@ -175,7 +175,7 @@ class Request
     /**
      * @param string $key
      *
-     * @return null|string
+     * @return mixed
      */
     public static function getCookie($key = '*')
     {
@@ -185,7 +185,7 @@ class Request
     /**
      * @param string $key
      *
-     * @return null|string
+     * @return mixed
      */
     public static function getServer($key = '*')
     {
@@ -195,7 +195,7 @@ class Request
     /**
      * @param string $key
      *
-     * @return null|string
+     * @return mixed
      */
     public static function getEnv($key = '*')
     {
@@ -209,65 +209,122 @@ class Request
      * @param string $key
      * @param null   $value
      *
-     * @return null|string
      */
     public static function setGet($key, $value = null)
     {
-        return self::setParam('get', $key, $value);
+        self::setParam('get', $key, $value);
     }
 
     /**
      * @param string $key
      * @param null   $value
      *
-     * @return null|string
      */
     public static function setPost($key, $value = null)
     {
-        return self::setParam('post', $key, $value);
+        self::setParam('post', $key, $value);
     }
 
     /**
      * @param string $key
      * @param null   $value
      *
-     * @return null|string
      */
     public static function setRequest($key, $value = null)
     {
-        return self::setParam('request', $key, $value);
+        self::setParam('request', $key, $value);
     }
 
     /**
      * @param string $key
      * @param null   $value
      *
-     * @return null|string
      */
     public static function setCookie($key, $value = null)
     {
-        return self::setParam('cookie', $key, $value);
+        self::setParam('cookie', $key, $value);
     }
 
     /**
      * @param string $key
      * @param null   $value
-     *
-     * @return null|string
      */
     public static function setServer($key, $value = null)
     {
-        return self::setParam('server', $key, $value);
+        self::setParam('server', $key, $value);
     }
 
     /**
      * @param string $key
      * @param null   $value
-     *
-     * @return null|string
      */
     public static function setEnv($key, $value = null)
     {
-        return self::setParam('env', $key, $value);
+        self::setParam('env', $key, $value);
     }
+
+    /**
+     * 判断当前请求是否为ajax请求
+     *
+     * @access public
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+     */
+    public static function isAjax()
+    {
+        $isAjax = false;
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower(
+                        $_SERVER['HTTP_X_REQUESTED_WITH']
+                ) == 'xmlhttprequest'
+        ) {
+            $isAjax = true;
+        } elseif (isset($_POST[VAR_AJAX_SUBMIT]) && $_POST[VAR_AJAX_SUBMIT]) {
+            $isAjax = true;
+        } elseif (isset($_GET[VAR_AJAX_SUBMIT]) && $_GET[VAR_AJAX_SUBMIT]) {
+            $isAjax = true;
+        }
+
+        return $isAjax;
+    }
+
+    public static function value($value)
+    {
+        if ($value instanceof Closure) {
+            return $value();
+        } else {
+            return $value;
+        }
+    }
+
+    public  static function parseGroup()
+    {
+
+    }
+
+    /**
+     * 站内跳转 (不会重新发起一次新的请求.而是根据url 重新解析url，然后再次dispatch)
+     *
+     * @param $url
+     */
+    public function redirect($url)
+    {
+        header('Location:' . $url);
+    }
+
+    /**
+     * 站内跳转 (不会重新发起一次新的请求.而是根据url 重新解析url，然后再次dispatch)
+     *
+     * @param $url
+     */
+    public function forward($url)
+    {
+        parse_str($url, $info);
+        $_GET     = array_merge($_GET, $info);
+        $_REQUEST = array_merge($_REQUEST, $info);
+
+        //解析url
+        Router::parseUrl();
+
+        Dispatcher::dispatch();
+    }
+
 }
