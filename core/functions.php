@@ -480,6 +480,117 @@ function file_debug($params, $label = '', $fileName = '', $filePath = '')
     error_log('[date:]' . date('Y-m-d H:i:s') . '|' . $label . ':' . $params . PHP_EOL, 3, $file);
 }
 
+function triggerBehaviorWithResult($name, &$params = null)
+{
+    if (strpos($name, '/')) {
+        list($name, $method) = explode('/', $name);
+    } else {
+        $method = 'run';
+    }
+    $class    = $name . 'Behavior';
+    $behavior = new $class();
+    $return   = $behavior->$method($params);
+    return $return;
+}
+
+function BR($name, &$params = null)
+{
+    return triggerBehaviorWithResult($name, $params);
+}
+
+/**
+ * @param      $tag
+ * @param null $params
+ *
+ * @return array|bool
+ */
+function tagWithReturn($tag, &$params = null)
+{
+    // 系统标签扩展
+    $extends = C('extends.' . $tag);
+    // 应用标签扩展
+    $tags = C('tags.' . $tag);
+    if (!empty($tags)) {
+        if (empty($tags['_overlay']) && !empty($extends)) { // 合并扩展
+            $tags = array_unique(array_merge($extends, $tags));
+        } elseif (isset($tags['_overlay'])) { // 通过设置 '_overlay'=>1 覆盖系统标签
+            unset($tags['_overlay']);
+        }
+    } elseif (!empty($extends)) {
+        $tags = $extends;
+    }
+    if ($tags) {
+        $return = [];
+        // 执行扩展
+        foreach ($tags as $key => $name) {
+            if (!is_int($key)) { // 指定行为类的完整路径 用于模式扩展
+                $name = $key;
+            }
+            $return[$name] = BR($name, $params);
+        }
+        return $return;
+    } else { // 未执行任何行为 返回false
+        return false;
+    }
+}
+
+/**
+ * 执行某个行为
+ *
+ * @param string $name   行为名称
+ * @param Mixed  $params 传入的参数
+ *
+ * @return void
+ */
+function B($name, &$params = null)
+{
+    if (strpos($name, '/')) {
+        list($name, $method) = explode('/', $name);
+    } else {
+        $method = 'run';
+    }
+    $class    = $name . 'Behavior';
+    $behavior = new $class();
+    $behavior->$method($params);
+}
+
+/**
+ * 处理标签扩展
+ *
+ * @param string $tag    标签名称
+ * @param mixed  $params 传入参数
+ *
+ * @return mixed
+ */
+function tag($tag, &$params = null)
+{
+    // 系统标签扩展
+    $extends = C('extends.' . $tag);
+    // 应用标签扩展
+    $tags = C('tags.' . $tag);
+    if (!empty($tags)) {
+        if (empty($tags['_overlay']) && !empty($extends)) { // 合并扩展
+            $tags = array_unique(array_merge($extends, $tags));
+        } elseif (isset($tags['_overlay'])) { // 通过设置 '_overlay'=>1 覆盖系统标签
+            unset($tags['_overlay']);
+        }
+    } elseif (!empty($extends)) {
+        $tags = $extends;
+    }
+    if ($tags) {
+        // 执行扩展
+        foreach ($tags as $key => $name) {
+            if (!is_int($key)) { // 指定行为类的完整路径 用于模式扩展
+                $name = $key;
+            }
+            B($name, $params);
+        }
+    } else { // 未执行任何行为 返回false
+        return false;
+    }
+}
+
+
 if (!function_exists('com_create_guid')) {
     function com_create_guid()
     {
