@@ -143,11 +143,11 @@ class Importer
     {
         $controllerFileSuffer = C('controllerFileSuffer');
         if ('@' == $groupName) {
-            $groupName = Router::getGroup();;
+            $groupName = Request::getGroup();;
         }
 
         if ('@' == $moduleName) {
-            $moduleName = Router::getModule();
+            $moduleName = Request::getModule();
         }
         $baseControllerFile = APP_DIR . $groupName . '/' . $groupName . $controllerFileSuffer;
         self::importFileByFullPath($baseControllerFile);
@@ -201,11 +201,11 @@ class Importer
     {
         $serviceFileSuffer = C('serviceFileSuffer');
         if ('@' == $groupName) {
-            $groupName = Router::getGroup();
+            $groupName = Request::getGroup();
         }
 
         if ('@' == $moduleName) {
-            $moduleName = Router::getModule();
+            $moduleName = Request::getModule();
         }
 
         $serviceFileName = $serviceName . $serviceFileSuffer;
@@ -255,11 +255,11 @@ class Importer
     public static function loadHelper($helperName, $groupName = '@', $moduleName = '@')
     {
         if ('@' == $groupName) {
-            $groupName = Router::getGroup();
+            $groupName = Request::getGroup();
         }
 
         if ('@' == $moduleName) {
-            $moduleName = Router::getModule();
+            $moduleName = Request::getModule();
         }
 
         $helperFileName = $helperName . '.class.php';
@@ -318,11 +318,11 @@ class Importer
         $daoFileSuffer = C('daoFileSuffer');
 
         if ('@' == $groupName) {
-            $groupName = Router::getGroup();
+            $groupName = Request::getGroup();
         }
 
         if ('@' == $moduleName) {
-            $moduleName = Router::getModule();
+            $moduleName = Request::getModule();
         }
 
         $daoFileName = $daoName . $daoFileSuffer;

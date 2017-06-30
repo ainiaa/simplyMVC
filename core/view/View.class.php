@@ -73,8 +73,8 @@ class View
         }
 
         $engineVars = get_class_vars(get_class($this->engine));
-        $groupName  = Router::getGroup();
-        $moduleName = Router::getModule();
+        $groupName  = Request::getGroup();
+        $moduleName = Request::getModule();
 
         foreach ((array)$this->viewEngineConfig as $key => $value) {
             $value = str_replace('@', ROOT_DIR . $groupName . '/' . $moduleName, $value);

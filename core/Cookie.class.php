@@ -37,7 +37,7 @@ class Cookie
      */
     public static function get($name = null, $default = null)
     {
-        return Router::getCookie($name, $default);
+        return Request::getCookie($name, $default);
     }
 
     /**

@@ -56,8 +56,8 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
         // create a new session
         $this->keys['session_id']  = $this->newSessionId();
         $this->keys['previous_id'] = $this->keys['session_id']; // prevents errors if previous_id has a unique index
-        $this->keys['ip_hash']     = md5(Router::getRemoteIp() . Router::getClientIp());
-        $this->keys['user_agent']  = Router::getUserAgent();
+        $this->keys['ip_hash']     = md5(Request::getRemoteIp() . Request::getClientIp());
+        $this->keys['user_agent']  = Request::getUserAgent();
         $this->keys['created']     = SmvcUtilHelper::getTime();
         $this->keys['updated']     = $this->keys['created'];
 
@@ -547,7 +547,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     public function getCookie()
     {
         // was the cookie value posted?
-        $cookie = Router::getPost($this->config['post_cookie_name'], false);
+        $cookie = Request::getPost($this->config['post_cookie_name'], false);
 
         // if not found, fetch the regular cookie
         if ($cookie === false) {
@@ -559,13 +559,13 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
 
         // if not found, check the URL for a cookie
         if ($cookie === false) {
-            $cookie = Router::getGet($this->config['cookie_name'], false);
+            $cookie = Request::getGet($this->config['cookie_name'], false);
         }
 
         // if not found, was a session-id present in the HTTP header?
         if ($cookie === false) {
             $header_header_name = isset($this->config['header_header_name']) ? $this->config['header_header_name'] : '';
-            $cookie             = Router::getHeader($header_header_name, false);
+            $cookie             = Request::getHeader($header_header_name, false);
         }
 
         if ($cookie !== false) {
