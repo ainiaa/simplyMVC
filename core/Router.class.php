@@ -53,29 +53,25 @@ class Router
     {
         $urlMappingConf = C('URL_MAPPING', []);
         if ($urlMappingConf) {
+            $matchedList = [];
             foreach ($urlMappingConf as $pattern => $mapping) {
                 list($group, $module, $controller, $action) = each(explode('/', $pattern));
-                list($mappingGroup, $mappingModule, $mappingController, $mappingAction) = each(explode('/', $mapping));
-                $originGroup = self::parseGroup();
-                if ($group === '*' || $group === $originGroup) {
-                    self::mappingGroup($mappingGroup);
-                    self::setOriginGroup($originGroup);
-                    $originModule = self::parseModule();
-                    if ($module === '*' || $module === $originModule) {
-                        self::mappingModule($mappingModule);
-                        self::setOriginModule($originModule);
-                        $originController = self::parseController();
-                        if ($controller === '*' || $controller === $originController) {
-                            self::mappingController($mappingController);
-                            self::setOriginController($originController);
-                            $originAction = self::parseAction();
-                            if ($action === '*' || $action === $originAction) {
-                                self::mappingAction($mappingAction);
-                                self::setOriginAction($originAction);
-                            }
-                        }
-                    }
+                $requestInfo       = Request::getRequestUri();
+                $originGroup       = SmvcArrayHelper::get($requestInfo, 'group');
+                $originModule      = SmvcArrayHelper::get($requestInfo, 'module');
+                $originController  = SmvcArrayHelper::get($requestInfo, 'controller');
+                $originAction      = SmvcArrayHelper::get($requestInfo, 'action');
+                $groupMatched      = $group === '*' || $group === $originGroup;
+                $moduleMatched     = $module === '*' || $module === $originModule;
+                $controllerMatched = $controller === '*' || $controller === $originController;
+                $actionMatched     = $action === '*' || $action === $originAction;
+                if ($groupMatched && $moduleMatched && $controllerMatched && $actionMatched) {//uri都匹配了 执行mapping操作
+                    $matchedList[$pattern] = $mapping;
                 }
+            }
+            if (count($matchedList) > 0) { //todo 这个需要再优化 --- 根据匹配度，设置为最匹配的
+                $first = array_pop($matchedList);
+                Request::mappingUri($first);
             }
         }
     }
@@ -265,108 +261,6 @@ class Router
     }
 
     /**
-     *
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     *
-     * @param string $module
-     */
-    private static function mappingModule($module = '')
-    {
-        if ($module) {
-            $moduleParamName = C('moduleParamName', 'm');
-            if (isset($_REQUEST[$moduleParamName])) {
-                $_REQUEST[$moduleParamName] = $module;
-            }
-            if (isset($_GET[$moduleParamName])) {
-                $_GET[$moduleParamName] = $module;
-            }
-            if (isset($_POST[$moduleParamName])) {
-                $_POST[$moduleParamName] = $module;
-            }
-            if (isset($_COOKIE[$moduleParamName])) {
-                $_COOKIE[$moduleParamName] = $module;
-            }
-            self::$module = $module;
-        }
-    }
-
-    /**
-     *
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     *
-     * @param string $group
-     */
-    private static function mappingGroup($group = '')
-    {
-        if ($group) {
-            $groupParamName = C('groupParamName', 'g');
-            if (isset($_REQUEST[$groupParamName])) {
-                $_REQUEST[$groupParamName] = $group;
-            }
-            if (isset($_GET[$groupParamName])) {
-                $_GET[$groupParamName] = $group;
-            }
-            if (isset($_POST[$groupParamName])) {
-                $_POST[$groupParamName] = $group;
-            }
-            if (isset($_COOKIE[$groupParamName])) {
-                $_COOKIE[$groupParamName] = $group;
-            }
-            self::$group = $group;
-        }
-    }
-
-    /**
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     *
-     * @param string $controller
-     */
-    private static function mappingController($controller = '')
-    {
-        if ($controller) {
-            $controllerParamName = C('controllerParamName', 'c');
-            if (isset($_REQUEST[$controllerParamName])) {
-                $_REQUEST[$controllerParamName] = $controller;
-            }
-            if (isset($_GET[$controllerParamName])) {
-                $_GET[$controllerParamName] = $controller;
-            }
-            if (isset($_POST[$controllerParamName])) {
-                $_POST[$controllerParamName] = $controller;
-            }
-            if (isset($_COOKIE[$controllerParamName])) {
-                $_COOKIE[$controllerParamName] = $controller;
-            }
-            self::$controller = $controller;
-        }
-    }
-
-    /**
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     *
-     * @param string $action
-     */
-    private static function mappingAction($action = '')
-    {
-        if ($action) {
-            $actionParamName = C('actionParamName', 'a');
-            if (isset($_REQUEST[$actionParamName])) {
-                $_REQUEST[$actionParamName] = $action;
-            }
-            if (isset($_GET[$actionParamName])) {
-                $_GET[$actionParamName] = $action;
-            }
-            if (isset($_POST[$actionParamName])) {
-                $_POST[$actionParamName] = $action;
-            }
-            if (isset($_COOKIE[$actionParamName])) {
-                $_COOKIE[$actionParamName] = $action;
-            }
-            self::$action = $action;
-        }
-    }
-
-    /**
      * 初始化module
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
@@ -490,33 +384,6 @@ class Router
         return SmvcArrayHelper::get($info, 'uri_params', []);
     }
 
-
-    /**
-     * 根据服务器环境不同，取得RequestUri信息
-     *
-     * @return array
-     */
-    public static function getRequestUri()
-    {
-        if (isset($_SERVER['HTTP_X_REWRITE_URL'])) { // check this first so IIS will catch
-            $requestUri = $_SERVER['HTTP_X_REWRITE_URL'];
-        } else {
-            if (isset($_SERVER['REQUEST_URI'])) {
-                $requestUri = $_SERVER['REQUEST_URI'];
-            } else {
-                if (isset($_SERVER['ORIG_PATH_INFO'])) { // IIS 5.0, PHP as CGI
-                    $requestUri = $_SERVER['ORIG_PATH_INFO'];
-                    if (!empty($_SERVER['QUERY_STRING'])) {
-                        $requestUri .= '?' . $_SERVER['QUERY_STRING'];
-                    }
-                } else {
-                    $requestUri = null;
-                }
-            }
-        }
-
-        return $requestUri;
-    }
 
     /**
      * @param mixed  $key
