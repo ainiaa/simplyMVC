@@ -7,46 +7,6 @@ class Router
 {
 
     /**
-     * @var string 分组名称
-     */
-    private static $group;
-
-    /**
-     * @var string 原始分组
-     */
-    private static $originGroup;
-
-    /**
-     * @var string module 名称
-     */
-    private static $module;
-
-    /**
-     * @var string 原始moudle
-     */
-    private static $originModule;
-
-    /**
-     * @var string 控制器名称
-     */
-    private static $controller;
-
-    /**
-     * @var string 原始控制器
-     */
-    private static $originController;
-
-    /**
-     * @var string action名称
-     */
-    private static $action;
-
-    /**
-     * @var string 原始action
-     */
-    private static $originAction;
-
-    /**
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      */
     public static function doUrlMapping()
@@ -187,8 +147,8 @@ class Router
      */
     public static function routerCheck()
     {
-        $controller = self::getControllerName(false);
-        $action     = self::getActionName(false);
+        $controller = Request::getControllerName(false);
+        $action     = Request::getActionName(false);
         if (C('routerFilterMode', 'none') === 'whiteList') {//白名单
             $return = self::routerCheckByWhiteList($controller, $action);
         } else if (C('routerFilterMode', 'none') === 'blacklist') {//黑名单
@@ -283,4 +243,5 @@ class Router
 
         return $return;
     }
+
 }

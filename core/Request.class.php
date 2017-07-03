@@ -592,7 +592,7 @@ class Request
                     $exclude_reserved ? FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE : null
             );
         } else {
-            return SimpleMVC::value($default);
+            return $default;
         }
     }
 
