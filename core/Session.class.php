@@ -113,7 +113,7 @@ class Session
      * @access    public
      * @return    SmvcBaseSession object
      */
-    public static function instance($instance = null)
+    public static function getInstance($instance = null)
     {
         if (is_null($instance) && C('session.driver')) {
             $instance = C('session.driver');
@@ -139,7 +139,7 @@ class Session
      */
     public static function set($name, $value = null)
     {
-        return self::instance()->set($name, $value);
+        return self::getInstance()->set($name, $value);
     }
 
 
@@ -155,7 +155,7 @@ class Session
      */
     public static function get($name = null, $default = null)
     {
-        return self::instance()->get($name, $default);
+        return self::getInstance()->get($name, $default);
     }
 
 
@@ -169,7 +169,7 @@ class Session
      */
     public static function delete($name)
     {
-        return self::instance()->delete($name);
+        return self::getInstance()->delete($name);
     }
 
 
@@ -184,7 +184,7 @@ class Session
      */
     public static function key($name = 'session_id')
     {
-        return self::instance()->key($name);
+        return self::getInstance()->key($name);
     }
 
 
@@ -199,7 +199,7 @@ class Session
      */
     public static function setFlash($name, $value = null)
     {
-        return self::instance()->setFlash($name, $value);
+        return self::getInstance()->setFlash($name, $value);
     }
 
 
@@ -216,7 +216,7 @@ class Session
      */
     public static function getFlash($name = null, $default = null, $expire = null)
     {
-        return self::instance()->getFlash($name, $default, $expire);
+        return self::getInstance()->getFlash($name, $default, $expire);
     }
 
 
@@ -231,7 +231,7 @@ class Session
      */
     public static function keepFlash($name = null)
     {
-        return self::instance()->keepFlash($name);
+        return self::getInstance()->keepFlash($name);
     }
 
 
@@ -245,7 +245,7 @@ class Session
      */
     public static function deleteFlash($name = null)
     {
-        return self::instance()->deleteFlash($name);
+        return self::getInstance()->deleteFlash($name);
     }
 
 
@@ -257,7 +257,7 @@ class Session
      */
     public static function create()
     {
-        return self::instance()->create();
+        return self::getInstance()->create();
     }
 
 
@@ -272,7 +272,7 @@ class Session
      */
     public static function read($id)
     {
-        return self::instance()->read($id);
+        return self::getInstance()->read($id);
     }
 
 
@@ -287,7 +287,7 @@ class Session
      */
     public static function write($id)
     {
-        return self::instance()->write($id);
+        return self::getInstance()->write($id);
     }
 
 
@@ -299,7 +299,7 @@ class Session
      */
     public static function rotate()
     {
-        return self::instance()->rotate();
+        return self::getInstance()->rotate();
     }
 
 
@@ -314,6 +314,6 @@ class Session
      */
     public static function destroy($id = '')
     {
-        return self::instance()->destroy($id);
+        return self::getInstance()->destroy($id);
     }
 }

@@ -166,7 +166,7 @@ class SimpleMVC
     {
         $autoInitialize = C('session.auto_initialize');
         if ($autoInitialize) {
-            Session::instance(C('session.driver'));
+            Session::getInstance(C('session.driver'));
         }
     }
 

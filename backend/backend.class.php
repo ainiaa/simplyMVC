@@ -221,7 +221,7 @@ class BackendController extends BaseController
         $this->assign('title', 'Simply MVC backend');
         $this->initTplComponent();
 
-        $sessionInfo = Session::instance()->get('userInfo');
+        $sessionInfo = Session::getInstance()->get('userInfo');
         if (empty($sessionInfo) && (!isset($_GET['a']) || $_GET['a'] != 'login')) { //这个需要修改
             $this->loginAction();
             exit;
@@ -241,7 +241,7 @@ class BackendController extends BaseController
             if ($adminInfo) {
                 $md5Password = md5($password);
                 if ($md5Password == $adminInfo['password']) { //登录成功
-                    Session::instance()->set('userInfo', array('userName' => $userName, 'password' => md5($password)));
+                    Session::getInstance()->set('userInfo', array('userName' => $userName, 'password' => md5($password)));
                     header('Location:/?debug=1&b=2&m=default&c=default&g=backend&a=index');
                     return;
                 }
@@ -257,7 +257,7 @@ class BackendController extends BaseController
      */
     public function logoutAction()
     {
-        Session::instance()->delete('userInfo');
+        Session::getInstance()->delete('userInfo');
         $this->display('login.tpl.html');
     }
 
