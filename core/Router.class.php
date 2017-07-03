@@ -51,29 +51,84 @@ class Router
      */
     public static function doUrlMapping()
     {
-        $urlMappingConf = C('URL_MAPPING', []);
-        if ($urlMappingConf) {
-            $matchedList = [];
-            foreach ($urlMappingConf as $pattern => $mapping) {
-                list($group, $module, $controller, $action) = each(explode('/', $pattern));
-                $requestInfo       = Request::getRequestUri();
-                $originGroup       = SmvcArrayHelper::get($requestInfo, 'group');
-                $originModule      = SmvcArrayHelper::get($requestInfo, 'module');
-                $originController  = SmvcArrayHelper::get($requestInfo, 'controller');
-                $originAction      = SmvcArrayHelper::get($requestInfo, 'action');
-                $groupMatched      = $group === '*' || $group === $originGroup;
-                $moduleMatched     = $module === '*' || $module === $originModule;
-                $controllerMatched = $controller === '*' || $controller === $originController;
-                $actionMatched     = $action === '*' || $action === $originAction;
-                if ($groupMatched && $moduleMatched && $controllerMatched && $actionMatched) {//uri都匹配了 执行mapping操作
-                    $matchedList[$pattern] = $mapping;
+        $urlMapping = C('URL_MAPPING', []);
+        if ($urlMapping) {
+            $matchedList      = [];
+            $requestInfo      = Request::getRequestUri();
+            $originGroup      = SmvcArrayHelper::get($requestInfo, 'group');
+            $originModule     = SmvcArrayHelper::get($requestInfo, 'module');
+            $originController = SmvcArrayHelper::get($requestInfo, 'controller');
+            $originAction     = SmvcArrayHelper::get($requestInfo, 'action');
+            foreach ($urlMapping as $pattern => $mapping) {
+                $matchRate = self::matchRate($pattern, $originGroup, $originModule, $originController, $originAction);
+                if ($matchRate == -1) {
+                    continue;
+                } else {
+                    if (isset($matchedList[0]) && $matchedList[0]['matchRate'] < $matchRate) {
+                        $matchedList[0] = ['matchRate' => $matchRate, 'pattern' => $pattern, 'mapping' => $mapping];
+                    }
+                    if ($matchRate == 4) {
+                        break;
+                    }
                 }
             }
-            if (count($matchedList) > 0) { //todo 这个需要再优化 --- 根据匹配度，设置为最匹配的
-                $first = array_pop($matchedList);
+            if (count($matchedList) > 0) {
+                $first = $matchedList[0]['mapping'];
                 Request::mappingUri($first);
             }
         }
+    }
+
+    /**
+     * 匹配度
+     *
+     * @param $pattern
+     * @param $mapping
+     * @param $originGroup
+     * @param $originModule
+     * @param $originController
+     * @param $originAction
+     */
+    public static function matchRate($pattern, $originGroup, $originModule, $originController, $originAction)
+    {
+        list($group, $module, $controller, $action) = each(explode('/', $pattern));
+        $groupMatched      = self::match($group, $originGroup);
+        $moduleMatched     = self::match($module, $originModule);
+        $controllerMatched = self::match($controller, $originController);
+        $actionMatched     = self::match($action, $originAction);
+        if ($groupMatched === '00' || $moduleMatched === '00' || $controllerMatched === '00' || $actionMatched === '00') {//uri都匹配了 执行mapping操作
+            return -1;
+        } else {
+            $matchStr = sprintf('%s%s%s%s', $groupMatched, $moduleMatched, $controllerMatched, $actionMatched);
+            switch ($matchStr) {
+                case '01010101':
+                    $matchRate = 4;
+                    break;
+                case '01010110':
+                    $matchRate = 3;
+                    break;
+                case '01011010':
+                    $matchRate = 2;
+                    break;
+                case '01101010':
+                    $matchRate = 1;
+                    break;
+                default:
+                    $matchRate = 0;
+            }
+            return $matchRate;
+        }
+    }
+
+    public static function match($data1, $data2)
+    {
+        $compare = '00';
+        if ($data1 === $data2) {
+            $compare = '01';
+        } else if ($data1 === '*') {
+            $compare = '10';
+        }
+        return $compare;
     }
 
     /**
@@ -120,7 +175,7 @@ class Router
      */
     public static function parseUrl()
     {
-        self::initEnv();
+        self::doUrlMapping();
     }
 
 
@@ -227,459 +282,5 @@ class Router
         }
 
         return $return;
-    }
-
-    /**
-     * 初始化环境变量
-     *
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    public static function initEnv()
-    {
-        self::doUrlMapping();
-        self::parseGroup();
-        self::parseModule();
-        self::parseController();
-        self::parseAction();
-    }
-
-    /**
-     * 解析分组
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    private static function parseGroup()
-    {
-        if (empty(self::$group)) {
-            $groupParamName = C('groupParamName', 'g');
-            if (isset($_REQUEST[$groupParamName])) {
-                self::$group = $_REQUEST[$groupParamName];
-            } else {
-                self::$group = C('defaultGroup', 'frontend');
-            }
-        }
-        return self::$group;
-    }
-
-    /**
-     * 初始化module
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    private static function parseModule()
-    {
-        if (empty(self::$module)) {
-            $moduleParamName = C('moduleParamName', 'm');
-            if (isset($_REQUEST[$moduleParamName])) {
-                self::$module = $_REQUEST[$moduleParamName];
-            } else {
-                self::$module = C('defaultModule', 'default');
-            }
-        }
-
-        return self::$module;
-    }
-
-    /**
-     * 初始化action
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    private static function parseController()
-    {
-        if (empty(self::$controller)) {
-            $controllerParamName = C('controllerParamName', 'c');
-
-            if (isset($_REQUEST[$controllerParamName])) {
-                self::$controller = $_REQUEST[$controllerParamName];
-            } else {
-                self::$controller = C('defaultController', 'default');
-            }
-        }
-
-        return self::$controller;
-    }
-
-    /**
-     * @return mixed|string
-     */
-    private static function parseAction()
-    {
-        if (empty(self::$action)) {
-            $actionParamName = C('actionParamName', 'a');
-
-            if (isset($_REQUEST[$actionParamName])) {
-                self::$action = $_REQUEST[$actionParamName];
-            } else {
-                self::$action = C('defaultAction', 'index');
-            }
-        }
-
-        return self::$action;
-    }
-
-    /**
-     * 获得实际的分组名称
-     * @return string
-     */
-    public static function getGroup()
-    {
-        return self::$group;
-    }
-
-    /**
-     * 获得实际的模块名称
-     * @access private
-     *
-     * @return string
-     */
-    public static function getModule()
-    {
-        return self::$module;
-    }
-
-
-    /**
-     * 获得实际的控制器名称
-     *
-     * @param bool $appendSuffer
-     *
-     * @return string
-     */
-    public static function getControllerName($appendSuffer = true)
-    {
-        if ($appendSuffer) {
-            $controllerName = self::$controller . C('controllerSuffix');
-        } else {
-            $controllerName = self::$controller;
-        }
-
-        return $controllerName;
-    }
-
-    /**
-     * 获得实际的操作名称
-     * @access public
-     *
-     * @param bool $appendSuffer
-     *
-     * @return string
-     */
-    public static function getActionName($appendSuffer = true)
-    {
-        if ($appendSuffer) {
-            $actionName = self::$action . C('actionSuffix');
-        } else {
-            $actionName = self::$action;
-        }
-
-        return $actionName;
-    }
-
-
-    /**
-     * @param array $info
-     *
-     * @return mixed
-     */
-    public static function getParams($info = [])
-    {
-        return SmvcArrayHelper::get($info, 'uri_params', []);
-    }
-
-
-    /**
-     * @param mixed  $key
-     * @param string $default
-     *
-     * @return string
-     */
-    public static function getPost($key = '', $default = '')
-    {
-        if (func_num_args() === 0) {
-            return $_POST;
-        }
-
-        return SmvcArrayHelper::get($_POST, $key, $default);
-    }
-
-
-    /**
-     * @param mixed  $key
-     * @param string $default
-     *
-     * @return string
-     */
-    public static function getGet($key = '', $default = '')
-    {
-        if (func_num_args() === 0) {
-            return $_GET;
-        }
-
-        return SmvcArrayHelper::get($_GET, $key, $default);
-    }
-
-    /**
-     * @param mixed  $key
-     * @param string $default
-     *
-     * @return string
-     */
-    public static function getRequest($key = '', $default = '')
-    {
-        if (func_num_args() === 0) {
-            return $_REQUEST;
-        }
-
-        return SmvcArrayHelper::get($_REQUEST, $key, $default);
-    }
-
-
-    /**
-     *
-     * @param mixed  $key
-     * @param string $default
-     *
-     * @return string
-     */
-    public static function getHeader($key = '', $default = '')
-    {
-        static $headers = null;
-        if ($headers === null) {
-            if (!function_exists('getallheaders')) {
-                $server = SmvcArrayHelper::filterPrefixed(self::getServer(), 'HTTP_', true);
-
-                foreach ($server as $k => $value) {
-                    $k = join('-', array_map('ucfirst', explode('_', strtolower($k))));
-
-                    $headers[$k] = $value;
-                }
-
-                $value = self::getServer(
-                        'Content_Type',
-                        self::getServer('Content-Type')
-                ) and $headers['Content-Type'] = $value;
-                $value = self::getServer(
-                        'Content_Length',
-                        self::getServer('Content-Length')
-                ) and $headers['Content-Length'] = $value;
-            } else {
-                $headers = getallheaders();
-            }
-        }
-
-        return empty($headers) ? $default : ((func_num_args() === 0) ? $headers : SmvcArrayHelper::get(
-                $headers,
-                $key,
-                $default
-        ));
-    }
-
-    /**
-     * @param        $key
-     * @param string $default
-     *
-     * @return mixed
-     */
-    public static function getServer($key = '', $default = '')
-    {
-        if (func_num_args() === 0) {
-            return $_SERVER;
-        }
-
-        return SmvcArrayHelper::get($_SERVER, $key, $default);
-    }
-
-    /**
-     * @param string $key
-     * @param string $default
-     *
-     * @return mixed
-     */
-    public static function getEnv($key = '', $default = '')
-    {
-        if (func_num_args() === 0) {
-            return $_ENV;
-        }
-
-        return SmvcArrayHelper::get($_ENV, $key, $default);
-    }
-
-
-    /**
-     * Get the public ip address of the user.
-     *
-     * @param string $default
-     *
-     * @return  string
-     */
-    public static function getRemoteIp($default = '0.0.0.0')
-    {
-        return self::getServer('REMOTE_ADDR', $default);
-    }
-
-
-    /**
-     * @param string $key
-     * @param string $default
-     *
-     * @return mixed
-     * @throws Exception
-     */
-    public static function getCookie($key = '', $default = '')
-    {
-        if (func_num_args() === 0) {
-            return $_COOKIE;
-        }
-
-        return SmvcArrayHelper::get($_COOKIE, $key, $default);
-    }
-
-    /**
-     * @param $default
-     *
-     * @return string
-     */
-    public static function getUserAgent($default = '')
-    {
-        return self::getServer('HTTP_USER_AGENT', $default);
-    }
-
-
-    /**
-     * Get the real ip address of the user.  Even if they are using a proxy.
-     *
-     * @param    string $default          the default to return on failure
-     * @param    bool   $exclude_reserved exclude private and reserved IPs
-     *
-     * @return  string  the real ip address of the user
-     */
-    public static function getClientIp($default = '0.0.0.0', $exclude_reserved = false)
-    {
-        static $server_keys = null;
-
-        if (empty($server_keys)) {
-            $server_keys = ['HTTP_CLIENT_IP', 'REMOTE_ADDR'];
-            if (C('security.allow_x_headers', false)) {
-                $server_keys = array_merge(
-                        ['HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_X_REAL_IP', 'HTTP_X_FORWARDED_FOR'],
-                        $server_keys
-                );
-            }
-        }
-        $clientIp = '';
-
-        foreach ($server_keys as $key) {
-            $clientIp = self::getEnv($key);
-            if (empty($clientIp)) {
-                continue;
-            } else {
-                break;
-            }
-        }
-
-        if (empty($clientIp)) {
-            foreach ($server_keys as $key) {
-                $clientIp = self::getServer($key);
-                if (empty($clientIp)) {
-                    continue;
-                } else {
-                    break;
-                }
-            }
-        }
-
-        $clientIp = trim($clientIp);
-        if ($clientIp) {
-            return filter_var(
-                    $clientIp,
-                    FILTER_VALIDATE_IP,
-                    $exclude_reserved ? FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE : null
-            );
-        } else {
-            return SimpleMVC::value($default);
-        }
-    }
-
-    /**
-     * Return's the protocol that the request was made with
-     *
-     * @return  string
-     */
-    public static function getProtocol()
-    {
-        $isHttpsOn              = self::getServer('HTTPS') == 'on';
-        $isHttps                = self::getServer('HTTPS') == 1;
-        $is443                  = self::getServer('SERVER_PORT') == 443;
-        $allow_x_headers        = C('security.allow_x_headers', false);
-        $HTTP_X_FORWARDED_PORT  = self::getServer('HTTP_X_FORWARDED_PORT') == 443;
-        $HTTP_X_FORWARDED_PROTO = self::getServer('HTTP_X_FORWARDED_PROTO') == 'https';
-        if ($isHttpsOn || $isHttps || $is443 || ($allow_x_headers && $HTTP_X_FORWARDED_PROTO) or ($allow_x_headers && $HTTP_X_FORWARDED_PORT)) {
-            return 'https';
-        }
-
-        return 'http';
-    }
-
-
-    /**
-     * @return string
-     */
-    public static function getOriginGroup()
-    {
-        return self::$originGroup;
-    }
-
-    /**
-     * @param string $originGroup
-     */
-    public static function setOriginGroup($originGroup)
-    {
-        self::$originGroup = $originGroup;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getOriginModule()
-    {
-        return self::$originModule;
-    }
-
-    /**
-     * @param string $originModule
-     */
-    public static function setOriginModule($originModule)
-    {
-        self::$originModule = $originModule;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getOriginController()
-    {
-        return self::$originController;
-    }
-
-    /**
-     * @param string $originController
-     */
-    public static function setOriginController($originController)
-    {
-        self::$originController = $originController;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getOriginAction()
-    {
-        return self::$originAction;
-    }
-
-    /**
-     * @param string $originAction
-     */
-    public static function setOriginAction($originAction)
-    {
-        self::$originAction = $originAction;
     }
 }

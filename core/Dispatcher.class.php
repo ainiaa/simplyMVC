@@ -35,13 +35,13 @@ class Dispatcher
 
 
         //获得controller
-        $controllerName = Router::getControllerName();
+        $controllerName = Request::getControllerName();
 
         //获得controller实例
         $controller = self::getControllerInstance($controllerName);
 
         //获得action
-        $actionName = Router::getActionName();
+        $actionName = Request::getActionName();
 
         //获得Params
         $params = self::getParams($controller, $actionName);

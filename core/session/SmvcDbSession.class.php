@@ -97,9 +97,9 @@ class SmvcDbSession extends SmvcBaseSession
                 // not a valid cookie payload
             } elseif ($payload[0]['updated'] + $this->config['expiration_time'] <= SmvcUtilHelper::getTime()) {
                 // session has expired
-            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Router::getRemoteIp() . Router::getClientIp())) {
+            } elseif ($this->config['match_ip'] and $payload[0]['ip_hash'] !== md5(Request::getRemoteIp() . Request::getClientIp())) {
                 // IP address doesn't match
-            } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Router::getUserAgent()) {
+            } elseif ($this->config['match_ua'] and $payload[0]['user_agent'] !== Request::getUserAgent()) {
                 // user agent doesn't match
             } else {
                 // session is valid, retrieve the payload
