@@ -11,9 +11,9 @@ class Router
      */
     public static function doUrlMapping()
     {
-        $urlMapping = C('URL_MAPPING', []);
+        $urlMapping  = C('URL_MAPPING', []);
+        $matchedList = [];
         if ($urlMapping) {
-            $matchedList      = [];
             $requestInfo      = Request::getRequestUri();
             $originGroup      = SmvcArrayHelper::get($requestInfo, 'group');
             $originModule     = SmvcArrayHelper::get($requestInfo, 'module');
@@ -32,10 +32,12 @@ class Router
                     }
                 }
             }
-            if (count($matchedList) > 0) {
-                $first = $matchedList[0]['mapping'];
-                Request::mappingUri($first);
-            }
+        }
+        if (count($matchedList) > 0) {
+            $first = $matchedList[0]['mapping'];
+            Request::mappingUri($first);
+        } else {
+            Request::getRequestUri();
         }
     }
 

@@ -169,6 +169,29 @@ class SimpleMVC
         }
     }
 
+    /**
+     * 判断当前请求是否为ajax请求
+     *
+     * @access public
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+     */
+    public static function isAjax()
+    {
+        $isAjax = false;
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower(
+                        $_SERVER['HTTP_X_REQUESTED_WITH']
+                ) == 'xmlhttprequest'
+        ) {
+            $isAjax = true;
+        } elseif (isset($_POST[VAR_AJAX_SUBMIT]) && $_POST[VAR_AJAX_SUBMIT]) {
+            $isAjax = true;
+        } elseif (isset($_GET[VAR_AJAX_SUBMIT]) && $_GET[VAR_AJAX_SUBMIT]) {
+            $isAjax = true;
+        }
+
+        return $isAjax;
+    }
+
 }
 
 //启动框架
