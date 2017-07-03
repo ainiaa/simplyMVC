@@ -84,10 +84,9 @@ class Session
             // register a shutdown event to update the session
             // init the session
             $driver->init();
-            $id = $driver->newSessionId();
-            $driver->read($id);
+//            $driver->read();
 
-            register_shutdown_function([&$driver, 'write'], ['']);
+//            register_shutdown_function([&$driver, 'write'], ['']);
 
             // store this instance
             self::$_instances[$cookieName] =& $driver;

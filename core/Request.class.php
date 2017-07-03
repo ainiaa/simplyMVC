@@ -144,16 +144,20 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $default
+     * @param null   $callback
      *
      * @return mixed
      */
-    public static function getGet($key = '*')
+    public static function getGet($key = '*', $default = null, $callback = null)
     {
-        return self::getParam('get', $key);
+        return self::getParam('get', $key, $default, $callback);
     }
 
     /**
      * @param string $key
+     * @param null   $default
+     * @param null   $callback
      *
      * @return mixed
      */
@@ -164,6 +168,8 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $default
+     * @param null   $callback
      *
      * @return mixed
      */
@@ -174,6 +180,8 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $default
+     * @param null   $callback
      *
      * @return mixed
      */
@@ -184,6 +192,8 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $default
+     * @param null   $callback
      *
      * @return mixed
      */
@@ -194,6 +204,8 @@ class Request
 
     /**
      * @param string $key
+     * @param null   $default
+     * @param null   $callback
      *
      * @return mixed
      */
@@ -202,8 +214,6 @@ class Request
         return self::getParam('env', $key, $default, $callback);
     }
 
-
-    // ==================
 
     /**
      * @param string $key
@@ -775,9 +785,10 @@ class Request
      *
      * @param $url
      */
-    public function redirect($url)
+    public static function redirect($url)
     {
         header('Location:' . $url);
+        exit;
     }
 
     /**
@@ -785,7 +796,7 @@ class Request
      *
      * @param $url
      */
-    public function forward($url)
+    public static function forward($url)
     {
         parse_str($url, $info);
         $_GET     = array_merge($_GET, $info);
@@ -797,6 +808,24 @@ class Request
         Dispatcher::dispatch();
     }
 
+    /**
+     *
+     */
+    public static function getCurrentUrl()
+    {
+        $urlWithPortFormat    = '%s://%s:%s/%s';
+        $urlWithoutPortFormat = '%s://%s:%s/%s';
+        $serverPort           = self::getServer('SERVER_PORT', '80');
+        $serverName           = self::getServer('SERVER_NAME');
+        $requestUri           = self::getServer('REQUEST_URI');
+        $protocol             = self::getProtocol();
+        if ($serverPort == '80' || $serverPort == '443') {
+            $url = sprintf($urlWithoutPortFormat, $protocol, $serverName, $serverPort, $requestUri);
+        } else {
+            $url = sprintf($urlWithPortFormat, $protocol, $serverName, $serverPort, $requestUri);
+        }
+        return $url;
+    }
 
     /**
      * @var string 分组名称

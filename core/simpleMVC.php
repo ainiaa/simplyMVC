@@ -164,7 +164,8 @@ class SimpleMVC
      */
     public static function initSession()
     {
-        if (C('session.auto_initialize')) {
+        $autoInitialize = C('session.auto_initialize');
+        if ($autoInitialize) {
             Session::instance(C('session.driver'));
         }
     }
@@ -190,6 +191,15 @@ class SimpleMVC
         }
 
         return $isAjax;
+    }
+
+    public static function value($value)
+    {
+        if ($value instanceof Closure) {
+            return $value();
+        } else {
+            return $value;
+        }
     }
 
 }

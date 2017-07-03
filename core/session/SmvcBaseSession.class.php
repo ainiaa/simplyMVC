@@ -32,6 +32,8 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      */
     protected $time = null;
 
+    protected $id = null;
+
 
     public function __construct($config = [])
     {
@@ -111,7 +113,6 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
                 $this->flash[$key]['state'] = 'loaded';
             }
         }
-
         return $this;
     }
 
@@ -126,11 +127,10 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      *
      * @return    SmvcSessionInterface
      */
-    public function write($id)
+    public function write($id = '')
     {
         // create the session if it doesn't exist
         empty($this->keys) and $this->create();
-
         $this->cleanupFlash();
 
         return $this;
@@ -148,6 +148,10 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     {
         // get a time object
         $this->time = SmvcUtilHelper::getTime();
+        if (empty($this->id)) {
+            $this->getCookie();
+        }
+        $this->read($this->id);
     }
 
     // --------------------------------------------------------------------
@@ -165,6 +169,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     {
         is_null($name) or SmvcArrayHelper::set($this->data, $name, $value);
 
+        $this->write($this->id);
         return $this;
     }
 
@@ -506,9 +511,10 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
 
             // make sure it doesn't exceed the cookie size specification
             if (strlen($payload) > 4000) {
-                throw new Exception('The session data stored by the application in the cookie exceeds 4Kb. Select a different session storage driver.');
+                throw new Exception(
+                        'The session data stored by the application in the cookie exceeds 4Kb. Select a different session storage driver.'
+                );
             }
-
             // write the session cookie
             if ($this->config['expire_on_close']) {
                 return Cookie::set(
@@ -548,13 +554,10 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     {
         // was the cookie value posted?
         $cookie = Request::getPost($this->config['post_cookie_name'], false);
-
         // if not found, fetch the regular cookie
         if ($cookie === false) {
             $cookie_name = isset($this->config['cookie_name']) ? $this->config['cookie_name'] : 'smvcid';
-            $cookie = Cookie::get(
-                    $cookie_name
-            ); //isset($_COOKIE[$this->config['cookie_name']]) ? $_COOKIE[$this->config['cookie_name']] : false;
+            $cookie      = Cookie::get($cookie_name);
         }
 
         // if not found, check the URL for a cookie
@@ -572,7 +575,6 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
             // fetch the payload
             $this->config['encrypt_cookie'] and $cookie = Crypt::decode($cookie);
             $cookie = $this->unserialize($cookie);
-
             // validate the cookie format: must be an array
             if (is_array($cookie)) {
                 // cookies use nested arrays, other drivers have a string value
@@ -585,6 +587,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
                 }
             } // or a string containing the session id
             elseif (is_string($cookie) and strlen($cookie) == 32) {
+                $this->id = $cookie;
                 $cookie = [$cookie];
             } // invalid general format
             else {
@@ -637,14 +640,13 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      *
      * @access    public
      *
-     * @param    array
+     * @param    string
      *
-     * @return    string
+     * @return array
      */
     public function unserialize($input)
     {
         $data = @unserialize($input);
-
         if (is_array($data)) {
             foreach ($data as $key => $val) {
                 if (is_string($val)) {

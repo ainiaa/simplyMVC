@@ -110,7 +110,7 @@ class SmvcFileSession extends SmvcBaseSession
      * @access    public
      * @return    $this
      */
-    public function write($id)
+    public function write($id = '')
     {
         // do we have something to write?
         if (!empty($this->keys) or !empty($this->data) or !empty($this->flash)) {
@@ -127,6 +127,7 @@ class SmvcFileSession extends SmvcBaseSession
 
             // create the session file
             $this->writeFile($this->keys['session_id'], $payload);
+            file_debug(['id' => $this->keys['session_id'], '$payload' => $payload]);
 
             // was the session id rotated?
             if (isset($this->keys['previous_id']) and $this->keys['previous_id'] != $this->keys['session_id']) {
@@ -343,7 +344,6 @@ class SmvcFileSession extends SmvcBaseSession
      */
     public function gc($maxLifeTime)
     {
-        // TODO: Implement gc() method.
     }
 }
 

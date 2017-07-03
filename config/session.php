@@ -2,7 +2,7 @@
 return [
         'session' => [
                 'auto_initialize'        => true, //获取方式  C('session.auto_initialize')
-                'driver'                 => 'cookie', //cookie database redis memcache
+                'driver'                 => 'file', //cookie database redis memcache file
                 'enable_cookie'          => true,
                 'match_ip'               => false,
                 'match_ua'               => true,
@@ -23,7 +23,7 @@ return [
                         'pconnect' => false,
                 ],
                 'file'                   => [
-                        'path' => 'e:/tmp/',
+                        'path' => 'd:/tmp/',
                 ],
                 'memcached'              => [
                         'host' => '127.0.0.1',

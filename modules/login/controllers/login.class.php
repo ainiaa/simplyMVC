@@ -14,11 +14,9 @@ class LoginController extends ModulesController
      */
     public function loginAction()
     {
-
         $userInfo = Session::instance()->get('userInfo');
-
         if ($userInfo) {
-            $url = $this->getRedirectUrl('from_url');
+            $url = $this->getRedirectUrl('backurl');
             $this->redirect($url);
         } else {
             if (IS_POST) {
@@ -29,9 +27,11 @@ class LoginController extends ModulesController
                     $md5Password = md5($password);
                     if ($md5Password == $adminInfo['password']) { //登录成功
                         Session::instance()->set('userInfo', ['userName' => $userName, 'password' => md5($password)]);
-                        $url = $this->getRedirectUrl('from_url');
+                        $url = $this->getRedirectUrl('backurl');
                         header('Location:' . $url);
                         return;
+                    } else {
+                        echo 1;exit;
                     }
                 }
                 $this->assign('loginError', '用户名或者密码错误');
@@ -48,12 +48,16 @@ class LoginController extends ModulesController
     public function getRedirectUrl($key, $withReferer = true, $cleanCache = false)
     {
         $url = I($key);
+        if (empty($url)) {
+            $url = Session::instance()->get($key);
+            if ($cleanCache) {
+                Session::instance()->set($key, null);
+            }
+        }
         if (empty($url) && $withReferer) {
             $url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
         }
-        if (empty($url)) {
-            $url = Session::instance()->get($key);
-        }
+
         if (empty($url)) {
             $url = C('DEFAULT_URL');
         }

@@ -55,7 +55,8 @@ class Cookie
      * @param   boolean $secure     if true, the cookie should only be transmitted over a secure HTTPS connection
      * @param   boolean $http_only  if true, the cookie will be made accessible only through the HTTP protocol
      *
-     * @return  boolean
+     * @return bool
+     * @throws Exception
      */
     public static function set(
             $name,
@@ -67,9 +68,9 @@ class Cookie
             $http_only = null
     ) {
         // you can't set cookies in CLi mode
-//        if (defined('IS_CGI') && IS_CGI) {
-//            return false;
-//        }
+        //        if (defined('IS_CGI') && IS_CGI) {
+        //            return false;
+        //        }
         $value = SimpleMVC::value($value);
 
         // use the class defaults for the other parameters if not provided
@@ -81,7 +82,13 @@ class Cookie
 
         // add the current time so we have an offset
         $expiration = $expiration > 0 ? $expiration + time() : 0;
-        return setcookie($name, $value, $expiration, $path, $domain, $secure, $http_only);
+        //        var_export(['name' => $name, 'value' => $value, 'expiration' =>$expiration, 'time' => time(), 'path' => $path, 'domain' => $domain, 'secure'=>$secure, 'http_only' => $http_only]);exit;
+        $return = setcookie($name, $value, $expiration, $path, $domain, $secure, $http_only);
+        if (!$return) {
+            headers_sent($file, $line);
+            throw new Exception('Cookie set failure for header has sent at file:' . $file . ' line:' . $line);
+        }
+        return $return;
     }
 
     /**
