@@ -225,10 +225,10 @@ class CategoryBaseController extends BaseController
         $this->assign('title', 'Simply MVC backend');
         $this->initTplComponent();
 
-        $sessionInfo = Session::getInstance()->get('userInfo');
+        $sessionInfo = session('userInfo');
         if (empty($sessionInfo) && (!isset($_GET['a']) || $_GET['a'] != 'login')) {
             $url = make_url('modules/login/login/login');
-            Session::getInstance()->set('backurl', Request::getCurrentUrl());
+            session('backurl', Request::getCurrentUrl());
             Request::redirect($url);
         }
     }

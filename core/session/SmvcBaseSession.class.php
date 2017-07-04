@@ -185,7 +185,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
      *
      * @return    mixed
      */
-    public function get($name, $default = null)
+    public function get($name = null, $default = null)
     {
         if (is_null($name)) {
             return $this->data;
@@ -222,7 +222,17 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
     public function delete($name)
     {
         SmvcArrayHelper::delete($this->data, $name);
+        $this->write($this->id);
+        return $this;
+    }
 
+    /**
+     * @return $this
+     */
+    public function deleteAll()
+    {
+        $this->data = null;
+        $this->write($this->id);
         return $this;
     }
 
@@ -588,7 +598,7 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
             } // or a string containing the session id
             elseif (is_string($cookie) and strlen($cookie) == 32) {
                 $this->id = $cookie;
-                $cookie = [$cookie];
+                $cookie   = [$cookie];
             } // invalid general format
             else {
                 $cookie = false;

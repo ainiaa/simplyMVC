@@ -590,6 +590,29 @@ function tag($tag, &$params = null)
     }
 }
 
+/**
+ * session 操作
+ *
+ * @param        $name
+ * @param string $value
+ *
+ * @return mixed|SmvcSessionInterface
+ */
+function session($name, $value = '')
+{
+    if ($name === '') { //获取所有的session
+        return Session::getInstance()->get();
+    } else if (is_null($name)) {//清空所有session
+        return Session::getInstance()->deleteAll();
+    } else if ($value === '') {//获取单个session
+        return Session::getInstance()->get($name);
+    } else if (is_null($value)) { //删除单个session
+        return Session::getInstance()->delete($name);
+    } else { //设置session
+        return Session::getInstance()->set($name, $value);
+    }
+}
+
 
 if (!function_exists('com_create_guid')) {
     function com_create_guid()

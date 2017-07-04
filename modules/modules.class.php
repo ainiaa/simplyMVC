@@ -224,11 +224,11 @@ class ModulesController extends BaseController
         $this->assign('title', 'Simply MVC modules');
         $this->initTplComponent();
 
-        $sessionInfo = Session::getInstance()->get('userInfo');
+        $sessionInfo = session('userInfo');
         if (empty($sessionInfo) && (!isset($_GET['a']) || $_GET['a'] != 'login')) { //这个需要修改
-            $current_url = get_current_url();
-            header('Location:/index.php?g=modules&m=login&c=login&a=login&from_url='.urlencode($current_url));
-            exit;
+            $currentUrl = get_current_url();
+            session('backurl', $currentUrl);
+            Request::redirect(make_url('modules/login/login/login'));
         }
     }
 

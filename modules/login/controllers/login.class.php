@@ -14,7 +14,7 @@ class LoginController extends ModulesController
      */
     public function loginAction()
     {
-        $userInfo = Session::getInstance()->get('userInfo');
+        $userInfo = session('userInfo');
         if ($userInfo) {
             $url = $this->getRedirectUrl('backurl');
             $this->redirect($url);
@@ -26,7 +26,7 @@ class LoginController extends ModulesController
                 if ($adminInfo) {
                     $md5Password = md5($password);
                     if ($md5Password == $adminInfo['password']) { //登录成功
-                        Session::getInstance()->set('userInfo', ['userName' => $userName, 'password' => md5($password)]);
+                        session('userInfo', ['userName' => $userName, 'password' => md5($password)]);
                         $url = $this->getRedirectUrl('backurl');
                         Request::redirect($url);
                     } else {
@@ -48,9 +48,9 @@ class LoginController extends ModulesController
     {
         $url = I($key);
         if (empty($url)) {
-            $url = Session::getInstance()->get($key);
+            $url = session($key);
             if ($cleanCache) {
-                Session::getInstance()->set($key, null);
+                session($key, null);
             }
         }
         if (empty($url) && $withReferer) {
@@ -69,7 +69,7 @@ class LoginController extends ModulesController
      */
     public function logoutAction()
     {
-        Session::getInstance()->delete('userInfo');
+        session('userInfo', null);
         $this->display('login.tpl.html');
     }
 }
