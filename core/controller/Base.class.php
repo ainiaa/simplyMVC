@@ -4,7 +4,7 @@
  * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * 控制器基类 定义了 控制器的基本方法
  */
-class BaseController extends SmvcObject
+abstract class BaseController extends SmvcObject
 {
     /**
      * @var View

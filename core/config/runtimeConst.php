@@ -4,7 +4,7 @@
 
 if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '<')) { //判断php的版本是不是为php5  php5.3.0之后才有匿名函数
     die('require PHP VERSION >= ' . MIN_PHP_VERSION);
-} else if (version_compare(PHP_VERSION, '5.4.0', '<')) {
+} else if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '<')) {
     ini_set('magic_quotes_runtime', 0);
     define('MAGIC_QUOTES_GPC', get_magic_quotes_gpc() ? true : false);
 } else {
@@ -17,7 +17,7 @@ if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '<')) { //判断php的版本�
 !defined('PEAR_DIR') && define('PEAR_DIR', INCLUDE_DIR . '/lib/pear/'); //include目录的地址
 
 //  版本信息
-!defined('SMVC_VERSION') && define('SMVC_VERSION', '0.3.0');
+!defined('SMVC_VERSION') && define('SMVC_VERSION', '0.4.0');
 
 !defined('IS_CGI') && define('IS_CGI', substr(PHP_SAPI, 0, 3) == 'cgi' ? 1 : 0);
 !defined('IS_WIN') && define('IS_WIN', strstr(PHP_OS, 'WIN') ? 1 : 0);

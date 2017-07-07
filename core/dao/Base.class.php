@@ -9,7 +9,7 @@
  *
  * Class BaseDBDAO
  */
-class BaseDAO extends SmvcObject
+abstract class BaseDAO extends SmvcObject
 {
 
 }
