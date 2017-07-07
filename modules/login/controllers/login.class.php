@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Admin
+ * Login module done
  * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/05/27
  */
