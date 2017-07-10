@@ -38,7 +38,7 @@ class CategoryController extends CategoryBaseController
         if (IS_POST) {
             $name           = I('post.name');
             $desc           = I('post.desc');
-            $parentId       = I('post.parentid');
+            $parentId       = I('post.parent_id');
             $parentCategory = $this->CategoryService->getCategoryInfo($parentId);
             $data           = ['name' => $name, 'desc' => $desc, 'parent_id' => $parentId];
             if ($parentCategory) {

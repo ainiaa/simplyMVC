@@ -279,6 +279,7 @@ class BaseDBDAO extends SmvcObject
                             'server'        => $dbConfig['DB_HOST'],
                             'username'      => $dbConfig['DB_USER'],
                             'password'      => $dbConfig['DB_PASS'],
+                            'charset'       => $dbConfig['CHARSET'],
                             'logging'       => isset($dbConfig['LOGGING']) ? $dbConfig['LOGGING'] : false,
                     ]
             );
