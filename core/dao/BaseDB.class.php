@@ -623,24 +623,6 @@ class BaseDBDAO extends SmvcObject
     public function delete($where = [])
     {
         $this->setLatestStorageType(self::WRITE_STORAGE);
-        /*
-        if (method_exists($this, 'preDelete')) {
-            $this->preDelete($where);
-        } else if (method_exists($this, 'defaultPre')) {
-            $this->defaultPre($where);
-        }
-        if ($this->hasError()) {
-            return $this->getError();
-        }
-        $result = $this->getStorage()->delete($this->getTableName(), $where);
-        if (method_exists($this, 'postDelete')) {
-            $result = $this->postDelete($where, $result);
-        } else if (method_exists($this, 'defaultPost')) {
-            $result = $this->defaultPost($where, $result);
-        }
-        if ($this->hasError()) {
-            return $this->getError();
-        }*/
         $result = $this->callChain('delete', [$this->getTableName(), $where], $this->getStorage());
         return $result;
     }

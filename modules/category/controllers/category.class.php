@@ -34,7 +34,8 @@ class CategoryController extends CategoryBaseController
      */
     public function addAction()
     {
-        $this->assign('action', make_url('modules/category/category/add'));
+        $url = make_url();
+        $this->assign('action', $url);
         if (IS_POST) {
             $name           = I('post.name');
             $desc           = I('post.desc');

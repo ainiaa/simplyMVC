@@ -371,9 +371,14 @@ class Request
      * 获得实际的分组名称
      * @return string
      */
-    public static function getGroup()
+    public static function getGroup($default = null)
     {
-        return self::$group;
+        if (self::$group) {
+            $groupName = self::$group;
+        } else {
+            $groupName = $default;
+        }
+        return $groupName;
     }
 
 
@@ -381,11 +386,18 @@ class Request
      * 获得实际的模块名称
      * @access private
      *
+     * @param null $default
+     *
      * @return string
      */
-    public static function getModule()
+    public static function getModule($default = null)
     {
-        return self::$module;
+        if (self::$module) {
+            $moduleName = self::$module;
+        } else {
+            $moduleName = $default;
+        }
+        return $moduleName;
     }
 
 
@@ -393,17 +405,20 @@ class Request
      * 获得实际的控制器名称
      *
      * @param bool $appendSuffer
+     * @param null $default
      *
      * @return string
      */
-    public static function getControllerName($appendSuffer = true)
+    public static function getControllerName($appendSuffer = true, $default = null)
     {
-        if ($appendSuffer) {
-            $controllerName = self::$controller . C('controllerSuffix');
-        } else {
+        if (self::$controller) {
             $controllerName = self::$controller;
+        } else {
+            $controllerName = $default;
         }
-
+        if ($appendSuffer) {
+            $controllerName .= C('controllerSuffix');
+        }
         return $controllerName;
     }
 
@@ -412,15 +427,20 @@ class Request
      * @access public
      *
      * @param bool $appendSuffer
+     * @param null $defalut
      *
      * @return string
      */
-    public static function getActionName($appendSuffer = true)
+    public static function getActionName($appendSuffer = true, $defalut = null)
     {
-        if ($appendSuffer) {
-            $actionName = self::$action . C('actionSuffix');
-        } else {
+        if (self::$action) {
             $actionName = self::$action;
+        } else {
+            $actionName = $defalut;
+        }
+
+        if ($appendSuffer) {
+            $actionName .= C('actionSuffix');
         }
 
         return $actionName;
@@ -813,16 +833,16 @@ class Request
      */
     public static function getCurrentUrl()
     {
-        $urlWithPortFormat    = '%s://%s:%s/%s';
-        $urlWithoutPortFormat = '%s://%s:%s/%s';
+        $urlWithPortFormat    = '%s://%s%s';
+        $urlWithoutPortFormat = '%s://%s:%s%s';
         $serverPort           = self::getServer('SERVER_PORT', '80');
         $serverName           = self::getServer('SERVER_NAME');
         $requestUri           = self::getServer('REQUEST_URI');
         $protocol             = self::getProtocol();
         if ($serverPort == '80' || $serverPort == '443') {
-            $url = sprintf($urlWithoutPortFormat, $protocol, $serverName, $serverPort, $requestUri);
+            $url = sprintf($urlWithPortFormat, $protocol, $serverName, $requestUri);
         } else {
-            $url = sprintf($urlWithPortFormat, $protocol, $serverName, $serverPort, $requestUri);
+            $url = sprintf($urlWithoutPortFormat, $protocol, $serverName, $serverPort, $requestUri);
         }
         return $url;
     }

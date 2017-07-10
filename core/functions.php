@@ -255,19 +255,31 @@ function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = fals
  *
  * @return string
  */
-function make_url($uri_path, $uri_params = '', $with_domain = false)
+function make_url($uri_path = '', $uri_params = '', $with_domain = true)
 {
     $final_url    = '';
-    $uri_path     = explode('/', $uri_path);
-    $uri_path     = array_reverse($uri_path);
-    $uri_path     = array_combine(['action', 'controller', 'module', 'group'], $uri_path);
+    if (empty($uri_path)) {
+        if ($with_domain) {
+            return Request::getCurrentUrl();
+        } else {
+            return Request::getServer('REQUEST_URI');
+        }
+    } else {
+        $uri_path     = explode('/', $uri_path);
+        $uri_path     = array_reverse($uri_path);
+    }
+
     $default_path = [
-            'action'     => C('defaultAction'),
-            'controller' => C('defaultController'),
-            'module'     => C('defaultModule'),
-            'group'      => C('defaultGroup')
+            'action'     => Request::getActionName(false),
+            'controller' => Request::getControllerName(false),
+            'module'     => Request::getModule(),
+            'group'      => Request::getGroup(),
     ];
-    $uri_path     = array_merge($default_path, $uri_path);
+    $keys = array_keys($default_path);
+    for ($i = count($uri_path);$i<count($default_path);$i++) {
+        $uri_path[$i] = $default_path[$keys[$i]];
+    }
+    $uri_path     = array_combine(['action', 'controller', 'module', 'group'], $uri_path);
     $final_url    .= sprintf(
             'index.php?g=%s&m=%s&c=%s&a=%s',
             $uri_path['group'],
@@ -280,9 +292,47 @@ function make_url($uri_path, $uri_params = '', $with_domain = false)
     }
 
     if ($with_domain) {
-        $final_url = get_domain() . $final_url;
+        $final_url = generateUrlByDomainAndRequestUri(get_domain(),$final_url);
     }
     return $final_url;
+}
+
+/**
+ * PS 在配置项 urlMapping 中配置使用
+ * @param $domain
+ * @param $url
+ *
+ * @return string
+ */
+function generateUrlByDomainAndRequestUri($domain, $url)
+{
+    if($domain) {
+        $domain = (is_ssl()?'https://':'http://') . str_replace(['http://','https://'], '', $domain);
+        $domainLatestLetter = substr($domain, -1);
+        $urlFirstLetter     = substr($url, 0, 1);
+        if ($domainLatestLetter == '/' && $urlFirstLetter == '/') {
+            $url = $domain . substr($url, 1);
+        } else if ($domainLatestLetter == '/' || $urlFirstLetter == '/') {
+            $url = $domain . $url;
+        } else {
+            $url = $domain .'/'. $url;
+        }
+    }
+
+    return $url;
+}
+
+/**
+ * 判断是否SSL协议
+ * @return boolean
+ */
+function is_ssl() {
+    if(isset($_SERVER['HTTPS']) && ('1' == $_SERVER['HTTPS'] || 'on' == strtolower($_SERVER['HTTPS']))){
+        return true;
+    }elseif(isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'] )) {
+        return true;
+    }
+    return false;
 }
 
 /**
