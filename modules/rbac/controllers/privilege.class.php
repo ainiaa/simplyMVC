@@ -44,23 +44,11 @@ class PrivilegeController extends AdminController
     public function delPrivAction()
     {
         $id  = I('id');
-        $ret = $this->PrivilegeDAO->delete(['id' =>$id]);
+        $ret = $this->PrivilegeDAO->delete(['id' => $id]);
         if ($ret) {
-            $this->ajaxReturn(
-                    [
-                            'status' => 1,
-                            'info'   => '权限删除成功'
-                    ],
-                    'JSON'
-            );
+            $this->ajaxReturn(['status' => 1, 'info' => '权限删除成功'], 'JSON');
         } else {
-            $this->ajaxReturn(
-                    [
-                            'status' => 0,
-                            'info'   => '权限删除失败'
-                    ],
-                    'JSON'
-            );
+            $this->ajaxReturn(['status' => 0, 'info' => '权限删除失败'], 'JSON');
         }
 
     }
@@ -87,9 +75,9 @@ class PrivilegeController extends AdminController
 
             $res = $this->PrivilegeDAO->add($getPost);
             if ($res) {
-                $this->success('权限添加成功', ['返回列表页' => U('Admin/Privilege/index'),]);
+                $this->success('权限添加成功', ['返回列表页' => make_url('index'),]);
             } else {
-                $this->error('权限添加失败:' . var_export($res, 1) . ' sql:' . M()->_sql());
+                $this->error('权限添加失败:' . var_export($res, 1));
             }
         }
         $this->display();
@@ -109,12 +97,12 @@ class PrivilegeController extends AdminController
             unset($getPost['id']);
             $res = $this->PrivilegeDAO->saveData($getPost, ['id' => $id]);
             if ($res) {
-                $this->success('权限修改成功', ['返回列表页' => U('index'),]);
+                $this->success('权限修改成功', ['返回列表页' => make_url('index'),]);
             } else {
                 $this->error('权限修改失败:' . var_export($res, 1));
             }
         }
-        $id = I('get.id');
+        $id   = I('get.id');
         $info = $this->PrivilegeDAO->getOne(['id' => $id]);
         $this->assign('info', $info);
         $this->display();

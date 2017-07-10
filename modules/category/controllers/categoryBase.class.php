@@ -260,11 +260,7 @@ class CategoryBaseController extends BaseController
     {
         $messageInfo = $this->getMessageInfoByErrno($errno);
         $msg         = isset($messageInfo['errorSoftTxt']) ? $messageInfo['errorSoftTxt'] : $errno;
-        $data        = array(
-                'data'   => 'error',
-                'info'   => $msg,
-                'status' => $errno,
-        );
+        $data        = ['data' => 'error', 'info' => $msg, 'status' => $errno,];
 
         return $data;
     }

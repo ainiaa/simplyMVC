@@ -30,7 +30,7 @@ class MenuController extends AdminController
      */
     public function indexAction()
     {
-        $where      = [];
+        $where = [];
         if (isset($_GET['menu_name']) && $_GET['menu_name']) {
             $where['menu_name'] = ['LIKE', '%' . $_GET['menu_name'] . '%'];
         }
@@ -82,7 +82,7 @@ class MenuController extends AdminController
 
             $res = $this->MenuDAO->add($getPost);
             if ($res) {
-                $this->success('菜单添加成功', ['返回列表页' => make_url('Admin/Menu/index'),]);
+                $this->success('菜单添加成功', ['返回列表页' => make_url('index'),]);
             } else {
                 $this->error('菜单添加失败:' . var_export($res, 1));
             }

@@ -287,7 +287,7 @@ class Request
     /**
      * @return array
      */
-    public static function getRequestUri()
+    public static function parseRequest()
     {
         $group      = self::parseGroup();
         $module     = self::parseModule();

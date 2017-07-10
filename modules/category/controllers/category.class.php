@@ -55,7 +55,7 @@ class CategoryController extends CategoryBaseController
                 $error = $this->CategoryService->getDbError();
                 $this->displayError($error);
             } else {
-                $this->redirect(make_url('modules/category/category/index'));
+                $this->redirect(make_url('index'));
             }
         } else {
             $categoryList           = $this->CategoryService->getCategoryList();
@@ -98,7 +98,7 @@ class CategoryController extends CategoryBaseController
      */
     public function editAction()
     {
-        $this->assign('action', make_url('modules/category/category/edit'));
+        $this->assign('action', make_url('edit'));
         $id = I('id');
         if ($id) {
             if (IS_POST) {
@@ -121,7 +121,7 @@ class CategoryController extends CategoryBaseController
                     $error = $this->CategoryService->getDbError();
                     $this->displayError($error);
                 } else {
-                    $this->redirect(make_url('modules/category/category/index'));
+                    $this->redirect(make_url('index'));
                 }
             } else {//显示
                 $categoryInfo = $this->CategoryService->getCategoryInfo($id);
@@ -156,6 +156,6 @@ class CategoryController extends CategoryBaseController
     {
         $id = I('get.id');
         $this->CategoryService->deleteCategoryById($id);
-        $this->redirect(make_url('modules/category/category/index'));
+        $this->redirect(make_url('index'));
     }
 }

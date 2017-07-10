@@ -14,7 +14,7 @@ class Router
         $urlMapping  = C('URL_MAPPING', []);
         $matchedList = [];
         if ($urlMapping) {
-            $requestInfo      = Request::getRequestUri();
+            $requestInfo      = Request::parseRequest();
             $originGroup      = SmvcArrayHelper::get($requestInfo, 'group');
             $originModule     = SmvcArrayHelper::get($requestInfo, 'module');
             $originController = SmvcArrayHelper::get($requestInfo, 'controller');
@@ -37,7 +37,7 @@ class Router
             $first = $matchedList[0]['mapping'];
             Request::mappingUri($first);
         } else {
-            Request::getRequestUri();
+            Request::parseRequest();
         }
     }
 

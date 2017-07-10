@@ -255,7 +255,7 @@ function trace($value = '[think]', $label = '', $level = 'DEBUG', $record = fals
  *
  * @return string
  */
-function make_url($uri_path = '', $uri_params = '', $with_domain = true)
+function make_url($uri_path = '', $uri_params = [], $with_domain = true)
 {
     $final_url    = '';
     if (empty($uri_path)) {
