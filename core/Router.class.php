@@ -135,7 +135,7 @@ class Router
      *
      * 目前还是使用的tp的代码 还需要整理
      */
-    public static function parseUrl()
+    public static function route()
     {
         self::doUrlMapping();
     }

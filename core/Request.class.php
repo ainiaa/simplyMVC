@@ -823,7 +823,7 @@ class Request
         $_REQUEST = array_merge($_REQUEST, $info);
 
         //解析url
-        Router::parseUrl();
+        Router::route();
 
         Dispatcher::dispatch();
     }

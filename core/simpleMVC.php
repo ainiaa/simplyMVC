@@ -1,9 +1,7 @@
 <?php
 /***
- * 框架入口文件
  * @date   2013-01-30
- * @author Jeff Liu
- * 设置编码为UTF-8 防止因为编码问题导致显示界面错乱
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 header('Content-Type:text/html;charset=utf-8');
 
@@ -23,7 +21,7 @@ class SimpleMVC
         self::init();
 
         //解析url
-        Router::parseUrl();
+        Router::route();
 
         Dispatcher::dispatch();
     }
@@ -79,7 +77,7 @@ class SimpleMVC
         self::loadFramewrok();
 
         // 设定错误和异常处理
-        self::initExceptionHandle();
+        self::initExceptionHandler();
 
         //加载所有的配置文件
         self::initConf();
@@ -95,7 +93,7 @@ class SimpleMVC
      * 设置异常处理
      * @author Jeff Liu<jeff.liu.guo@gmail.com>
      */
-    public static function initExceptionHandle()
+    public static function initExceptionHandler()
     {
         ExceptionHandle::init();
     }
