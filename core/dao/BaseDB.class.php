@@ -96,6 +96,9 @@ class BaseDBDAO extends SmvcObject
     ];
     protected $options = [];
 
+    protected $errCode = 0;//错误代码
+    protected $errInfo = [];//错误信息（详细）
+
     /**
      *
      *
@@ -149,7 +152,6 @@ class BaseDBDAO extends SmvcObject
         }
         return $this->name;
     }
-
 
     /**
      * 是否为1：n的关系
@@ -599,6 +601,15 @@ class BaseDBDAO extends SmvcObject
         }
     }
 
+    /**
+     * 删除数据之前的动作
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+     */
+    protected function preDelete($where)
+    {
+        $this->errCode = '';
+        return true;
+    }
 
     /**
      * 删除数据
@@ -607,41 +618,44 @@ class BaseDBDAO extends SmvcObject
      *
      * @param array $where
      *
-     * @return int The number of rows affected.
+     * @return mixed
      */
     public function delete($where = [])
     {
         $this->setLatestStorageType(self::WRITE_STORAGE);
-
-        return $this->getStorage()->delete($this->getTableName(), $where);
-    }
-
-    /**
-     * 删除数据之前的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function preDelete()
-    {
-    }
-
-    /**
-     * 删除数据之后的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function postDelete()
-    {
+        /*
+        if (method_exists($this, 'preDelete')) {
+            $this->preDelete($where);
+        } else if (method_exists($this, 'defaultPre')) {
+            $this->defaultPre($where);
+        }
+        if ($this->hasError()) {
+            return $this->getError();
+        }
+        $result = $this->getStorage()->delete($this->getTableName(), $where);
+        if (method_exists($this, 'postDelete')) {
+            $result = $this->postDelete($where, $result);
+        } else if (method_exists($this, 'defaultPost')) {
+            $result = $this->defaultPost($where, $result);
+        }
+        if ($this->hasError()) {
+            return $this->getError();
+        }*/
+        $result = $this->callChain('delete', [$this->getTableName(), $where], $this->getStorage());
+        return $result;
     }
 
     /**
      * @param array $where
      *
-     * @return int The number of rows.
+     * @return mixed
      */
     public function getCount($where)
     {
         $this->setLatestStorageType(self::READ_STORAGE);
+        $result = $this->callChain('count', [$this->getTableName(), $where], $this->getStorage());
 
-        return $this->getStorage()->count($this->getTableName(), $where);
+        return $result;
     }
 
     /**
@@ -654,7 +668,8 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->max($this->getTableName(), $column, $where);
+        $result = $this->callChain('max', [$this->getTableName(), $column, $where], $this->getStorage());
+        return $result;
     }
 
     /**
@@ -667,7 +682,8 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->min($this->getTableName(), $column, $where);
+        $result = $this->callChain('min', [$this->getTableName(), $column, $where], $this->getStorage());
+        return $result;
     }
 
     /**
@@ -680,7 +696,8 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->avg($this->getTableName(), $column, $where);
+        $result = $this->callChain('avg', [$this->getTableName(), $column, $where], $this->getStorage());
+        return $result;
     }
 
     /**
@@ -693,7 +710,8 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->sum($this->getTableName(), $column, $where);
+        $result = $this->callChain('sum', [$this->getTableName(), $column, $where], $this->getStorage());
+        return $result;
     }
 
     /**
@@ -705,7 +723,8 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->has($this->getTableName(), $where);
+        $result = $this->callChain('has', [$this->getTableName(), $where], $this->getStorage());
+        return $result;
     }
 
     /**
@@ -718,7 +737,8 @@ class BaseDBDAO extends SmvcObject
     {
         $this->setLatestStorageType(self::READ_STORAGE);
 
-        return $this->getStorage()->has($this->getTableName(), $join, $where);
+        $result = $this->callChain('has', [$this->getTableName(), $join, $where], $this->getStorage());
+        return $result;
     }
 
     /**
@@ -739,8 +759,8 @@ class BaseDBDAO extends SmvcObject
                 $type = self::WRITE_STORAGE;
             }
         }
-        $return = $this->getStorage($type)->query($query);
-        return $return;
+        $result = $this->callChain('query', [$query], $this->getStorage($type));
+        return $result;
     }
 
     /**
@@ -1587,6 +1607,78 @@ class BaseDBDAO extends SmvcObject
     public function log()
     {
         return $this->getStorage()->log();
+    }
+
+    /**
+     * 是否有错误
+     * @return bool
+     */
+    public function hasError()
+    {
+        if ($this->errCode === '' || $this->errCode === '00000') {
+            return false;
+        }
+        return true;
+    }
+
+    public function getError()
+    {
+        return $this->errInfo;
+    }
+
+    /**
+     * getCount之后面的动作
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+     */
+    protected function defaultPre($args)
+    {
+        $this->errCode = '';
+        return true;
+    }
+
+    /**
+     * getCount之后面的动作
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
+     */
+    protected function defaultPost($args, $result)
+    {
+        if ($result instanceof PDOStatement) {
+            $this->errCode = $result->errorCode();
+            $this->errInfo = $result->errorInfo();
+            return $result;
+        }
+        return $result;
+    }
+
+    /**
+     * @param $method
+     * @param $args
+     * @param $obj
+     *
+     * @return array|mixed
+     */
+    protected function callChain($method, $args, $obj)
+    {
+        $preMethod = 'pre' . ucfirst($method);
+        if (method_exists($this, $preMethod)) {
+            $this->$preMethod($args);
+        } else if (method_exists($this, 'defaultPre')) {
+            $this->defaultPre($args);
+        }
+        if ($this->hasError()) {
+            return $this->getError();
+        }
+        $result     = call_user_func_array([$obj, $method], $args);
+        $postMethod = 'post' . ucfirst($method);
+        if (method_exists($this, $postMethod)) {
+            $result = $this->$postMethod($args, $result);
+        } else if (method_exists($this, 'defaultPost')) {
+            $result = $this->defaultPost($args, $result);
+        }
+        if ($this->hasError()) {
+            return $this->getError();
+        }
+        return $result;
     }
 
 }

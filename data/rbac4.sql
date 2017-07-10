@@ -1,6 +1,6 @@
 /*
 SQLyog Ultimate v12.09 (64 bit)
-MySQL - 5.5.40 : Database - smvc_test_master
+MySQL - 5.5.40 : Database - smvc_test_slave
 *********************************************************************
 */
 
@@ -12,9 +12,9 @@ MySQL - 5.5.40 : Database - smvc_test_master
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`smvc_test_master` /*!40100 DEFAULT CHARACTER SET utf8 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`smvc_test_slave` /*!40100 DEFAULT CHARACTER SET utf8 */;
 
-USE `smvc_test_master`;
+USE `smvc_test_slave`;
 
 /*Table structure for table `smvc_admin` */
 
@@ -22,9 +22,9 @@ DROP TABLE IF EXISTS `smvc_admin`;
 
 CREATE TABLE `smvc_admin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_name` varchar(45) DEFAULT NULL,
-  `password` char(35) DEFAULT NULL,
-  `email` varchar(45) DEFAULT NULL,
+  `user_name` varchar(45) NOT NULL,
+  `password` char(35) NOT NULL,
+  `email` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
@@ -47,11 +47,11 @@ CREATE TABLE `smvc_category` (
   `parent_id` int(11) NOT NULL DEFAULT '0' COMMENT '父类ID',
   `path` mediumtext NOT NULL,
   `depth` tinyint(4) NOT NULL DEFAULT '1' COMMENT '深度',
-  `order_by` int(11) DEFAULT NULL COMMENT '排序',
-  `created_by` int(11) DEFAULT NULL COMMENT '创建人ID',
-  `created_at` int(11) DEFAULT NULL COMMENT '创建时间',
-  `updated_by` int(11) DEFAULT NULL COMMENT '更新人ID',
-  `updated_at` int(11) DEFAULT NULL COMMENT '更新时间',
+  `order_by` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
+  `created_by` int(11) NOT NULL DEFAULT '0' COMMENT '创建人ID',
+  `created_at` int(11) NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `updated_by` int(11) NOT NULL DEFAULT '0' COMMENT '更新人ID',
+  `updated_at` int(11) NOT NULL DEFAULT '0' COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
