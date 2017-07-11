@@ -752,6 +752,23 @@ abstract class SmvcBaseSession implements SmvcSessionInterface
 
         return $validated;
     }
+
+    protected $status = '';
+
+    public function start($id)
+    {
+        // TODO: Implement start() method.
+    }
+
+    public function pause($id)
+    {
+        // TODO: Implement pause() method.
+    }
+
+    public function stop($id)
+    {
+        // TODO: Implement stop() method.
+    }
 }
 
 

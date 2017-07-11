@@ -648,7 +648,7 @@ function tag($tag, &$params = null)
  *
  * @return mixed|SmvcSessionInterface
  */
-function session($name, $value = '')
+function session($name = '', $value = '')
 {
     if ($name === '') { //获取所有的session
         return Session::getInstance()->get();
@@ -658,7 +658,13 @@ function session($name, $value = '')
         return Session::getInstance()->get($name);
     } else if (is_null($value)) { //删除单个session
         return Session::getInstance()->delete($name);
-    } else { //设置session
+    } else if ($name === '[start]'){
+        return Session::getInstance()->start();
+    } else if ($name === '[pause]'){
+        return Session::getInstance()->pause();
+    }else if ($name === '[stop]'){
+        return Session::getInstance()->stop();
+    }else{ //设置session
         return Session::getInstance()->set($name, $value);
     }
 }
