@@ -16,11 +16,9 @@ return [
         CORE_DIR . 'dao/BaseRedisDBDAO.class.php',
         CORE_DIR . 'dao/UserSplitDBDAO.class.php',
         CORE_DIR . 'service/BaseService.class.php',
-        CORE_DIR . 'service/UserSplitService.class.php',
         CORE_DIR . 'view/View.class.php',
         CORE_DIR . 'SmvcConf.class.php',
         CORE_DIR . 'functions.php',
-        CORE_DIR . 'exception/ExceptionHandle.class.php',
-        VENDOR_DIR . '/FirePHP.class.php',
+        CORE_DIR . 'exception/ExceptionHandler.class.php',
         VENDOR_DIR . '/Medoo/Medoo.php',
 ];

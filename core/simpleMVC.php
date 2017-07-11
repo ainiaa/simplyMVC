@@ -95,7 +95,7 @@ class SimpleMVC
      */
     public static function initExceptionHandler()
     {
-        ExceptionHandle::init();
+        ExceptionHandler::init();
     }
 
     /**

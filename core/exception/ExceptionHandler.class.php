@@ -4,7 +4,7 @@
  * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * Class ExceptionHandle
  */
-class ExceptionHandle
+class ExceptionHandler
 {
     /**
      * 自定义异常处理
@@ -91,8 +91,8 @@ class ExceptionHandle
             ini_set('display_errors', 'off');
         }
 
-        register_shutdown_function(['ExceptionHandle', 'fatalError']);
-        set_error_handler(['ExceptionHandle', 'appError']);
-        set_exception_handler(['ExceptionHandle', 'appException']);
+        register_shutdown_function(['ExceptionHandler', 'fatalError']);
+        set_error_handler(['ExceptionHandler', 'appError']);
+        set_exception_handler(['ExceptionHandler', 'appException']);
     }
 }
