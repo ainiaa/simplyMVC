@@ -93,27 +93,6 @@ class Router
         return $compare;
     }
 
-    /**
-     * @param $value
-     *
-     * @return array|string
-     */
-    public static function stripSlashesDeep($value)
-    {
-        if (is_array($value)) {
-            foreach ($value as $k => $v) {
-                if (is_array($v)) {
-                    $value[$k] = self::stripSlashesDeep($v);
-                } else {
-                    $value[$k] = stripslashes($v);
-                }
-            }
-        } else {
-            $value = stripslashes($value);
-        }
-
-        return $value;
-    }
 
     /**
      * URL组装 支持不同URL模式

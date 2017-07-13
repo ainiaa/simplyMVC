@@ -506,13 +506,9 @@ class Request
                     $headers[$k] = $value;
                 }
 
-                $value = self::getServer(
-                        'Content_Type',
-                        self::getServer('Content-Type')
+                $value = self::getServer('Content_Type', self::getServer('Content-Type')
                 ) and $headers['Content-Type'] = $value;
-                $value = self::getServer(
-                        'Content_Length',
-                        self::getServer('Content-Length')
+                $value = self::getServer('Content_Length', self::getServer('Content-Length')
                 ) and $headers['Content-Length'] = $value;
             } else {
                 $headers = getallheaders();
@@ -846,6 +842,12 @@ class Request
         }
         return $url;
     }
+
+    public function getMethod()
+    {
+        return self::getServer('REQUEST_METHOD', 'GET');
+    }
+
 
     /**
      * @var string 分组名称
