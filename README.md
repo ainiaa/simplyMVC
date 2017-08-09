@@ -11,7 +11,6 @@
 3、Conf配置的具体实现 (使用第三方 + 修改)   `doing`  -- required
 
    * core/SmvcConf.class.php  <font color="green">`done`</font>
-   * based on Configula `pending`  -- optional
 
 4、template的具体实现 `doing`  -- optional
 
@@ -70,7 +69,7 @@
    * RBAC   `pending`
    * ACL   `pending`
 
-14、 UnitTest 集成  `pending`  -- required UT必须要弄 不能想这么就怎么。。
+14、 UnitTest 集成  `pending`  -- required 
 
    * PHPUnit `pending`
    * simpletest `pending`
