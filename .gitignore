@@ -222,3 +222,12 @@ pip-log.txt
 #################
 .idea
 frontend/default/templates_c/hello_world.tpl.html.php
+*.lock
+
+
+########################
+##composer autoload
+########################
+include/composer.phar
+include/vendor/
+

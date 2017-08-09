@@ -3,19 +3,16 @@
 class Crypt
 {
 
-    /*
-     * Crypto object used to encrypt/decrypt
-     *
-     * @var	encrypt
+
+    /**
+     * @var phpseclib\Crypt\AES
      */
-    private static $crypter = null;
+    private static $crypter;
 
     /*
-     * Hash object used to generate hashes
-     *
-     * @var	object
+     * @var	phpseclib\Crypt\Hash
      */
-    private static $hasher = null;
+    private static $hasher;
 
     /*
      * Crypto configuration
@@ -32,14 +29,14 @@ class Crypt
     public static function _init()
     {
         if (empty(self::$inited)) {
-            self::$crypter = new Crypt_AES();
-            self::$hasher  = new Crypt_Hash('sha256');
+            self::$crypter = new \phpseclib\Crypt\AES();
+            self::$hasher  = new \phpseclib\Crypt\Hash('sha256');
 
             self::$config = C('crypt', []);
 
             // generate random crypto keys if we don't have them or they are incorrect length
             $update = false;
-            foreach (array('crypto_key', 'crypto_iv', 'crypto_hmac') as $key) {
+            foreach (['crypto_key', 'crypto_iv', 'crypto_hmac'] as $key) {
                 if (empty(self::$config[$key]) or (strlen(self::$config[$key]) % 4) != 0) {
                     $crypto = '';
                     for ($i = 0; $i < 8; $i++) {
@@ -59,7 +56,6 @@ class Crypt
             }
 
             self::$crypter->enableContinuousBuffer();
-
             self::$hasher->setKey(self::safe_b64decode(self::$config['crypto_hmac']));
             self::$inited = true;
         }
@@ -78,7 +74,6 @@ class Crypt
     public static function encode($value, $key = false)
     {
         self::_init();
-
         $key ? self::$crypter->setKey($key) : self::$crypter->setKey(
                 self::safe_b64decode(self::$config['crypto_key'])
         );
@@ -101,7 +96,7 @@ class Crypt
      */
     public static function decode($value, $key = false)
     {
-//        return $value;
+        //        return $value;
         self::_init();
         $key ? self::$crypter->setKey($key) : self::$crypter->setKey(
                 self::safe_b64decode(self::$config['crypto_key'])
@@ -121,13 +116,13 @@ class Crypt
     private static function safe_b64encode($value)
     {
         $data = base64_encode($value);
-        $data = str_replace(array('+', '/', '='), array('-', '_', ''), $data);
+        $data = str_replace(['+', '/', '='], ['-', '_', ''], $data);
         return $data;
     }
 
     private static function safe_b64decode($value)
     {
-        $data = str_replace(array('-', '_'), array('+', '/'), $value);
+        $data = str_replace(['-', '_'], ['+', '/'], $value);
         $mod4 = strlen($data) % 4;
         if ($mod4) {
             $data .= substr('====', $mod4);

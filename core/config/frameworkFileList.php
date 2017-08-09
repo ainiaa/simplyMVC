@@ -20,5 +20,4 @@ return [
         CORE_DIR . 'SmvcConf.class.php',
         CORE_DIR . 'functions.php',
         CORE_DIR . 'exception/ExceptionHandler.class.php',
-        VENDOR_DIR . '/Medoo/Medoo.php',
 ];

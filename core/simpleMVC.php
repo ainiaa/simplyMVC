@@ -146,6 +146,11 @@ class SimpleMVC
      */
     public static function initAutoLoad()
     {
+        $autoload = ROOT_DIR .'include/vendor/autoload.php';
+        if (file_exists($autoload)) {
+            include $autoload;
+        }
+
         if (function_exists('spl_autoload_register')) {
             spl_autoload_register(['Importer', 'autoLoad']);
         } else {
