@@ -114,8 +114,8 @@ class SimpleMVC
      */
     private static function loadFramewrok()
     {
-        $needLoadFileOneByOne   = true;//单文件加载
-        $needCreateAllInOneFile = false;//
+        $needLoadFileOneByOne   = true;
+        $needCreateAllInOneFile = false;
         if (defined('USE_ALLINONE_CACHE') && USE_ALLINONE_CACHE) {
             if (file_exists(self::$frameFileAllInOne) && is_readable(self::$frameFileAllInOne)) {
                 $loadResult = Importer::importFileByFullPath(self::$frameFileAllInOne);
@@ -146,9 +146,9 @@ class SimpleMVC
      */
     public static function initAutoLoad()
     {
-        $autoload = ROOT_DIR .'include/vendor/autoload.php';
-        if (file_exists($autoload)) {
-            include $autoload;
+        $composerLoadFile = ROOT_DIR . 'include/vendor/autoload.php';
+        if (file_exists($composerLoadFile)) {
+            include $composerLoadFile;
         }
 
         if (function_exists('spl_autoload_register')) {
@@ -184,8 +184,7 @@ class SimpleMVC
         $isAjax = false;
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower(
                         $_SERVER['HTTP_X_REQUESTED_WITH']
-                ) == 'xmlhttprequest'
-        ) {
+                ) == 'xmlhttprequest') {
             $isAjax = true;
         } elseif (isset($_POST[VAR_AJAX_SUBMIT]) && $_POST[VAR_AJAX_SUBMIT]) {
             $isAjax = true;
