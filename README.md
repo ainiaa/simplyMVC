@@ -16,7 +16,7 @@
 
    * 使用 原生态的PHP 作为模板语言  <font color="green">`done`</font>
    * 使用 smarty (太庞大了)  <font color="green">`done`</font>
-   * 使用 twing  `pending` -- optional
+   * 使用 twig  <font color="green">`done`</font>
    * 使用 bootstrap  `pending` -- optional
 
 5、session 的具体实现   <font color="green">`done`</font>
@@ -26,9 +26,6 @@
    * redis <font color="green">`done`</font>
 
 6、db的 具体实现   `done`
-
-   * db 分库   `done`
-   * db 分表   `done`
 
 7、ORM的具体实现   `pending`   -- optional
 

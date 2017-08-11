@@ -2,7 +2,7 @@
 $currentTime      = time();
 $currentMicroTime = microtime(true);
 return [
-        'DS'                       => DIRECTORY_SEPARATOR,//目录分隔符
+        'DS'                       => DS,//目录分隔符
         'smvcDebug'                => true,//是否为debug模式
         'debugMode'                => 1,//1:直接信息输出简单的调试信息,2:将简单的调试信息写入文件,3:直接输出复杂的调试信息,4:将复杂的调试信息写入文件
         'site_url'                 => '',//网站url

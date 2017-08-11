@@ -45,16 +45,3 @@
            * [数据库分库技巧](http://wenku.baidu.com/link?url=DvH7E3jZE72Id7jESFNbm5QVS4wWO_YFK54rqsQhIrXa-TMmZPOzXD707DHj7JUTVT20jIY8DTrtzyKR-jdsDsQAikpuH8u4J_10oec3g_i "数据库分库技巧")
            * [MYSQL分库分表总结](http://wentao365.iteye.com/blog/1740874 "MYSQL分库分表总结")
            * [Mysql分表策略及实现](http://gubaojian.blog.163.com/blog/static/16617990820133183334047/ "Mysql分表策略及实现")
-2、http://www.cnblogs.com/leonkao/p/laravel-composer.html  composer 介绍
-
-3、template 可以支持
-
-   * 使用 原生态的PHP 作为模板语言
-   * 使用 smarty (太庞大了)
-   * 使用 Twig
-   * 使用 bootstrap
-
-4、redis 相关
-   * https://github.com/salimane/rediscluster-php/blob/master/src/RedisCluster/RedisCluster.php
-   * https://github.com/ysbaddaden/php5-redis/blob/master/lib/Redis/Client.php
-   * https://github.com/s1lent1um/phpredis-proxy/blob/master/RedisProxy.php
