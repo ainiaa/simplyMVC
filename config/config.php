@@ -9,7 +9,7 @@ return [
         'defaultController'      => 'default',
         'defaultAction'          => 'index',
         'charset'                => 'UTF-8',
-        'viewEngine'             => 'SmvcTemplate', //'Smarty', //视图engine
+        'viewEngine'             => 'Twig', //'Smarty', //视图engine
     //        'viewEnginePath'    => ROOT_DIR . 'include/vendor/Smarty/Smarty.class.php', //视图engine 所在位置
         'viewEnginePath'         => CORE_DIR . 'view/SmvcTemplate.class.php', //视图engine 所在位置
         'viewEngineConf'         => [ //视图engine相关配置

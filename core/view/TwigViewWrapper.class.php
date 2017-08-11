@@ -1,164 +1,69 @@
 <?php
 
-class View
+class TwigViewWrapper
 {
-    public $tpl_vars = [];
+    public $tplVars = [];
 
     /**
-     *  模板引擎实例
-     * @var Object
+     * @var Twig_Environment
      */
-    private $engine = null;
-
-    private static $instance = null;
-
-    private $vars = [];
+    private $ViewEngine = null;
 
     /**
      * @var array
      */
-    public $engineConfig = [ //视图engine相关配置
-                             'caching'         => false, //是否使用缓存，项目在调试期间，不建议启用缓存
-                             'template_dir'    => '@/templates', //设置模板目录
-                             'compile_dir'     => '@/templates_c', //设置编译目录
-                             'cache_dir'       => '@/smarty_cache', //缓存文件夹
-                             'cache_lifetime'  => 3600, // 缓存更新时间, 默认 3600 秒
-                             'force_compile'   => false,
-                             'left_delimiter'  => '<{', // smarty左限定符
-                             'right_delimiter' => '}>', // smarty右限定符
-                             'auto_literal'    => true, // Smarty3新特性
-    ];
+    public $viewEngineConfig = [];
 
-    /**
-     * @return View
-     */
-    public static function getInstance()
-    {
-        if (null === self::$instance) {
-            self::$instance = new View();
-        }
-
-        return self::$instance;
-    }
-
-    private function __construct()
+    public function __construct()
     {
         $this->init();
     }
 
-    public function setEngine($engine)
+    /**
+     * @return Twig_Environment
+     */
+    public function getViewEngine()
     {
-        if (C('viewEnginePath')) {
-            Importer::importFileByFullPath(C('viewEnginePath'));
-        }
-        $this->engine = new $engine();
+        return $this->ViewEngine;
     }
 
-    /**
-     * @return null|Object
-     */
-    public function getEngine()
+    private function init()
     {
-        return $this->engine;
-    }
-
-    /**
-     *
-     * 初始化视图
-     */
-    public function init()
-    {
-        $engine = C('viewEngine');
         if (C('viewEngineConf')) {
-            $this->engineConfig = C('viewEngineConf');
+            $this->viewEngineConfig = C('viewEngineConf');
         }
 
-        $groupName  = Request::getGroup();
-        $moduleName = Request::getModule();
-
-        switch ($engine) {
-            case 'smarty':
-                $this->initSmarty($groupName, $moduleName);
-                break;
-            case 'twig':
-                $this->initTwig($groupName, $moduleName);
-                break;
-            default:
-                $this->setEngine($engine);
-                $this->initDefaultEngine($groupName, $moduleName);
-        }
-    }
-
-    public function initDefaultEngine($groupName, $moduleName)
-    {
-        $engineVars = get_class_vars(get_class($this->engine));
-        foreach ((array)$this->engineConfig as $key => $value) {
-            $value = str_replace('@', ROOT_DIR . $groupName . '/' . $moduleName, $value);
-            if (isset($engineVars[$key])) {
-                $this->engine->{$key} = $value;
-            }
-        }
-    }
-
-    public function initSmarty($groupName, $moduleName)
-    {
-        $engineVars = get_class_vars(get_class($this->engine));
-        foreach ((array)$this->engineConfig as $key => $value) {
-            $value = str_replace('@', ROOT_DIR . $groupName . '/' . $moduleName, $value);
-            if (isset($engineVars[$key])) {
-                $this->engine->{$key} = $value;
-            } elseif ('template_dir' == $key) { //@see http://www.smarty.net/docs/zh_CN/variable.template.dir.tpl   自从smarty 3.1 之后 在Smarty 3.1之后，$template_dir属性不能直接访问，需使用 getTemplateDir()， setTemplateDir() 和 addTemplateDir()来进行存取。
-                $this->engine->setTemplateDir($value);
-            } elseif ('compile_dir' == $key) { //@see http://www.smarty.net/docs/zh_CN/variable.compile.dir.tpl   在Smarty 3.1之后，$cache_dir属性不能直接访问，需使用getCompileDir() 和 setCompileDir() 来进行存取。
-                $this->engine->setCompileDir($value);
-            }
-        }
-    }
-
-    public function initTwig($groupName, $moduleName)
-    {
-        $templateDir = isset($this->engineConfig['template_dir']) ? $this->engineConfig['template_dir'] : '';
+        $groupName   = Request::getGroup();
+        $moduleName  = Request::getModule();
+        $templateDir = isset($this->viewEngineConfig['template_dir']) ? $this->viewEngineConfig['template_dir'] : 'template';
         $templateDir = str_replace('@', ROOT_DIR . $groupName . '/' . $moduleName, $templateDir);
-        $compileDir  = isset($this->engineConfig['compile_dir']) ? $this->engineConfig['compile_dir'] : '';
-        $compileDir  = str_replace('@', ROOT_DIR . $groupName . '/' . $moduleName, $compileDir);
+        $cache       = isset($this->viewEngineConfig['cache']) ? $this->viewEngineConfig['cache'] : false;
+        if ($cache && is_string($cache)) {
+            $cache = str_replace('@', ROOT_DIR . $groupName . '/' . $moduleName, $cache);
 
-        $this->engineConfig['cache'] = $compileDir;
-        $loader                      = new Twig_Loader_Filesystem($templateDir);
-        $twig                        = new Twig_Environment($loader, $this->engineConfig);
-        $this->engine                = $twig;
+            $this->viewEngineConfig['cache'] = $cache;
+        }
+        $loader           = new Twig_Loader_Filesystem($templateDir, ROOT_DIR);
+        $twig             = new Twig_Environment($loader, $this->viewEngineConfig);
+        $this->ViewEngine = $twig;
     }
 
 
     /**
-     * @param $var
+     * @param $key
      * @param $value
      *
-     * @return mixed
+     * @return void
      */
-    public function assign($var, $value)
+    public function assign($key, $value = '')
     {
-        if (method_exists($this->engine, 'assign')) {
-            return $this->engine->assign($var, $value);
-        } else {
-            $this->vars[$var] = $value;
-            return true;
+        if (is_scalar($key)) {
+            $this->tplVars[$key] = $value;
+        } else if (is_array($key)) {
+            foreach ($key as $index => $item) {
+                $this->tplVars[$index] = $item;
+            }
         }
-
-    }
-
-    /**
-     * @param $file
-     *
-     * @return mixed
-     */
-    public function fetch($file)
-    {
-        if (method_exists($this->engine, 'fetch')) {
-            return $this->engine->fetch($file);
-        } else {
-            return include $file;
-        }
-
     }
 
     /**
@@ -168,21 +73,28 @@ class View
      */
     public function get($var = null)
     {
-        if (method_exists($this->engine, 'get')) {
-            return $this->engine->get($var);
-        } else {
-            return isset($this->vars[$var]) ? $this->vars[$var] : null;
+        if ($var) {
+            return isset($this->tplVars[$var]) ? $this->tplVars[$var] : '';
         }
+        return $this->tplVars;
     }
 
     /**
-     * @param $file
-     *
-     * @return mixed
+     * @param       $file
+     * @param array $context
      */
-    public function display($file)
+    public function display($file, $context = [])
     {
-        return $this->engine->display($file);
+        $this->ViewEngine->display($file, array_merge($this->tplVars, $context));
+    }
+
+    /**
+     * @param       $file
+     * @param array $context
+     */
+    public function render($file, $context = [])
+    {
+        $this->ViewEngine->render($file, array_merge($this->tplVars, $context));
     }
 
     /**
@@ -193,6 +105,6 @@ class View
      */
     public function __call($method, $args)
     {
-        return $this->engine->$method($args);
+        return $this->ViewEngine->$method($args);
     }
 }
