@@ -16,7 +16,8 @@ return [
                 CORE_DIR . 'helper',
                 CORE_DIR . 'session',
                 CORE_DIR . 'exception',
-                INCLUDE_DIR . 'vendor'
+                INCLUDE_DIR . 'vendor',
+                ROOT_DIR .'include/lib/twigext',
         ],
         'defaultLocal'             => 'en_us',//默认语言
         'routerFilterMode'         => 'blacklist',//开启 路由过滤 whiteList:开启白名单, blacklist:开启黑名单, none:不过滤

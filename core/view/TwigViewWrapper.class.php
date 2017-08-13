@@ -43,8 +43,9 @@ class TwigViewWrapper
 
             $this->viewEngineConfig['cache'] = $cache;
         }
-        $loader           = new Twig_Loader_Filesystem($templateDir, ROOT_DIR);
-        $twig             = new Twig_Environment($loader, $this->viewEngineConfig);
+        $loader   = new Twig_Loader_Filesystem($templateDir, ROOT_DIR);
+        $twig     = new Twig_Environment($loader, $this->viewEngineConfig);
+        $twig->addExtension(new Project_Twig_Extension());
         $this->ViewEngine = $twig;
     }
 

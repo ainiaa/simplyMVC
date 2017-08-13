@@ -127,7 +127,7 @@ class CategoryService
             $labelId = $labelName;
         }
         $selectorHtml = <<< HTML
-            <select name="{$labelName}" id="{$labelId}">
+            <select name="{$labelName}" id="{$labelId}" class="form-control">
                 <option value="0">--请选择--</option> 
 HTML;
 

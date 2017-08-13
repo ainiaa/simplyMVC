@@ -19,12 +19,12 @@ class CategoryController extends CategoryBaseController
     public function indexAction()
     {
         $categoryList = $this->CategoryService->getCategoryList();
-        $this->assign('list', $categoryList);
 
-        $this->setMainTpl('category_list.tpl.html');
+        $this->assign('list', $categoryList);
         $this->assign('title', 'Simply MVC backend - table list');
         $this->assign('tableHeaderList', ['id', 'name', 'desc', 'parent_id', 'path', 'depth']);
 
+        $this->setMainTpl('category_list.tpl.html');
         $this->display();
     }
 
