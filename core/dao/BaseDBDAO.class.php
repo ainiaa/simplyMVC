@@ -17,8 +17,8 @@ class BaseDBDAO extends SmvcObject
     const SELECT_TYPE_ONE = 1; // 1：获得一条满足条件的记录
     const SELECT_TYPE_FIELD = 2; // 2:获得一条满足条件的记录中的某些字段
 
-    protected static $writeKey = 'db.master';
-    protected static $readKey = 'db.slave';
+    protected static $dbKey = 'db';
+
     protected $name = '';// 模型名称
     protected $dbName = '';// 数据库名称
     protected $connection = '';//数据库配置
@@ -37,7 +37,7 @@ class BaseDBDAO extends SmvcObject
      * 写操作对应的storage
      * @var Medoo
      */
-    protected $writerStorage = null;
+    protected $storage = null;
 
     /**
      * 最后一次使用的storage
@@ -92,7 +92,7 @@ class BaseDBDAO extends SmvcObject
             'validate',
             'result',
             'bind',
-            'token'
+            'token',
     ];
     protected $options = [];
 
@@ -109,14 +109,6 @@ class BaseDBDAO extends SmvcObject
     public function __construct($name = '', $tablePrefix = '', $connection = '')
     {
         parent::__construct();
-
-        if (empty(self::$writeKey) || !is_scalar(self::$writeKey)) {
-            self::$writeKey = 'db.master';
-        }
-
-        if (empty(self::$readKey) || !is_scalar(self::$readKey)) {
-            self::$readKey = 'db.slave';
-        }
 
         // 获取模型名称
         if (!empty($name)) {
@@ -137,7 +129,7 @@ class BaseDBDAO extends SmvcObject
             $this->tablePrefix = $this->tablePrefix ? $this->tablePrefix : C('DB_PREFIX');
         }
 
-        $this->connect(false); //先初始化一个读取db实例  todo 真的有这个必要吗？？
+        $this->connect(); //先初始化一个读取db实例  todo 真的有这个必要吗？？
     }
 
     /**
@@ -228,14 +220,9 @@ class BaseDBDAO extends SmvcObject
         return $ret;
     }
 
-
-    /**
-     * todo 数据库 原理上来说可以通用。可以提到一个公用的地方 统一处理
-     */
     public function initDb()
     {
-        $this->initWriteStorage();
-        $this->initReadStorage();
+        $this->initStorage();
     }
 
 
@@ -244,17 +231,13 @@ class BaseDBDAO extends SmvcObject
      * @author Jeff Liu
      * @return Medoo
      */
-    public function initWriteStorage()
+    public function initStorage()
     {
-        if (empty($this->writerStorage)) {
-            $masterIndex         = $this->getDbMasterIndex();
-            $dbMasterConfig      = C(self::$writeKey);
-            $masterConifg        = $dbMasterConfig[$masterIndex];
-            $this->writerStorage = $this->getDbInstance($masterConifg);
-            $this->setTableName($masterConifg);
-        }
+        $dbMasterConfig = C(self::$dbKey);
+        $this->storage  = $this->getDbInstance($dbMasterConfig);
+        $this->setTableName($dbMasterConfig);
 
-        return $this->writerStorage;
+        return $this->storage;
     }
 
     /**
@@ -290,43 +273,6 @@ class BaseDBDAO extends SmvcObject
     }
 
     /**
-     * @return int|mixed
-     */
-    public function getDbMasterIndex()
-    {
-        $dbMasterConfig = C(self::$writeKey);
-        $userSplit      = LocalCache::getData('userSplit');
-        if ($userSplit && C('useUserSplit', false)) {
-            $masterIndex = isset($userSplit['db']) ? $userSplit['db'] : 0;
-        } else {
-            $masterIndex = array_rand($dbMasterConfig);
-        }
-
-        return $masterIndex;
-    }
-
-    /**
-     * @return Medoo
-     */
-    public function initReadStorage()
-    {
-        if (empty($this->readerStorage)) {
-            if (C('open_rw')) {
-                $masterIndex         = $this->getDbMasterIndex();
-                $dbSlaveConfig       = C(self::$readKey);
-                $slaveIndex          = array_rand($dbSlaveConfig[$masterIndex]);
-                $slaveConifg         = $dbSlaveConfig[$masterIndex][$slaveIndex];
-                $this->readerStorage = $this->getDbInstance($slaveConifg);
-                $this->setTableName($slaveConifg);
-            } else {
-                $this->readerStorage = $this->initWriteStorage();
-            }
-        }
-
-        return $this->readerStorage;
-    }
-
-    /**
      * @param $dbConfig
      *
      * @return $this
@@ -338,28 +284,6 @@ class BaseDBDAO extends SmvcObject
             $this->realTableName = $dbPrefix . $this->tableName;
         }
         return $this;
-    }
-
-    /**
-     * 设置最后一次 storage type
-     *
-     * @param $type
-     */
-    public function setLatestStorageType($type)
-    {
-        if ($type === self::WRITE_STORAGE || $type === self::READ_STORAGE) {
-            $this->latestStorageType = $type;
-        }
-    }
-
-    /**
-     * 获得最后一次的storage type
-     *
-     * @return String
-     */
-    public function getLatestStorageType()
-    {
-        return $this->latestStorageType;
     }
 
     /**
@@ -375,50 +299,20 @@ class BaseDBDAO extends SmvcObject
      */
     public function add($data)
     {
-        $this->setLatestStorageType(self::WRITE_STORAGE);
         $tableName = $this->getTableName();
         return $this->getStorage()->insert($tableName, $data);
     }
 
     /**
-     * @param $type
-     *
      * @return Medoo
      */
-    public function getStorage($type = null)
+    public function getStorage()
     {
-        if (is_null($type)) {
-            $type = $this->latestStorageType ? $this->latestStorageType : self::WRITE_STORAGE;
-        }
-        if ($type == self::WRITE_STORAGE) {
-            return $this->getWriteStorage();
-        } else {
-            return $this->getReadStorage();
-        }
-    }
-
-    /**
-     * @return Medoo
-     */
-    public function getWriteStorage()
-    {
-        if (empty($this->writerStorage)) {
-            $this->initWriteStorage();
+        if (empty($this->storage)) {
+            $this->initStorage();
         }
 
-        return $this->writerStorage;
-    }
-
-    /**
-     * @return Medoo
-     */
-    public function getReadStorage()
-    {
-        if (empty($this->readerStorage)) {
-            $this->initReadStorage();
-        }
-
-        return $this->readerStorage;
+        return $this->storage;
     }
 
     /**
@@ -449,7 +343,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function multiAdd($data)
     {
-        $this->setLatestStorageType(self::WRITE_STORAGE);
         array_unshift($data, $this->getTableName());
 
         return call_user_func_array([$this->getStorage(), 'insert'], $data);
@@ -485,7 +378,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function update($data, $where = '')
     {
-        $this->setLatestStorageType(self::WRITE_STORAGE);
         $where     = $this->_parseOptions($where);
         $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
         unset($where['table']);
@@ -521,7 +413,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function getOne($where = [], $columns = '*')
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
         $where     = $this->_parseOptions($where);
         $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
         unset($where['table']);
@@ -555,7 +446,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function getAll($columns = '*', $where = [])
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
         return $this->select($columns, null, $where);
     }
 
@@ -584,7 +474,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function getAllWithJoin($join, $columns, $where = [])
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
         return $this->select($columns, $join, $where);
     }
 
@@ -595,7 +484,8 @@ class BaseDBDAO extends SmvcObject
         unset($where['table']);
         unset($where['model']);
         if (is_null($join)) {
-            return $this->getStorage()->select($tableName, $columns, $where);
+            $return = $this->getStorage()->select($tableName, $columns, $where);
+            return $return;
         } else {
             return $this->getStorage()->select($tableName, $join, $columns, $where);
         }
@@ -622,7 +512,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function delete($where = [])
     {
-        $this->setLatestStorageType(self::WRITE_STORAGE);
         $result = $this->callChain('delete', [$this->getTableName(), $where], $this->getStorage());
         return $result;
     }
@@ -634,7 +523,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function getCount($where)
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
         $result = $this->callChain('count', [$this->getTableName(), $where], $this->getStorage());
 
         return $result;
@@ -648,8 +536,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function getMax($column, $where)
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
-
         $result = $this->callChain('max', [$this->getTableName(), $column, $where], $this->getStorage());
         return $result;
     }
@@ -662,8 +548,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function getMin($column, $where)
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
-
         $result = $this->callChain('min', [$this->getTableName(), $column, $where], $this->getStorage());
         return $result;
     }
@@ -676,8 +560,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function getAvg($column, $where)
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
-
         $result = $this->callChain('avg', [$this->getTableName(), $column, $where], $this->getStorage());
         return $result;
     }
@@ -690,8 +572,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function getSum($column, $where)
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
-
         $result = $this->callChain('sum', [$this->getTableName(), $column, $where], $this->getStorage());
         return $result;
     }
@@ -703,8 +583,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function has($where)
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
-
         $result = $this->callChain('has', [$this->getTableName(), $where], $this->getStorage());
         return $result;
     }
@@ -717,8 +595,6 @@ class BaseDBDAO extends SmvcObject
      */
     public function hasWithJoin($join, $where)
     {
-        $this->setLatestStorageType(self::READ_STORAGE);
-
         $result = $this->callChain('has', [$this->getTableName(), $join, $where], $this->getStorage());
         return $result;
     }
@@ -726,22 +602,11 @@ class BaseDBDAO extends SmvcObject
     /**
      * @param int $query 字符串
      *
-     * @param int $type
-     *
      * @return object The PDOStatement object.
      */
-    public function query($query, $type = null)
+    public function query($query)
     {
-        if ($this->transTimes > 0) { //事务
-            $type = self::WRITE_STORAGE;
-        } else if (is_null($type)) {
-            if ('SELECT' === strtoupper(substr($query, 0, 6))) {
-                $type = self::READ_STORAGE;
-            } else {
-                $type = self::WRITE_STORAGE;
-            }
-        }
-        $result = $this->callChain('query', [$query], $this->getStorage($type));
+        $result = $this->callChain('query', [$query], $this->getStorage());
         return $result;
     }
 
@@ -761,7 +626,7 @@ class BaseDBDAO extends SmvcObject
      */
     public function quote($string)
     {
-        return $this->getStorage(self::READ_STORAGE)->quote($string);
+        return $this->getStorage()->quote($string);
     }
 
     /**
@@ -791,50 +656,23 @@ class BaseDBDAO extends SmvcObject
     /**
      * 初始化数据库连接
      * @access protected
-     *
-     * @param boolean $master 主服务器
-     *
      * @return void
      */
-    protected function initConnect($master = true)
+    protected function initConnect()
     {
-        if (1 == C('DB_DEPLOY_TYPE')) { // 采用分布式数据库
-            $this->currentStorage = $this->multiConnect($master);
-        } else // 默认单数据库
-            if (!$this->connected) {
-                $this->currentStorage = $this->connect($master);
-            }
-    }
-
-    /**
-     * 连接分布式服务器
-     * @access protected
-     *
-     * @param boolean $master 主服务器
-     *
-     * @return mixed
-     */
-    protected function multiConnect($master = false)
-    {
-        return $this->connect($master);
+        if (!$this->connected) {
+            $this->currentStorage = $this->connect();
+        }
     }
 
     /**
      * 连接数据库方法
      * @access public
      *
-     * @param $master
-     *
      * @return mixed
      */
-    public function connect($master)
+    public function connect()
     {
-        if ($master) {
-            $this->setLatestStorageType(self::WRITE_STORAGE);
-
-        } else {
-            $this->setLatestStorageType(self::READ_STORAGE);
-        }
         $this->currentStorage = $this->getStorage();
         $this->connected      = true;
 
@@ -848,7 +686,7 @@ class BaseDBDAO extends SmvcObject
      */
     public function startTrans()
     {
-        $this->initConnect(true);
+        $this->initConnect();
         if (!$this->currentStorage) {
             return false;
         }
@@ -868,7 +706,7 @@ class BaseDBDAO extends SmvcObject
      */
     public function commit()
     {
-        $this->initConnect(true);
+        $this->initConnect();
         if ($this->transTimes > 0) {
             $result           = $this->currentStorage->query('COMMIT');
             $this->transTimes = 0;
@@ -889,7 +727,7 @@ class BaseDBDAO extends SmvcObject
      */
     public function rollback()
     {
-        $this->initConnect(true);
+        $this->initConnect();
         if ($this->transTimes > 0) {
             $result           = $this->currentStorage->query('ROLLBACK');
             $this->transTimes = 0;
@@ -903,29 +741,19 @@ class BaseDBDAO extends SmvcObject
         return true;
     }
 
-    public function execute($query, $type = 1)
+    public function execute($query)
     {
-        return $this->exec($query, $type);
+        return $this->exec($query);
     }
 
     /**
      * @param     $query
-     * @param int $type
      *
      * @return mixed
      */
-    public function exec($query, $type = 1)
+    public function exec($query)
     {
-        if ($this->transTimes > 0) { //事务
-            $type = self::WRITE_STORAGE;
-        } else if (is_null($type)) {
-            if ('SELECT' === strtoupper(substr($query, 0, 6))) {
-                $type = self::READ_STORAGE;
-            } else {
-                $type = self::WRITE_STORAGE;
-            }
-        }
-        return $this->getStorage($type)->exec($query);
+        return $this->getStorage()->exec($query);
     }
 
     /**
@@ -1415,7 +1243,7 @@ class BaseDBDAO extends SmvcObject
         }
 
         // 查询过后清空sql表达式组装 避免影响下次查询 调换位置是因为 调用table之后不能正确获取对应的数据
-        $this->options = array();
+        $this->options = [];
 
         if (!empty($options['alias'])) {
             $options['table'] .= ' ' . $options['alias'];
@@ -1437,8 +1265,10 @@ class BaseDBDAO extends SmvcObject
                 } elseif (!is_numeric($key) && '_' != substr($key, 0, 1) && false === strpos(
                                 $key,
                                 '.'
-                        ) && false === strpos($key, '(') && false === strpos($key, '|') && false === strpos($key, '&')
-                ) {
+                        ) && false === strpos($key, '(') && false === strpos($key, '|') && false === strpos(
+                                $key,
+                                '&'
+                        )) {
                     unset($options['where'][$key]);
                 }
             }
@@ -1589,6 +1419,11 @@ class BaseDBDAO extends SmvcObject
     public function log()
     {
         return $this->getStorage()->log();
+    }
+
+    public function debug()
+    {
+        return $this->getStorage()->debug();
     }
 
     /**

@@ -11,6 +11,6 @@
 class UserSplitDBDAO extends BaseDBDAO
 {
     protected $tableName = 'user_split';
-    protected static $writeKey = 'db.split';
+    protected static $dbKey = 'db.split';
     protected static $readKey = 'db.split';
 }
