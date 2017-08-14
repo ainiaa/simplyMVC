@@ -2,7 +2,8 @@
 SQLyog Ultimate v12.09 (64 bit)
 MySQL - 5.5.40 : Database - smvc_test_slave
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -46,6 +47,7 @@ CREATE TABLE `smvc_category` (
   `desc` varchar(200) NOT NULL,
   `parent_id` int(11) NOT NULL DEFAULT '0' COMMENT '父类ID',
   `path` mediumtext NOT NULL,
+  `type` enum('category','tag') DEFAULT 'category' COMMENT '类型',
   `depth` tinyint(4) NOT NULL DEFAULT '1' COMMENT '深度',
   `order_by` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
   `created_by` int(11) NOT NULL DEFAULT '0' COMMENT '创建人ID',
@@ -53,7 +55,7 @@ CREATE TABLE `smvc_category` (
   `updated_by` int(11) NOT NULL DEFAULT '0' COMMENT '更新人ID',
   `updated_at` int(11) NOT NULL DEFAULT '0' COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
 /*Data for the table `smvc_category` */
 

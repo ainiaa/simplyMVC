@@ -22,7 +22,7 @@ class CategoryController extends CategoryBaseController
 
         $this->assign('list', $categoryList);
         $this->assign('title', 'Simply MVC backend - table list');
-        $this->assign('tableHeaderList', ['id', 'name', 'desc', 'parent_id', 'path', 'depth']);
+        $this->assign('tableHeaderList', ['id', 'name', 'desc', 'parent_id', 'path', 'type', 'depth']);
 
         $this->setMainTpl('category_list.tpl.html');
         $this->display();
@@ -40,8 +40,9 @@ class CategoryController extends CategoryBaseController
             $name           = I('post.name');
             $desc           = I('post.desc');
             $parentId       = I('post.parent_id');
+            $type           = I('post.type');
             $parentCategory = $this->CategoryService->getCategoryInfo($parentId);
-            $data           = ['name' => $name, 'desc' => $desc, 'parent_id' => $parentId];
+            $data           = ['name' => $name, 'desc' => $desc, 'parent_id' => $parentId, 'type' => $type];
             if ($parentCategory) {
                 $data['path']  = $parentCategory['path'] . $parentId . ',';
                 $data['depth'] = (int)$parentCategory['depth'] + 1;
@@ -105,8 +106,9 @@ class CategoryController extends CategoryBaseController
                 $name           = I('post.name');
                 $desc           = I('post.desc');
                 $parentId       = I('post.pid');
+                $type           = I('post.type');
                 $parentCategory = $this->CategoryService->getCategoryInfo($parentId);
-                $data           = ['name' => $name, 'desc' => $desc];
+                $data           = ['name' => $name, 'desc' => $desc, 'type' => $type];
                 if ($parentCategory) {
                     $data['path']      = $parentCategory['path'] . $parentId . ',';
                     $data['depth']     = (int)$parentCategory['depth'] + 1;
