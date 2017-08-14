@@ -36,7 +36,7 @@ class LoginController extends ModulesController
                 $this->assign('loginError', '用户名或者密码错误');
             }
 
-            $this->display('login.tpl.html');
+            $this->display();
         }
 
     }

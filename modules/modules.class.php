@@ -203,7 +203,7 @@ class ModulesController extends BaseController
      *
      * @return mixed
      */
-    public function display($tpl = '')
+    public function display($tpl = null)
     {
         if (empty($tpl)) {
             $tpl = $this->getLayout();
