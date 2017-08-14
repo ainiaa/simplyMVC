@@ -220,15 +220,9 @@ class BaseDBDAO extends SmvcObject
         return $ret;
     }
 
-    public function initDb()
-    {
-        $this->initStorage();
-    }
-
-
     /**
-     * 初始化写
-     * @author Jeff Liu
+     * init database and get connection
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @return Medoo
      */
     public function initStorage()
@@ -246,14 +240,14 @@ class BaseDBDAO extends SmvcObject
     private $dbInstance = [];
 
     /**
-     * 获得 db实例
+     * get database instance
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $dbConfig
      *
      * @return Medoo
      */
-    public function getDbInstance($dbConfig)
+    public function getDbInstance($dbConfig = [])
     {
         $configSha = md5(json_encode($dbConfig));
         if (!isset($this->dbInstance[$configSha])) {
@@ -288,7 +282,7 @@ class BaseDBDAO extends SmvcObject
 
     /**
      *
-     * 创建一条新的记录
+     * create one new record
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * powered by jeff 2011-5-31
      * @see    http://medoo.in/api/insert
@@ -300,7 +294,7 @@ class BaseDBDAO extends SmvcObject
     public function add($data)
     {
         $tableName = $this->getTableName();
-        return $this->getStorage()->insert($tableName, $data);
+        return $this->callChain('insert', [$tableName, $data], $this->getStorage());
     }
 
     /**
@@ -313,24 +307,6 @@ class BaseDBDAO extends SmvcObject
         }
 
         return $this->storage;
-    }
-
-    /**
-     * 添加数据之前的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function preAdd()
-    {
-
-    }
-
-    /**
-     * 添加数据之后的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function postAdd()
-    {
-
     }
 
     /**
@@ -350,22 +326,6 @@ class BaseDBDAO extends SmvcObject
 
 
     /**
-     * 添加数据之前的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function preMultiAdd()
-    {
-    }
-
-    /**
-     * 添加数据之后的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function postMultiAdd()
-    {
-    }
-
-    /**
      * 更新
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
@@ -381,25 +341,7 @@ class BaseDBDAO extends SmvcObject
         $where     = $this->_parseOptions($where);
         $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
         unset($where['table']);
-        return $this->getStorage()->update($tableName, $data, $where);
-    }
-
-    /**
-     * 更新数据之前的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function preUpdate()
-    {
-
-    }
-
-    /**
-     * 更新数据之后的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function postUpdate()
-    {
-
+        return $this->callChain('update', [$tableName, $data, $where], $this->getStorage());
     }
 
     /**
@@ -417,26 +359,9 @@ class BaseDBDAO extends SmvcObject
         $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
         unset($where['table']);
         unset($where['model']);
-        return $this->getStorage()->get($tableName, $columns, $where);
+        return $this->callChain('get', [$tableName, $columns, $where], $this->getStorage());
     }
 
-    /**
-     * 获得数据之前的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function preGetOne()
-    {
-
-    }
-
-    /**
-     * 获得数据之后的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function postGetOne()
-    {
-
-    }
 
     /**
      * @param   string|array $columns
@@ -447,22 +372,6 @@ class BaseDBDAO extends SmvcObject
     public function getAll($columns = '*', $where = [])
     {
         return $this->select($columns, null, $where);
-    }
-
-    /**
-     * 获得数据之前的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function preGetAll()
-    {
-    }
-
-    /**
-     * 获得数据之后的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function postGetAll()
-    {
     }
 
     /**
@@ -484,25 +393,14 @@ class BaseDBDAO extends SmvcObject
         unset($where['table']);
         unset($where['model']);
         if (is_null($join)) {
-            $return = $this->getStorage()->select($tableName, $columns, $where);
-            return $return;
+            return $this->callChain('select', [$tableName, $columns, $where], $this->getStorage());
         } else {
-            return $this->getStorage()->select($tableName, $join, $columns, $where);
+            return $this->callChain('select', [$tableName, $join, $columns, $where], $this->getStorage());
         }
     }
 
     /**
-     * 删除数据之前的动作
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    protected function preDelete($where)
-    {
-        $this->errCode = '';
-        return true;
-    }
-
-    /**
-     * 删除数据
+     * delete data
      * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @see    http://medoo.in/api/delete
      *
@@ -512,8 +410,9 @@ class BaseDBDAO extends SmvcObject
      */
     public function delete($where = [])
     {
-        $result = $this->callChain('delete', [$this->getTableName(), $where], $this->getStorage());
-        return $result;
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->callChain('delete', [$tableName, $where], $this->getStorage());
     }
 
     /**
@@ -523,9 +422,9 @@ class BaseDBDAO extends SmvcObject
      */
     public function getCount($where)
     {
-        $result = $this->callChain('count', [$this->getTableName(), $where], $this->getStorage());
-
-        return $result;
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->callChain('count', [$tableName, $where], $this->getStorage());
     }
 
     /**
@@ -536,8 +435,9 @@ class BaseDBDAO extends SmvcObject
      */
     public function getMax($column, $where)
     {
-        $result = $this->callChain('max', [$this->getTableName(), $column, $where], $this->getStorage());
-        return $result;
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->callChain('max', [$tableName, $column, $where], $this->getStorage());
     }
 
     /**
@@ -548,8 +448,9 @@ class BaseDBDAO extends SmvcObject
      */
     public function getMin($column, $where)
     {
-        $result = $this->callChain('min', [$this->getTableName(), $column, $where], $this->getStorage());
-        return $result;
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->callChain('min', [$tableName, $column, $where], $this->getStorage());
     }
 
     /**
@@ -560,8 +461,9 @@ class BaseDBDAO extends SmvcObject
      */
     public function getAvg($column, $where)
     {
-        $result = $this->callChain('avg', [$this->getTableName(), $column, $where], $this->getStorage());
-        return $result;
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->callChain('avg', [$tableName, $column, $where], $this->getStorage());
     }
 
     /**
@@ -572,8 +474,9 @@ class BaseDBDAO extends SmvcObject
      */
     public function getSum($column, $where)
     {
-        $result = $this->callChain('sum', [$this->getTableName(), $column, $where], $this->getStorage());
-        return $result;
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->callChain('sum', [$tableName, $column, $where], $this->getStorage());
     }
 
     /**
@@ -583,8 +486,9 @@ class BaseDBDAO extends SmvcObject
      */
     public function has($where)
     {
-        $result = $this->callChain('has', [$this->getTableName(), $where], $this->getStorage());
-        return $result;
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->callChain('has', [$tableName, $where], $this->getStorage());
     }
 
     /**
@@ -595,8 +499,9 @@ class BaseDBDAO extends SmvcObject
      */
     public function hasWithJoin($join, $where)
     {
-        $result = $this->callChain('has', [$this->getTableName(), $join, $where], $this->getStorage());
-        return $result;
+        $where     = $this->_parseOptions($where);
+        $tableName = isset($where['table']) ? $where['table'] : $this->getTableName();
+        return $this->callChain('has', [$tableName, $join, $where], $this->getStorage());
     }
 
     /**
@@ -606,8 +511,7 @@ class BaseDBDAO extends SmvcObject
      */
     public function query($query)
     {
-        $result = $this->callChain('query', [$query], $this->getStorage());
-        return $result;
+        return $this->callChain('query', [$query], $this->getStorage());
     }
 
     /**
@@ -712,7 +616,6 @@ class BaseDBDAO extends SmvcObject
             $this->transTimes = 0;
             if (!$result) {
                 $this->error();
-
                 return false;
             }
         }
@@ -757,7 +660,7 @@ class BaseDBDAO extends SmvcObject
     }
 
     /**
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff Liu<jeff.liu.guo@gmail.com>
      *
      * @param $data
      * @param $where
@@ -786,7 +689,7 @@ class BaseDBDAO extends SmvcObject
     }
 
     /**
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $tableName
      *
@@ -1432,7 +1335,7 @@ class BaseDBDAO extends SmvcObject
      */
     public function hasError()
     {
-        if ($this->errCode === '' || $this->errCode === '00000') {
+        if (empty($this->errInfo) && ($this->errCode === '' || $this->errCode === '00000')) {
             return false;
         }
         return true;
@@ -1463,18 +1366,22 @@ class BaseDBDAO extends SmvcObject
             $this->errCode = $result->errorCode();
             $this->errInfo = $result->errorInfo();
             return $result;
+        } else if (empty($result)) {
+            $this->errCode = $this->getStorage()->errorCode();
+            $this->errInfo = $this->getStorage()->errorInfo();
         }
+
         return $result;
     }
 
     /**
      * @param $method
      * @param $args
-     * @param $obj
+     * @param $object
      *
      * @return array|mixed
      */
-    protected function callChain($method, $args, $obj)
+    protected function callChain($method, $args, $object)
     {
         $preMethod = 'pre' . ucfirst($method);
         if (method_exists($this, $preMethod)) {
@@ -1485,7 +1392,7 @@ class BaseDBDAO extends SmvcObject
         if ($this->hasError()) {
             return $this->getError();
         }
-        $result     = call_user_func_array([$obj, $method], $args);
+        $result     = call_user_func_array([$object, $method], $args);
         $postMethod = 'post' . ucfirst($method);
         if (method_exists($this, $postMethod)) {
             $result = $this->$postMethod($args, $result);
@@ -1493,8 +1400,9 @@ class BaseDBDAO extends SmvcObject
             $result = $this->defaultPost($args, $result);
         }
         if ($this->hasError()) {
-            return $this->getError();
+            throw  new Exception(json_encode($this->getError()));
         }
+
         return $result;
     }
 
