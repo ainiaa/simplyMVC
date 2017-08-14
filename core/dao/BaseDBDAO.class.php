@@ -1362,13 +1362,18 @@ class BaseDBDAO extends SmvcObject
      */
     protected function defaultPost($args, $result)
     {
+        $errCode = '';
+        $errInfo = [];
         if ($result instanceof PDOStatement) {
-            $this->errCode = $result->errorCode();
-            $this->errInfo = $result->errorInfo();
-            return $result;
+            $errCode = $result->errorCode();
+            $errInfo = $result->errorInfo();
         } else if (empty($result)) {
-            $this->errCode = $this->getStorage()->errorCode();
-            $this->errInfo = $this->getStorage()->errorInfo();
+            $errCode = $this->getStorage()->errorCode();
+            $errInfo = $this->getStorage()->errorInfo();
+        }
+        if ($errCode && $errCode != '00000') {
+            $this->errCode = $errCode;
+            $this->errInfo = $errInfo;
         }
 
         return $result;
@@ -1400,7 +1405,7 @@ class BaseDBDAO extends SmvcObject
             $result = $this->defaultPost($args, $result);
         }
         if ($this->hasError()) {
-            throw  new Exception(json_encode($this->getError()));
+            throw  new Exception(json_encode(['errorCode' => $this->errCode, 'errorInfo' => $this->errInfo]));
         }
 
         return $result;
