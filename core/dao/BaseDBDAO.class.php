@@ -96,8 +96,8 @@ class BaseDBDAO extends SmvcObject
     ];
     protected $options = [];
 
-    protected $errCode = 0;//错误代码
-    protected $errInfo = [];//错误信息（详细）
+    protected $errorCode = 0;//错误代码
+    protected $errorInfo = [];//错误信息（详细）
 
     /**
      *
@@ -1335,7 +1335,7 @@ class BaseDBDAO extends SmvcObject
      */
     public function hasError()
     {
-        if (empty($this->errInfo) && ($this->errCode === '' || $this->errCode === '00000')) {
+        if (empty($this->errorInfo) && ($this->errorCode === '' || $this->errorCode === '00000')) {
             return false;
         }
         return true;
@@ -1343,7 +1343,7 @@ class BaseDBDAO extends SmvcObject
 
     public function getError()
     {
-        return $this->errInfo;
+        return $this->errorInfo;
     }
 
     /**
@@ -1352,7 +1352,7 @@ class BaseDBDAO extends SmvcObject
      */
     protected function defaultPre($args)
     {
-        $this->errCode = '';
+        $this->errorCode = '';
         return true;
     }
 
@@ -1362,18 +1362,18 @@ class BaseDBDAO extends SmvcObject
      */
     protected function defaultPost($args, $result)
     {
-        $errCode = '';
-        $errInfo = [];
+        $errorCode = '';
+        $errorInfo = [];
         if ($result instanceof PDOStatement) {
-            $errCode = $result->errorCode();
-            $errInfo = $result->errorInfo();
+            $errorCode = $result->errorCode();
+            $errorInfo = $result->errorInfo();
         } else if (empty($result)) {
-            $errCode = $this->getStorage()->errorCode();
-            $errInfo = $this->getStorage()->errorInfo();
+            $errorCode = $this->getStorage()->errorCode();
+            $errorInfo = $this->getStorage()->errorInfo();
         }
-        if ($errCode && $errCode != '00000') {
-            $this->errCode = $errCode;
-            $this->errInfo = $errInfo;
+        if ($errorCode && $errorCode != '00000') {
+            $this->errorCode = $errorCode;
+            $this->errorInfo = $errorInfo;
         }
 
         return $result;
@@ -1405,7 +1405,7 @@ class BaseDBDAO extends SmvcObject
             $result = $this->defaultPost($args, $result);
         }
         if ($this->hasError()) {
-            throw  new Exception(json_encode(['errorCode' => $this->errCode, 'errorInfo' => $this->errInfo]));
+            throw  new Exception(json_encode(['errorCode' => $this->errorCode, 'errorInfo' => $this->errorInfo]));
         }
 
         return $result;
