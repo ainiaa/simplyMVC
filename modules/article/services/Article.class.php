@@ -51,15 +51,19 @@ class ArticleService
     public function getArticleDefaultData()
     {
         return [
-                'name'       => '',
-                'desc'       => '',
-                'parent_id'  => 0,
-                'path'       => '',
-                'order_by'   => '',
-                'created_by' => '',
-                'created_at' => '',
-                'updated_by' => '',
-                'updated_at' => '',
+                'post_title'     => '',
+                'post_excerpt'   => '',
+                'post_password'  => '',
+                'post_content'   => '',
+                'post_author'    => '',
+                'post_status'    => '',
+                'post_type'      => '',
+                'comment_status' => '',
+                'comment_count'  => '',
+                'created_by'     => '',
+                'created_at'     => '',
+                'updated_by'     => '',
+                'updated_at'     => '',
         ];
     }
 

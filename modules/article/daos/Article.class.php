@@ -5,7 +5,7 @@
  */
 class ArticleDAO extends BaseDBDAO
 {
-    protected $tableName = 'category';
+    protected $tableName = 'article';
 
     public function getValidParents($id)
     {
@@ -15,7 +15,7 @@ class ArticleDAO extends BaseDBDAO
                 'smvc_category',
                 $currentInfo['path']
         );
-        $q           = $this->query($query, 1);
+        $q           = $this->query($query);
         if ($q === false) {
             return $this->getError();
         } else {

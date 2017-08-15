@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Class CategoryController
- */
 class ArticleController extends ArticleBaseController
 {
 
@@ -20,7 +17,20 @@ class ArticleController extends ArticleBaseController
 
         $this->assign('list', $articleList);
         $this->assign('title', 'Simply MVC backend - table list');
-        $this->assign('tableHeaderList', ['id', 'name', 'desc', 'parent_id', 'path', 'type', 'depth']);
+        $this->assign(
+                'tableHeaderList',
+                [
+                        'id',
+                        'post_title',
+                        'post_excerpt',
+                        'post_password',
+                        'post_content',
+                        'post_author',
+                        'post_status',
+                        'comment_status',
+                        'comment_count'
+                ]
+        );
 
         $this->setMainTpl('article_list.tpl.html');
         $this->display();
@@ -34,21 +44,20 @@ class ArticleController extends ArticleBaseController
         $url = make_url();
         $this->assign('action', $url);
         if (IS_POST) {
-            $name           = I('post.name');
-            $desc           = I('post.desc');
-            $parentId       = I('post.parent_id');
-            $type           = I('post.type');
-            $parentCategory = $this->ArticleService->getArticleInfo($parentId);
-            $data           = ['name' => $name, 'desc' => $desc, 'parent_id' => $parentId, 'type' => $type];
-            if ($parentCategory) {
-                $data['path']  = $parentCategory['path'] . $parentId . ',';
-                $data['depth'] = (int)$parentCategory['depth'] + 1;
-            } else {
-                $data['path']  = ',0,';
-                $data['depth'] = 1;
-            }
-            $data = $this->ArticleService->buildArticleData($data);
-            $id   = $this->ArticleService->addArticle($data);
+            $post_title     = I('post.post_title');
+            $post_excerpt   = I('post.post_excerpt');
+            $post_password  = I('post.post_password');
+            $post_status    = I('post.post_status');
+            $comment_status = I('post.comment_status');
+            $data           = [
+                    'post_title'     => $post_title,
+                    'post_excerpt'   => $post_excerpt,
+                    'post_password'  => $post_password,
+                    'post_status'    => $post_status,
+                    'comment_status' => $comment_status,
+            ];
+            $data           = $this->ArticleService->buildArticleData($data);
+            $id             = $this->ArticleService->addArticle($data);
             if (empty($id)) {
                 $error = $this->ArticleService->getDbError();
                 $this->displayError($error);
@@ -56,11 +65,16 @@ class ArticleController extends ArticleBaseController
                 $this->redirect(make_url('index'));
             }
         } else {
-            $categoryList           = $this->ArticleService->getArticleList();
-            $parentCategorySelector = $this->ArticleService->generateCategorySelector(-1, 0, 'parent_id');
-            $this->assign('list', $categoryList);
-            $this->assign('parentCategorySelector', $parentCategorySelector);
+            $jscontent = <<<JS_CONTENT
+<script type="text/javascript">            
+  $(function () {
+    CKEDITOR.replace('post_excerpt');
+  });
+</script>  
+JS_CONTENT;
 
+            $this->assign('jscontent', $jscontent);
+            $this->assign('jslist', ['assets/bower_components/ckeditor/ckeditor.js']);
             $this->setMainTpl('article_add.tpl.html');
             $this->display();
         }
@@ -132,7 +146,7 @@ class ArticleController extends ArticleBaseController
                     );
                     $this->assign('list', $categoryList);
                     $this->assign('parentCategorySelector', $parentCategorySelector);
-                    $this->assign('categoryInfo', $categoryInfo);
+                    $this->assign('articleInfo', $categoryInfo);
                     $this->setMainTpl('category_add.tpl.html');
                     $this->assign('id', $id);
                     $this->display();

@@ -69,43 +69,28 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `smvc_posts`;
 
-CREATE TABLE `smvc_posts` (
+CREATE TABLE `smvc_article` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `post_author` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '作者',
-  `post_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加日期',
-  `post_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文章内容',
-  `post_title` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文章标题',
-  `post_excerpt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文章摘要',
-  `post_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'publish' COMMENT '文章状态',
-  `comment_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open' COMMENT '文章屏蔽状态',
-  `ping_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open' COMMENT '文章ping状态',
-  `post_password` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '文章访问密码',
-  `post_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '文章name',
-  `to_ping` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `pinged` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `post_modified` datetime DEFAULT '0000-00-00 00:00:00' COMMENT '文章修改时间',
-  `post_modified_gmt` datetime DEFAULT '0000-00-00 00:00:00' COMMENT '文章修改时间',
-  `post_content_filtered` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `post_parent` bigint(20) unsigned DEFAULT '0',
-  `guid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `menu_order` int(11) DEFAULT '0',
-  `post_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'post' COMMENT '文章类型',
-  `post_mime_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '文章类型',
-  `comment_count` bigint(20) DEFAULT '0' COMMENT '文章评论数量',
+  `post_title` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_excerpt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `post_password` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `post_content` longtext NOT NULL,
+  `post_category` int(11) DEFAULT NULL,
+  `post_author` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `post_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'publish',
+  `post_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'post',
+  `comment_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
+  `comment_count` bigint(20) NOT NULL DEFAULT '0',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` int(11) DEFAULT NULL,
+  `updated_by` int(11) DEFAULT NULL,
+  `updated_at` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `post_name` (`post_name`(191)),
-  KEY `type_status_date` (`post_type`,`post_status`,`post_date`,`id`),
-  KEY `post_parent` (`post_parent`),
-  KEY `post_author` (`post_author`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+  KEY `post_author` (`post_author`),
+  KEY `type_status_date` (`post_type`,`post_status`,`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `smvc_posts` */
-
-LOCK TABLES `smvc_posts` WRITE;
-
-insert  into `smvc_posts`(`id`,`post_author`,`post_date`,`post_content`,`post_title`,`post_excerpt`,`post_status`,`comment_status`,`ping_status`,`post_password`,`post_name`,`to_ping`,`pinged`,`post_modified`,`post_modified_gmt`,`post_content_filtered`,`post_parent`,`guid`,`menu_order`,`post_type`,`post_mime_type`,`comment_count`) values (1,0,'2016-03-23 14:38:12','hello, world!!','first post','hello, world!!','publish','open','open','','','','','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,0,'',0,'post','',0),(2,0,'2016-05-05 14:27:19','hello, world!!ssssssddddddd','first post','hello, world!!ssssss','publish','open','open','','','','','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,0,'',0,'post','',0),(3,0,'2016-09-29 14:43:28','','','0','publish','open','open','','','','','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,0,'',0,'post','',0);
-
-UNLOCK TABLES;
 
 /*Table structure for table `smvc_terms` */
 
