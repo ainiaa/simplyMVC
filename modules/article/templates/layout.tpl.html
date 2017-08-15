@@ -1,0 +1,31 @@
+{% include "header.tpl.html" %}
+<div class="wrapper">
+
+    {% include "top_menu.tpl.html" %}
+
+    {% include "left_menu.tpl.html" %}
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        {% include "top_nav.tpl.html" %}
+        <!-- Main content -->
+        <section class="content">
+        {% include mainTpl %}
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <footer class="main-footer">
+        <div class="pull-right hidden-xs">
+            <b>Version</b> 2.4.0
+        </div>
+        <strong>Copyright &copy; 2014-2016 <a href="https://adminlte.io">Almsaeed Studio</a>.</strong> All rights
+        reserved.
+    </footer>
+
+    {% include "right_control_sidebar.tpl.html" %}
+
+</div>
+<!-- ./wrapper -->
+
+{% include "footer.tpl.html" %}

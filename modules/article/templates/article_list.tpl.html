@@ -1,0 +1,49 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Bordered Table</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive ">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        {% for tableHeader in tableHeaderList %}
+                        <th>{{ tableHeader }}</th>
+                        {% endfor %}
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in list %}
+                    <tr>
+                        {% for tableHeader in tableHeaderList %}
+                            <td>{{ item[tableHeader] }}</td>
+                        {% endfor %}
+                        {% set param = {'id' : item.id} %}
+                        <td>
+                            <a class="btn btn-success" href="{{ make_url('modules/category/category/detail', param) }}">
+                                <i class="glyphicon glyphicon-zoom-in icon-white"></i>
+                                View
+                            </a>
+                            <a class="btn btn-info" href="{{ make_url('modules/category/category/edit', param) }}">
+                                <i class="glyphicon glyphicon-edit icon-white"></i>
+                                Edit
+                            </a>
+                            <a class="btn btn-danger" href="{{ make_url('modules/category/category/delete', param) }}">
+                                <i class="glyphicon glyphicon-trash icon-white"></i>
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+    <!-- /.col -->
+</div>
