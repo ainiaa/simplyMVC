@@ -28,7 +28,12 @@ class LoginController extends ModulesController
                     if ($md5Password == $adminInfo['password']) { //登录成功
                         session('userInfo', ['userName' => $userName, 'password' => md5($password)]);
                         $url = $this->getRedirectUrl('backurl');
-                        Request::redirect($url);
+                        if (stripos($url, 'logout') !== 0) {
+                            Request::redirect($url);
+                        } else {
+                            Request::redirect(make_url('modules/category/category/index'));
+                        }
+
                     } else {
                         echo 1;exit;
                     }
@@ -62,14 +67,5 @@ class LoginController extends ModulesController
         }
 
         return $url;
-    }
-
-    /**
-     *
-     */
-    public function logoutAction()
-    {
-        session('userInfo', null);
-        $this->display('login.tpl.html');
     }
 }

@@ -1,0 +1,30 @@
+{% include "header.tpl.html" %}
+<div class="login-box">
+    <div class="login-logo">
+        <a href="#"><b>Admin</b>LTE</a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="login-box-body">
+        <p class="login-box-msg">Sign out to close your session</p>
+        <div>logout success.jump to <a href="">login</a> after <span id="left_time">3</span></div>
+    </div>
+    <!-- /.login-box-body -->
+</div>
+<!-- /.login-box -->
+{% include "footer.tpl.html" %}
+
+<script type="text/javascript">
+    var intervalId = null;
+    $(function () {
+        intervalId = setInterval(function () {
+            var left_time_obj = $('#left_time');
+            var left_time = parseInt(left_time_obj.text());
+            if (left_time <= 0) {
+                document.location.href = "{{ make_url('modules/login/login/login')|raw }}";
+                clearTimeout(intervalId);
+            } else {
+                left_time_obj.text(left_time - 1);
+            }
+        }, 1000);
+    });
+</script>
