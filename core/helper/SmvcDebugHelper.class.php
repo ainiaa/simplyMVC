@@ -148,7 +148,7 @@ class SmvcDebugHelper implements ArrayAccess
     }
 
     /**
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param mixed  $info
      * @param string $label
@@ -190,7 +190,7 @@ class SmvcDebugHelper implements ArrayAccess
 
     /**
      * 格式化消息
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param mixed  $info
      * @param string $label

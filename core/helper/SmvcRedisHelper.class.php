@@ -692,7 +692,7 @@ class SmvcRedisHelper
 
     /**
      * 构建流水号
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param     $name
      *

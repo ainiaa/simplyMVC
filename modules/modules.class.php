@@ -248,7 +248,7 @@ class ModulesController extends BaseController
 
 
     /**
-     * @author Jeff Liu<liuwy@iamgeco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $errno
      *

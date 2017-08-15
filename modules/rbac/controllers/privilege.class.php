@@ -2,7 +2,7 @@
 
 /**
  * 权限管理 权限
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/05/27
  */
 class PrivilegeController extends AdminController
@@ -38,7 +38,7 @@ class PrivilegeController extends AdminController
 
     /**
      * 删除权限
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function delPrivAction()
@@ -55,7 +55,7 @@ class PrivilegeController extends AdminController
 
     /**
      * 添加权限
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function addAction()
@@ -85,7 +85,7 @@ class PrivilegeController extends AdminController
 
     /**
      * 编辑
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function editAction()

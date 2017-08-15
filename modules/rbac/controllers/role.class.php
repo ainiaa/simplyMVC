@@ -2,7 +2,7 @@
 
 /**
  * 权限管理 角色
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/05/27
  */
 class RoleController extends AdminController
@@ -20,7 +20,7 @@ class RoleController extends AdminController
 
     /**
      * 角色列表
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function indexAction()
@@ -42,7 +42,7 @@ class RoleController extends AdminController
 
     /**
      * 删除角色
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function deleteAction()
@@ -60,7 +60,7 @@ class RoleController extends AdminController
 
     /**
      * 添加角色
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function addAction()
@@ -90,7 +90,7 @@ class RoleController extends AdminController
 
     /**
      * 编辑角色
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function editAction()
@@ -123,7 +123,7 @@ class RoleController extends AdminController
 
     /**
      * 关联权限
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function relatePrivilegeAction()
@@ -167,7 +167,7 @@ class RoleController extends AdminController
 
     /**
      * 关联菜单权限
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function relateMenuPrivilegeAction()

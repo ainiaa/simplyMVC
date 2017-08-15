@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 class ArticleService
 {

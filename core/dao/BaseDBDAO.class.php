@@ -855,7 +855,7 @@ class BaseDBDAO extends SmvcObject
      * todo 这个还需要进行处理
      * 通用获得数据的方法
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $table
      * @param array  $where

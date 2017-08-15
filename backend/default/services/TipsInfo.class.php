@@ -3,7 +3,7 @@
 /**
  * 获取configTipsInfo配置项信息
  *
- * @author Jeff Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 class TipsInfoService extends BaseService
 {

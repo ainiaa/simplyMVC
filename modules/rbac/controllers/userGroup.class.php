@@ -2,7 +2,7 @@
 
 /**
  * 权限管理 用户分组
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/05/27
  */
 class UserGroupController extends AdminController
@@ -20,7 +20,7 @@ class UserGroupController extends AdminController
 
     /**
      * 列表
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function indexAction()
@@ -42,7 +42,7 @@ class UserGroupController extends AdminController
 
     /**
      * 删除用户分组
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function deleteAction()
@@ -60,7 +60,7 @@ class UserGroupController extends AdminController
 
     /**
      * 添加用户分组
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function addAction()
@@ -85,7 +85,7 @@ class UserGroupController extends AdminController
 
     /**
      * 编辑菜单
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function editAction()
@@ -114,7 +114,7 @@ class UserGroupController extends AdminController
 
     /**
      * 关联角色
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function relateRoleAction()

@@ -5,7 +5,7 @@
  * 2、redis 缓存支持列表
  * Redis DB 数据存储model
  *
- * @author  Jeff Liu<liuwy@imageco.com.cn>
+ * @author  Jeff.Liu<jeff.liu.guo@gmail.com>
  * @version 0.1
  */
 class RedisDBBase extends BaseDBDAO
@@ -70,7 +70,7 @@ class RedisDBBase extends BaseDBDAO
     /**
      * 是否使用redis缓存
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @return bool
      */
     public function needUseCache()
@@ -100,7 +100,7 @@ class RedisDBBase extends BaseDBDAO
 
     /**
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $pk
      */
@@ -126,7 +126,7 @@ class RedisDBBase extends BaseDBDAO
     /**
      * 添加数据
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param array|string $data
      * @param array        $options
@@ -189,7 +189,7 @@ class RedisDBBase extends BaseDBDAO
     /**
      * 格式化 where 以前where写的乱七八糟的， 有的是 array 有的是字符串
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param array $options
      *
@@ -226,7 +226,7 @@ class RedisDBBase extends BaseDBDAO
     /**
      * 获得 pk sk的值
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param array $data
      * @param array $options
@@ -264,7 +264,7 @@ class RedisDBBase extends BaseDBDAO
      * $node_id, 'id' => $id, ); $model->save($data, $where); //where只能包含pk和sk
      * PS： 请不要使用 字符串形式的。 格式要统一
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $data
      * @param array  $options
@@ -285,7 +285,7 @@ class RedisDBBase extends BaseDBDAO
      * $node_id, 'id' => $id, ); $model->updateByPk($data, $where);
      * //where只能包含pk和sk PS： 请不要使用 字符串形式的。 格式要统一
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param array $data
      * @param array $options
@@ -335,7 +335,7 @@ class RedisDBBase extends BaseDBDAO
     /**
      * 按照主键获取数据
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $pk
      *
@@ -366,7 +366,7 @@ class RedisDBBase extends BaseDBDAO
 
     /**
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param string $pk
      * @param string $sk
@@ -401,7 +401,7 @@ class RedisDBBase extends BaseDBDAO
     /**
      * 删除数据
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $pk
      * @param $sk
@@ -440,7 +440,7 @@ class RedisDBBase extends BaseDBDAO
     /**
      * 根据给定的主键值或由主键值组成的数组，删除相应的记录。
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param        $pk
      * @param string $sk
@@ -456,7 +456,7 @@ class RedisDBBase extends BaseDBDAO
     /**
      * todo 错误信息记录
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $method
      * @param $params
@@ -477,7 +477,7 @@ class RedisDBBase extends BaseDBDAO
     /**
      * 根据联合主键查询数据
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param number $pk
      * @param number $sk
@@ -495,7 +495,7 @@ class RedisDBBase extends BaseDBDAO
 
     /**
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param number $pk
      *
@@ -511,7 +511,7 @@ class RedisDBBase extends BaseDBDAO
      * $id, ); $model->delete($data, $where); //where只能包含pk和sk PS： 请不要使用 字符串形式的。
      * 格式要统一
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param array $options
      *
@@ -539,7 +539,7 @@ class RedisDBBase extends BaseDBDAO
      * $node_id, 'id' => $id, ); $model->select($where); //where只能包含pk和sk PS：
      * 请不要使用 字符串形式的。 格式要统一
      *
-     * @author Jeff Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param array $options 表达式参数
      *

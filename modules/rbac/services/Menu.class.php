@@ -3,7 +3,7 @@
 /**
  * 权限管理
  * Class YmRbac
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/06/06
  */
 class MenuService extends BaseService

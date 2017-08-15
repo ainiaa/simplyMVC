@@ -2,7 +2,7 @@
 
 /**
  * 权限管理 用户
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/05/27
  */
 class UserController extends AdminController
@@ -25,7 +25,7 @@ class UserController extends AdminController
 
     /**
      * 列表
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function indexAction()
@@ -51,7 +51,7 @@ class UserController extends AdminController
 
     /**
      * 关联用户分组
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function relateUserGroupAction()
@@ -95,7 +95,7 @@ class UserController extends AdminController
 
     /**
      * 关联角色
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function relateRoleAction()

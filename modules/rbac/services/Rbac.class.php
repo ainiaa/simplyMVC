@@ -3,7 +3,7 @@
 /**
  * 权限管理
  * Class YmRbac
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/05/09
  */
 class RbacService extends BaseService
@@ -88,7 +88,7 @@ class RbacService extends BaseService
 
     /**
      * 获得用户信息
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      *
      * @param $userId
      *
@@ -154,7 +154,7 @@ class RbacService extends BaseService
     /**
      * 获得用户$userId所属的用户角色组
      *  PS:用户 m:1 角色组
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/050/09
      *
      * @param $userId
@@ -187,7 +187,7 @@ class RbacService extends BaseService
      * 根据用户$userId 获得所属角色
      *
      * PS:用户 1:n 角色组
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/050/09
      *
      * @param $userId
@@ -234,7 +234,7 @@ class RbacService extends BaseService
     /**
      * todo
      * 根据用户Id获得所有权限
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/050/09
      *
      * @param $userId
@@ -249,7 +249,7 @@ class RbacService extends BaseService
     /**
      * todo
      * 获得所有菜单项
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/050/09
      * @return string
      */
@@ -261,7 +261,7 @@ class RbacService extends BaseService
     /**
      * todo
      * 获得所有菜单项
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/050/09
      *
      * @param $userId

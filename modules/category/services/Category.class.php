@@ -3,7 +3,7 @@
 /**
  * 分类
  * Class CategoryService
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  */
 class CategoryService
 {

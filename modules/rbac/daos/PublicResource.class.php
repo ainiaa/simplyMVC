@@ -3,7 +3,7 @@
 /**
  * 权限相关 model
  *
- * @author : Jeff Liu<liuwy@imageco.com.cn>
+ * @author : Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   : 2017/05/27
  */
 class PublicResourceDAO extends RedisDBBase

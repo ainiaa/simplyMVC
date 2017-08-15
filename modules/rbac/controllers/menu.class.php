@@ -2,7 +2,7 @@
 
 /**
  * 权限管理 菜单
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/05/27
  */
 class MenuController extends AdminController
@@ -25,7 +25,7 @@ class MenuController extends AdminController
 
     /**
      * 列表
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function indexAction()
@@ -46,7 +46,7 @@ class MenuController extends AdminController
 
     /**
      * 删除菜单
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function deleteAction()
@@ -63,7 +63,7 @@ class MenuController extends AdminController
 
     /**
      * 添加菜单
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function addAction()
@@ -96,7 +96,7 @@ class MenuController extends AdminController
 
     /**
      * 编辑菜单
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function editAction()
@@ -132,7 +132,7 @@ class MenuController extends AdminController
 
     /**
      * 关联权限
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function relatePrivilegeAction()

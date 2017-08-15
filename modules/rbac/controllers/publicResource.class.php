@@ -2,7 +2,7 @@
 
 /**
  * 权限管理 公共资源
- * @author Jeff.Liu<liuwy@imageco.com.cn>
+ * @author Jeff.Liu<jeff.liu.guo@gmail.com>
  * @date   2017/05/27
  */
 class PublicResourceController extends AdminController
@@ -16,7 +16,7 @@ class PublicResourceController extends AdminController
 
     /**
      * 公共资源列表
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function indexAction()
@@ -41,7 +41,7 @@ class PublicResourceController extends AdminController
 
     /**
      * 删除公共资源
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function deleteAction()
@@ -60,7 +60,7 @@ class PublicResourceController extends AdminController
 
     /**
      * 添加公共资源
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function addAction()
@@ -93,7 +93,7 @@ class PublicResourceController extends AdminController
 
     /**
      * 编辑公共资源
-     * @author Jeff.Liu<liuwy@imageco.com.cn>
+     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
      * @date   2017/05/27
      */
     public function editAction()
