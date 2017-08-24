@@ -58,7 +58,7 @@ class MenuController extends AdminController
         } else {
             $data = ['status' => 0, 'info' => '菜单删除失败'];
         }
-        $this->ajaxReturn($data, 'JSON');
+        $this->ajaxReturn($data);
     }
 
     /**

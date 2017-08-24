@@ -54,7 +54,7 @@ class UserGroupController extends AdminController
         } else {
             $data = ['status' => 0, 'info' => '用户分组删除失败'];
         }
-        $this->ajaxReturn($data, 'JSON');
+        $this->ajaxReturn($data);
 
     }
 

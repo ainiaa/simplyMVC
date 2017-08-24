@@ -54,7 +54,7 @@ class PublicResourceController extends AdminController
             $data = ['status' => 0, 'info' => '公共资源删除失败'];
         }
 
-        $this->ajaxReturn($data, 'JSON');
+        $this->ajaxReturn($data);
 
     }
 

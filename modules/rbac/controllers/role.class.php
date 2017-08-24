@@ -54,7 +54,7 @@ class RoleController extends AdminController
         } else {
             $data = ['status' => 0, 'info' => '角色删除失败'];
         }
-        $this->ajaxReturn($data, 'JSON');
+        $this->ajaxReturn($data);
 
     }
 

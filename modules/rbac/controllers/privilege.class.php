@@ -46,9 +46,9 @@ class PrivilegeController extends AdminController
         $id  = I('id');
         $ret = $this->PrivilegeDAO->delete(['id' => $id]);
         if ($ret) {
-            $this->ajaxReturn(['status' => 1, 'info' => '权限删除成功'], 'JSON');
+            $this->ajaxReturn(['status' => 1, 'info' => '权限删除成功']);
         } else {
-            $this->ajaxReturn(['status' => 0, 'info' => '权限删除失败'], 'JSON');
+            $this->ajaxReturn(['status' => 0, 'info' => '权限删除失败']);
         }
 
     }
