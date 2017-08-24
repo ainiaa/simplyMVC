@@ -37,6 +37,10 @@
                             </a>
                         </td>
                     </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="{{ count(tableHeaderList) + 1 }}">no data</td>
+                    </tr>
                     {% endfor %}
                     </tbody>
                 </table>

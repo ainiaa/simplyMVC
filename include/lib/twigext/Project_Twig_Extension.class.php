@@ -12,6 +12,7 @@ class Project_Twig_Extension extends Twig_Extension
     {
         return array(
                 new Twig_Function('make_url', 'make_url'),
+                new Twig_Function('count', 'count'),
         );
     }
 }
