@@ -21,6 +21,34 @@
                                value="{{ articleInfo.post_category }}">
                     </div>
                     <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="post_status" id="post_status" value="1" checked="">
+                                开启
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="post_status" id="post_status2" value="0">
+                                关闭
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="comment_status" id="comment_status1" value="1" checked="">
+                                开启
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="comment_status" id="comment_status2" value="0">
+                                关闭
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label>文章密码</label>
                         <input type="text" class="form-control" placeholder="文章密码" name="post_password"
                                value="{{ articleInfo.post_password }}">
@@ -34,7 +62,7 @@
                     </div>
                     <div class="form-group">
                         <label>文章内容</label>
-                        <textarea id="post_excerpt" name="post_excerpt" rows="10" cols="80"></textarea>
+                        <textarea id="post_content" name="post_content" rows="10" cols="80">{{ articleInfo.post_content }}</textarea>
                     </div>
 
                     <div class="box-footer">

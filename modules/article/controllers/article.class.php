@@ -47,6 +47,7 @@ class ArticleController extends ArticleBaseController
             $post_title     = I('post.post_title');
             $post_excerpt   = I('post.post_excerpt');
             $post_password  = I('post.post_password');
+            $post_content   = I('post.post_content');
             $post_status    = I('post.post_status');
             $comment_status = I('post.comment_status');
             $data           = [
@@ -54,6 +55,7 @@ class ArticleController extends ArticleBaseController
                     'post_excerpt'   => $post_excerpt,
                     'post_password'  => $post_password,
                     'post_status'    => $post_status,
+                    'post_content' => $post_content,
                     'comment_status' => $comment_status,
             ];
             $data           = $this->ArticleService->buildArticleData($data);
@@ -66,11 +68,11 @@ class ArticleController extends ArticleBaseController
             }
         } else {
             $jscontent = <<<JS_CONTENT
-<script type="text/javascript">            
-  $(function () {
-    CKEDITOR.replace('post_excerpt');
-  });
-</script>  
+        <script type="text/javascript">            
+          $(function () {
+            CKEDITOR.replace('post_content');
+          });
+        </script>  
 JS_CONTENT;
 
             $this->assign('jscontent', $jscontent);
