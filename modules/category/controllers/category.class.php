@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 分类管理控制器
  * Class CategoryController
@@ -160,4 +159,5 @@ class CategoryController extends CategoryBaseController
         $this->CategoryService->deleteCategoryById($id);
         $this->redirect(make_url('index'));
     }
+
 }

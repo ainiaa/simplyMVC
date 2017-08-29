@@ -284,7 +284,7 @@ abstract class BaseController extends SmvcObject
      *
      * @return void
      */
-    protected function ajaxReturn($data, $type = '')
+    protected function ajaxReturn($data, $type = 'JSON')
     {
         if (empty($type)) {
             $type = C('DEFAULT_AJAX_RETURN');
