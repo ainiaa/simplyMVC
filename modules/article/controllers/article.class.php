@@ -74,7 +74,7 @@ class ArticleController extends ArticleBaseController
           });
         </script>  
 JS_CONTENT;
-//            $categoryList = Api::get('category.getList'); //curl local timeout multiple port is ok or api call via rpc
+            $categoryList = Api::get('category.getList'); //curl local timeout multiple port is ok or api call via rpc
 
             $this->assign('jscontent', $jscontent);
             $this->assign('jslist', ['assets/bower_components/ckeditor/ckeditor.js']);

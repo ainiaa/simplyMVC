@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class ApiCallViaCurl
+ * Class ApiCallViaDB
  */
-class ApiCallViaCurl extends ApiCallBase
+class ApiCallViaDB extends ApiCallBase
 {
     const API_SECRET = 'fjzlT9HcyumCwV4VGxKtGkwdyQC9P07p';
     const TIMEOUT = 10;
@@ -14,7 +14,6 @@ class ApiCallViaCurl extends ApiCallBase
      * @param      $api
      * @param      $data
      * @param int  $timeout
-     *
      * @param null $cookie
      *
      * @return mixed
@@ -99,12 +98,6 @@ class ApiCallViaCurl extends ApiCallBase
         return $return;
     }
 
-    /**
-     * @param        $api
-     * @param string $data
-     *
-     * @return mixed|string
-     */
     public function getUrlByApi($api, $data = '')
     {
         $mapping = [
@@ -129,7 +122,7 @@ class ApiCallViaCurl extends ApiCallBase
      *
      * @return mixed
      */
-    private function curl($api, $second = 30, $mode = 'get', $data = null, $cookie = [])
+    public function curl($api, $second = 30, $mode = 'get', $data = null, $cookie = [])
     {
         $ch = curl_init();
         if ($mode === 'get') {

@@ -10,15 +10,15 @@ return [
         'BACKEND_CONTROLLER_PATH'  => ROOT_DIR . 'backend',
         'cookieDomain'             => '',//COOKIE 域名
         'autoLoadPath'             => [//类自动加载目录 多个目录之间使用逗号分割
-                CORE_DIR,
-                CORE_DIR . 'cache',
-                CORE_DIR . 'i18n',
-                CORE_DIR . 'helper',
-                CORE_DIR . 'session',
-                CORE_DIR . 'exception',
-                INCLUDE_DIR . 'vendor',
-                ROOT_DIR .'include/lib/twigext',
-                ROOT_DIR .'api',
+                                       CORE_DIR,
+                                       CORE_DIR . 'cache',
+                                       CORE_DIR . 'i18n',
+                                       CORE_DIR . 'helper',
+                                       CORE_DIR . 'session',
+                                       CORE_DIR . 'exception',
+                                       INCLUDE_DIR . 'vendor',
+                                       ROOT_DIR . 'include/lib/twigext',
+                                       ROOT_DIR . 'api',
         ],
         'defaultLocal'             => 'en_us',//默认语言
         'routerFilterMode'         => 'blacklist',//开启 路由过滤 whiteList:开启白名单, blacklist:开启黑名单, none:不过滤
@@ -42,4 +42,5 @@ return [
         'CURRENT_TIME_YMD'    => date('Y-m-d', $currentTime),//Y-m-d方式的时间
         'CURRENT_TIME_YMDHIS' => date('Y-m-d H:i:s', $currentTime),//Y-m-d H:i:s方式的时间
         'DEFAULT_URL'         => 'index.php',//默认访问页面
+        'API_CALL_TYPE'       => 'db',
 ];

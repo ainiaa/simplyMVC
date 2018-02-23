@@ -3,7 +3,7 @@
 /**
  * Class Api
  */
-class ApiCallViaGRPC
+class ApiCallViaGRPC extends ApiCallBase
 {
     const API_SECRET = 'fjzlT9HcyumCwV4VGxKtGkwdyQC9P07p';
     const TIMEOUT = 10;
@@ -13,17 +13,17 @@ class ApiCallViaGRPC
      *
      * @param      $api
      * @param      $data
-     * @param int  $second
+     * @param int  $timeout
      *
      * @param null $cookie
      *
      * @return mixed
      */
-    public static function post($api, $data, $second = self::TIMEOUT, $cookie = null)
+    public function post($api, $data, $timeout = self::TIMEOUT, $cookie = null)
     {
-        $data         = self::formatData($data);
-        $data['sign'] = self::CreatSign($data);
-        return self::curl($api, $second, 'post', $data, $cookie);
+        $data         = $this->formatData($data);
+        $data['sign'] = $this->creatSign($data);
+        return $this->curl($api, $timeout, 'post', $data, $cookie);
     }
 
     /**
@@ -31,16 +31,16 @@ class ApiCallViaGRPC
      *
      * @param       $api
      * @param       $data
-     * @param int   $second
+     * @param int   $timeout
      * @param array $cookie
      *
      * @return mixed
      */
-    public static function get($api, $data = [], $second = self::TIMEOUT, $cookie = [])
+    public function get($api, $data = [], $timeout = self::TIMEOUT, $cookie = [])
     {
-        $data         = self::formatData($data);
-        $data['sign'] = self::CreatSign($data);
-        return self::curl($api, $second, 'get', $data, $cookie);
+        $data         = $this->formatData($data);
+        $data['sign'] = $this->creatSign($data);
+        return $this->curl($api, $timeout, 'get', $data, $cookie);
     }
 
     /**
@@ -50,7 +50,7 @@ class ApiCallViaGRPC
      *
      * @return string
      */
-    private static function CreatSign($data)
+    public function creatSign($data)
     {
         $args = [];
 
@@ -82,7 +82,7 @@ class ApiCallViaGRPC
      *
      * @return array
      */
-    private static function formatData($array)
+    public function formatData($array)
     {
         $return = [];
         foreach ($array as $k => $v) {
@@ -99,7 +99,7 @@ class ApiCallViaGRPC
         return $return;
     }
 
-    private static function getUrlByApi($api, $data = '')
+    public function getUrlByApi($api, $data = '')
     {
         $mapping = [
                 'category.getList' => 'http://local.smvc.me/index.php?g=modules&m=category&c=api&a=getList',
@@ -123,7 +123,7 @@ class ApiCallViaGRPC
      *
      * @return mixed
      */
-    private static function curl($api, $second = 30, $mode = 'get', $data = null, $cookie = [])
+    public function curl($api, $second = 30, $mode = 'get', $data = null, $cookie = [])
     {
         $ch = curl_init();
         if ($mode === 'get') {
@@ -153,86 +153,5 @@ class ApiCallViaGRPC
         $result = curl_exec($ch);
         curl_close($ch);
         return $result;
-    }
-
-
-    public static function apiReturn($data)
-    {
-
-        $result = json_decode($data, true);
-        if ((int)$result['code'] === 0) {
-            self::jsonReturn($result['data']);
-        } else {
-            self::jsonReturn(null, $result['code'], $result['msg']);
-        }
-    }
-
-    /**
-     *  成功后输出提示，且无数据
-     *
-     * @param $data
-     */
-    public static function reApiReturn($data)
-    {
-        $result = json_decode($data, true);
-        if ((int)$result['code'] === 0) {
-            self::jsonReturn(null, $result['code'], $result['data']);
-        } else {
-            self::jsonReturn(null, $result['code'], $result['msg']);
-        }
-    }
-
-    /**
-     * json输出
-     *
-     * @param mixed      $data
-     * @param int|number $errcode
-     * @param string     $err
-     */
-    public static function jsonReturn($data, $errcode = 0, $err = '')
-    {
-        header('Content-Type: application/json; charset=utf-8');
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods:POST,GET,OPTIONS,PUT,DELETE');
-        header('Access-Control-Allow-Headers:x-requested-with,content-type');
-
-        $header_list = headers_list();
-        error_log('$header_list:' . var_export($header_list, 1), 3, '/tmp/JSONRET');
-
-        exit(json_encode(['code' => (int)$errcode, 'data' => $data, 'msg' => $err], JSON_UNESCAPED_UNICODE));
-    }
-
-    public static function csv_h($filename)
-    {
-        header("Content-type:text/csv");
-        header("Content-Type: application/force-download");
-        header("Content-Disposition: attachment; filename=" . $filename . ".csv");
-        header('Expires:0');
-        header('Pragma:public');
-    }
-
-    public static function downloadCsvData($csv_data = [], $arrayhead = [])
-    {
-        $csv_string = null;
-        $csv_row    = [];
-        if (!empty($arrayhead)) {
-            $current = [];
-            foreach ($arrayhead AS $item) {
-                $current[] = mb_convert_encoding($item, 'GBK', 'UTF-8');
-            }
-            $csv_row[] = trim(implode(",", $current), ',');
-        }
-        foreach ($csv_data as $key => $csv_item) {
-            $current = [];
-            foreach ($csv_item AS $item) {
-                if (preg_match('/^(\d){15,}$/', $item)) {
-                    $item = "'" . $item . "'";
-                }
-                $current[] = mb_convert_encoding($item, 'GBK', 'UTF-8');
-            }
-            $csv_row[] = trim(implode(",", $current), ',');
-        }
-        $csv_string = implode("\r\n", $csv_row);
-        echo $csv_string;
     }
 }
