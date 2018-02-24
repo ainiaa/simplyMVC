@@ -23,15 +23,15 @@
                         {% endfor %}
                         {% set param = {'id' : item.id} %}
                         <td>
-                            <a class="btn btn-success" href="{{ make_url('modules/category/category/detail', param) }}">
+                            <a class="btn btn-success" href="{{ make_url('modules/article/article/detail', param) }}">
                                 <i class="glyphicon glyphicon-zoom-in icon-white"></i>
                                 View
                             </a>
-                            <a class="btn btn-info" href="{{ make_url('modules/category/category/edit', param) }}">
+                            <a class="btn btn-info" href="{{ make_url('modules/article/article/add', param) }}">
                                 <i class="glyphicon glyphicon-edit icon-white"></i>
                                 Edit
                             </a>
-                            <a class="btn btn-danger" href="{{ make_url('modules/category/category/delete', param) }}">
+                            <a class="btn btn-danger" href="{{ make_url('modules/article/article/delete', param) }}">
                                 <i class="glyphicon glyphicon-trash icon-white"></i>
                                 Delete
                             </a>

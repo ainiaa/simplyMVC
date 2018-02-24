@@ -67,6 +67,26 @@ class ArticleController extends ArticleBaseController
                 $this->redirect(make_url('index'));
             }
         } else {
+
+            $id = I('get.id');
+            if ($id) {
+                $categoryInfo = $this->ArticleService->getArticleInfo($id);
+                if ($categoryInfo) {
+                    $artileList             = $this->ArticleService->getArticleList();
+                    $parentCategorySelector = $this->ArticleService->generateCategorySelector(
+                            $id,
+                            $categoryInfo['parent_id']
+                    );
+                    $this->assign('jslist', ['assets/bower_components/ckeditor/ckeditor.js']);
+                    $this->assign('list', $artileList);
+                    $this->assign('parentCategorySelector', $parentCategorySelector);
+                    $this->assign('articleInfo', $categoryInfo);
+                    $this->setMainTpl('article_add.tpl.html');
+                    $this->assign('id', $id);
+                    $this->display();
+                }
+            }
+
             $jscontent    = <<<JS_CONTENT
         <script type="text/javascript">            
           $(function () {
@@ -118,22 +138,22 @@ JS_CONTENT;
         $id = I('id');
         if ($id) {
             if (IS_POST) {
-                $name           = I('post.name');
-                $desc           = I('post.desc');
-                $parentId       = I('post.pid');
-                $type           = I('post.type');
-                $parentCategory = $this->ArticleService->getArticleInfo($parentId);
-                $data           = ['name' => $name, 'desc' => $desc, 'type' => $type];
-                if ($parentCategory) {
-                    $data['path']      = $parentCategory['path'] . $parentId . ',';
-                    $data['depth']     = (int)$parentCategory['depth'] + 1;
-                    $data['parent_id'] = $parentId;
-                } else {
-                    $data['path']  = ',0,';
-                    $data['depth'] = 1;
-                }
-                $data = $this->ArticleService->buildArticleData($data);
-                $id   = $this->ArticleService->updateArticle($data, ['id' => $id]);
+                $post_title     = I('post.post_title');
+                $post_excerpt   = I('post.post_excerpt');
+                $post_password  = I('post.post_password');
+                $post_content   = I('post.post_content');
+                $post_status    = I('post.post_status');
+                $comment_status = I('post.comment_status');
+                $data           = [
+                        'post_title'     => $post_title,
+                        'post_excerpt'   => $post_excerpt,
+                        'post_password'  => $post_password,
+                        'post_status'    => $post_status,
+                        'post_content'   => $post_content,
+                        'comment_status' => $comment_status,
+                ];
+                $data           = $this->ArticleService->buildArticleData($data);
+                $id             = $this->ArticleService->updateArticle($data, ['id' => $id]);
                 if (empty($id)) {
                     $error = $this->ArticleService->getDbError();
                     $this->displayError($error);
@@ -143,15 +163,27 @@ JS_CONTENT;
             } else {//显示
                 $categoryInfo = $this->ArticleService->getArticleInfo($id);
                 if ($categoryInfo) {
-                    $categoryList           = $this->ArticleService->getArticleList();
+                    $artileList             = $this->ArticleService->getArticleList();
                     $parentCategorySelector = $this->ArticleService->generateCategorySelector(
                             $id,
                             $categoryInfo['parent_id']
                     );
-                    $this->assign('list', $categoryList);
+                    $jscontent              = <<<JS_CONTENT
+        <script type="text/javascript">            
+          $(function () {
+            CKEDITOR.replace('post_content');
+          });
+        </script>  
+JS_CONTENT;
+                    $categoryList           = Api::get('category.getList');
+
+                    $this->assign('categoryList', $categoryList);
+                    $this->assign('jscontent', $jscontent);
+                    $this->assign('jslist', ['assets/bower_components/ckeditor/ckeditor.js']);
+                    $this->assign('list', $artileList);
                     $this->assign('parentCategorySelector', $parentCategorySelector);
                     $this->assign('articleInfo', $categoryInfo);
-                    $this->setMainTpl('category_add.tpl.html');
+                    $this->setMainTpl('article_add.tpl.html');
                     $this->assign('id', $id);
                     $this->display();
                 } else {
