@@ -32,8 +32,6 @@ class ArticleController extends ArticleBaseController
                 ]
         );
 
-        $categoryList = Api::get('category.getList'); //curl local timeout multiple port is ok or api call via rpc
-
         $this->setMainTpl('article_list.tpl.html');
         $this->display();
     }
@@ -76,7 +74,7 @@ class ArticleController extends ArticleBaseController
           });
         </script>  
 JS_CONTENT;
-            $categoryList = Api::get('category.getList'); //curl local timeout multiple port is ok or api call via rpc
+            $categoryList = Api::get('category.getList');
 
             $this->assign('categoryList', $categoryList);
             $this->assign('jscontent', $jscontent);
