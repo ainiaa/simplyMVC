@@ -17,8 +17,7 @@
                     </div>
                     <div class="form-group">
                         <label>文章分类</label>
-                        <input type="text" class="form-control" placeholder="文章分类" name="post_category"
-                               value="{{ articleInfo.post_category }}">
+                        {{ parentCategorySelector|raw }}
                     </div>
                     <div class="form-group">
                         <label>文章状态</label>

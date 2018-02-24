@@ -67,23 +67,16 @@ class ArticleController extends ArticleBaseController
                 $this->redirect(make_url('index'));
             }
         } else {
-
             $id = I('get.id');
             if ($id) {
-                $categoryInfo = $this->ArticleService->getArticleInfo($id);
-                if ($categoryInfo) {
-                    $artileList             = $this->ArticleService->getArticleList();
-                    $parentCategorySelector = $this->ArticleService->generateCategorySelector(
-                            $id,
-                            $categoryInfo['parent_id']
+                $articleInfo = $this->ArticleService->getArticleInfo($id);
+                if ($articleInfo) {
+                    $parentCategorySelector = Api::get(
+                            'category.generateCategorySelector',
+                            ['id' => $id, $articleInfo['post_category']]
                     );
-                    $this->assign('jslist', ['assets/bower_components/ckeditor/ckeditor.js']);
-                    $this->assign('list', $artileList);
-                    $this->assign('parentCategorySelector', $parentCategorySelector);
-                    $this->assign('articleInfo', $categoryInfo);
-                    $this->setMainTpl('article_add.tpl.html');
+                    $this->assign('articleInfo', $articleInfo);
                     $this->assign('id', $id);
-                    $this->display();
                 }
             }
 
@@ -98,6 +91,7 @@ JS_CONTENT;
 
             $this->assign('categoryList', $categoryList);
             $this->assign('jscontent', $jscontent);
+            $this->assign('parentCategorySelector', $parentCategorySelector);
             $this->assign('jslist', ['assets/bower_components/ckeditor/ckeditor.js']);
             $this->setMainTpl('article_add.tpl.html');
             $this->display();
