@@ -2,7 +2,7 @@
 SQLyog Ultimate v12.09 (64 bit)
 MySQL - 5.5.53 : Database - smvc_test_master
 *********************************************************************
-*/
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -45,6 +45,7 @@ CREATE TABLE `smvc_article` (
   `post_title` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文章标题',
   `post_excerpt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文章摘要',
   `post_author` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '作者',
+  `post_category` int(11) DEFAULT NULL COMMENT '文章分类',
   `post_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文章内容',
   `post_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'publish' COMMENT '文章状态',
   `comment_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open' COMMENT '文章评论状态',
@@ -63,13 +64,13 @@ CREATE TABLE `smvc_article` (
   `published` int(11) DEFAULT NULL COMMENT '是否已发布  0：未发布 1：已发布',
   `deleted` int(11) DEFAULT NULL COMMENT '是否已删除 0：未删除 1：已删除',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `smvc_article` */
 
 LOCK TABLES `smvc_article` WRITE;
 
-insert  into `smvc_article`(`id`,`post_title`,`post_excerpt`,`post_author`,`post_content`,`post_status`,`comment_status`,`post_password`,`post_name`,`guid`,`post_type`,`comment_count`,`created_at`,`created_by`,`updated_at`,`updated_by`,`published_time`,`deleted_at`,`deleted_by`,`published`,`deleted`) values (1,'test','23',0,'<p>111111</p>\r\n','0','0','1','','','',0,1519457598,0,0,0,NULL,NULL,NULL,NULL,NULL);
+insert  into `smvc_article`(`id`,`post_title`,`post_excerpt`,`post_author`,`post_category`,`post_content`,`post_status`,`comment_status`,`post_password`,`post_name`,`guid`,`post_type`,`comment_count`,`created_at`,`created_by`,`updated_at`,`updated_by`,`published_time`,`deleted_at`,`deleted_by`,`published`,`deleted`) values (1,'test','23',0,NULL,'<p>111111</p>\r\n','0','0','1','','','',0,1519457598,0,0,0,NULL,NULL,NULL,NULL,NULL),(2,'test','23',0,NULL,'<p>1111114444</p>\r\n','1','1','1','','','',0,1519465822,0,0,0,NULL,NULL,NULL,NULL,NULL);
 
 UNLOCK TABLES;
 
