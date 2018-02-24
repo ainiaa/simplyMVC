@@ -20,7 +20,6 @@ class Dispatcher
         if (!$checkResult) {//路由检测失败
             throw new Exception('route deny!!!');
         } else {
-
             //设置  usersplit
             $uId = self::getUserId();
             LocalCache::setData('uId', $uId);
@@ -112,13 +111,13 @@ class Dispatcher
      * 获得controller 实例
      * @author Jeff Liu
      *
-     * @param $controller_name
+     * @param $controllerName
      *
      * @return object
      */
-    public static function getControllerInstance($controller_name)
+    public static function getControllerInstance($controllerName)
     {
-        $controller = Factory::getInstanceNow($controller_name);
+        $controller = Factory::getInstanceNow($controllerName);
         return $controller;
     }
 

@@ -39,7 +39,7 @@ abstract class ApiCallBase
      *
      * @return mixed
      */
-    abstract function getUrlByApi($api, $data = '');
+    abstract function getHanderByApi($api, $data = '');
 
     /**
      * 整理数据

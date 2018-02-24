@@ -16,6 +16,7 @@ return [
         CORE_DIR . 'dao/BaseRedisDBDAO.class.php',
         CORE_DIR . 'dao/UserSplitDBDAO.class.php',
         CORE_DIR . 'service/BaseService.class.php',
+        CORE_DIR . 'service/ApiBaseService.class.php',
         CORE_DIR . 'view/DefaultViewWrapper.class.php',
         CORE_DIR . 'view/TwigViewWrapper.class.php',
         CORE_DIR . 'view/View.class.php',

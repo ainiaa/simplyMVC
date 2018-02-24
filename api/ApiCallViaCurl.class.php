@@ -105,7 +105,7 @@ class ApiCallViaCurl extends ApiCallBase
      *
      * @return mixed|string
      */
-    public function getUrlByApi($api, $data = '')
+    public function getHanderByApi($api, $data = '')
     {
         $mapping = [
                 'category.getList' => 'http://local.smvc.me/index.php?g=modules&m=category&c=api&a=getList',
@@ -133,9 +133,9 @@ class ApiCallViaCurl extends ApiCallBase
     {
         $ch = curl_init();
         if ($mode === 'get') {
-            $url = $this->getUrlByApi($api, $data);
+            $url = $this->getHanderByApi($api, $data);
         } else {
-            $url = $this->getUrlByApi($api);
+            $url = $this->getHanderByApi($api);
         }
 
         //设置超时

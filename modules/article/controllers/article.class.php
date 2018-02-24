@@ -28,9 +28,11 @@ class ArticleController extends ArticleBaseController
                         'post_author',
                         'post_status',
                         'comment_status',
-                        'comment_count'
+                        'comment_count',
                 ]
         );
+
+        $categoryList = Api::get('category.getList'); //curl local timeout multiple port is ok or api call via rpc
 
         $this->setMainTpl('article_list.tpl.html');
         $this->display();
@@ -55,7 +57,7 @@ class ArticleController extends ArticleBaseController
                     'post_excerpt'   => $post_excerpt,
                     'post_password'  => $post_password,
                     'post_status'    => $post_status,
-                    'post_content' => $post_content,
+                    'post_content'   => $post_content,
                     'comment_status' => $comment_status,
             ];
             $data           = $this->ArticleService->buildArticleData($data);
@@ -67,7 +69,7 @@ class ArticleController extends ArticleBaseController
                 $this->redirect(make_url('index'));
             }
         } else {
-            $jscontent = <<<JS_CONTENT
+            $jscontent    = <<<JS_CONTENT
         <script type="text/javascript">            
           $(function () {
             CKEDITOR.replace('post_content');
@@ -76,6 +78,7 @@ class ArticleController extends ArticleBaseController
 JS_CONTENT;
             $categoryList = Api::get('category.getList'); //curl local timeout multiple port is ok or api call via rpc
 
+            $this->assign('categoryList', $categoryList);
             $this->assign('jscontent', $jscontent);
             $this->assign('jslist', ['assets/bower_components/ckeditor/ckeditor.js']);
             $this->setMainTpl('article_add.tpl.html');

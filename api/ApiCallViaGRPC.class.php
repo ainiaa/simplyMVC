@@ -99,7 +99,7 @@ class ApiCallViaGRPC extends ApiCallBase
         return $return;
     }
 
-    public function getUrlByApi($api, $data = '')
+    public function getHanderByApi($api, $data = '')
     {
         $mapping = [
                 'category.getList' => 'http://local.smvc.me/index.php?g=modules&m=category&c=api&a=getList',
@@ -127,9 +127,9 @@ class ApiCallViaGRPC extends ApiCallBase
     {
         $ch = curl_init();
         if ($mode === 'get') {
-            $url = self::getUrlByApi($api, $data);
+            $url = self::getHanderByApi($api, $data);
         } else {
-            $url = self::getUrlByApi($api);
+            $url = self::getHanderByApi($api);
         }
 
         //设置超时

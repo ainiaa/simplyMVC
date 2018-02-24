@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class ApiCallViaCurl
+ * Class Api
  */
 class Api
 {
@@ -31,7 +31,6 @@ class Api
                 default:
                     self::$instances[$id] = new ApiCallViaDB();
             }
-            self::$instances[$id] = new Api();
         }
 
         return self::$instances[$id];

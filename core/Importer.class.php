@@ -29,7 +29,7 @@ class Importer
      */
     public static function importFile($filePath, $fileExt = 'php', $rootPath = INCLUDE_DIR)
     {
-        $finalPath = $rootPath . '/' . preg_replace('|\.|', '/', $filePath) . '.' . $fileExt;
+        $finalPath = $rootPath . DS . preg_replace('|\.|', DS, $filePath) . '.' . $fileExt;
         if (is_file($finalPath)) {
             if (is_readable($finalPath)) {
                 $file_hash = md5($finalPath);
@@ -67,15 +67,15 @@ class Importer
                 }
                 $loadResult = true;
             } else {
-                if ($showError) {
-                    throw_exception('file_is_not_readable:' . $filePath);
-                }
+                //                if ($showError) {
+                //                    throw_exception('file_is_not_readable:' . $filePath);
+                //                }
             }
         } else {
-            if ($showError) {
-                debug_print_backtrace();
-                throw_exception('file_no_exists:' . $filePath);
-            }
+            //            if ($showError) {
+            //                debug_print_backtrace();
+            //                throw_exception('file_no_exists:' . $filePath);
+            //            }
         }
         return $loadResult;
     }
@@ -100,7 +100,7 @@ class Importer
         if (is_file($configPath)) { //如果传递过来的是一个具体的文件路径的话 直接调用importFileByFullPath方法
             $configFiles = [$configPath];
         } else {
-            $configFiles = glob($configPath . '/' . '*.' . $configFileExt);
+            $configFiles = glob($configPath . DS . '*.' . $configFileExt);
         }
 
         if (!empty($configFiles) && is_array($configFiles)) {
@@ -149,24 +149,21 @@ class Importer
         if ('@' == $moduleName) {
             $moduleName = Request::getModule();
         }
-        $baseControllerFile = ROOT_DIR . $groupName . '/' . $groupName . $controllerFileSuffer;
+        $baseControllerFile = ROOT_DIR . $groupName . DS . $groupName . $controllerFileSuffer;
         self::importFileByFullPath($baseControllerFile);
 
         $controllerFileName = $controllerName . $controllerFileSuffer;
 
-        $controllerFile = ROOT_DIR . $groupName . '/' . $moduleName . '/controllers/' . $controllerFileName;
+        $controllerFile = ROOT_DIR . $groupName . DS . $moduleName . DS . 'controllers' . DS . $controllerFileName;
         $loadResult     = self::importFileByFullPath($controllerFile);
 
         if (!$loadResult) { //当前group module下加载controller失败
             $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
-                $filePath = ROOT_DIR . $groupName . '/' . $module . '/controllers/' . $controllerFileName;
-                $files    = self::getControllerListByGroupAndModule($groupName, $module);
-                if (in_array($filePath, $files, true)) {
-                    $loadResult = self::importFileByFullPath($controllerFile);
-                    if ($loadResult) { //加载成功直接break
-                        break;
-                    }
+                $filePath   = ROOT_DIR . $groupName . DS . $module . DS . 'controllers' . DS . $controllerFileName;
+                $loadResult = self::importFileByFullPath($filePath);
+                if ($loadResult) { //加载成功直接break
+                    break;
                 }
             }
             //当前group加载失败 获取所有的加载其他group下的controll 直到第一个加载成功为止
@@ -175,13 +172,10 @@ class Importer
                 foreach ((array)$groupList as $group) {
                     $groupModules = self::getModuleList($group);
                     foreach ($groupModules as $groupModule) {
-                        $filePath = ROOT_DIR . $group . '/' . $groupModule . '/controllers/' . $controllerFileName;
-                        $files    = self::getControllerListByGroupAndModule($group, $groupModule);
-                        if (in_array($filePath, $files, true)) {
-                            $loadResult = self::importFileByFullPath($controllerFile);
-                            if ($loadResult) { //加载成功直接break
-                                break;
-                            }
+                        $filePath   = ROOT_DIR . $group . DS . $groupModule . DS . 'controllers' . DS . $controllerFileName;
+                        $loadResult = self::importFileByFullPath($filePath);
+                        if ($loadResult) { //加载成功直接break
+                            break;
                         }
                     }
                 }
@@ -209,19 +203,16 @@ class Importer
         }
 
         $serviceFileName = $serviceName . $serviceFileSuffer;
-
-        $serviceFile = ROOT_DIR . $groupName . '/' . $moduleName . '/services/' . ucfirst($serviceFileName);
-        $loadResult  = self::importFileByFullPath($serviceFile);
-        if (!$loadResult) { //当前group module下加载controller失败
+        $serviceFileName = ucfirst($serviceFileName);
+        $serviceFile     = ROOT_DIR . $groupName . DS . $moduleName . DS . 'services' . DS . $serviceFileName;
+        $loadResult      = self::importFileByFullPath($serviceFile);
+        if (!$loadResult) { //当前group module下加载service失败
             $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
-                $filePath = ROOT_DIR . $groupName . '/' . $module . '/services/' . $serviceFileName;
-                $files    = self::getServiceListByGroupAndModule($groupName, $module);
-                if (in_array($filePath, $files, true)) {
-                    $loadResult = self::importFileByFullPath($serviceFile);
-                    if ($loadResult) { //加载成功直接break
-                        break;
-                    }
+                $filePath   = ROOT_DIR . $groupName . DS . $module . DS . 'services' . DS . $serviceFileName;
+                $loadResult = self::importFileByFullPath($filePath);
+                if ($loadResult) { //加载成功直接break
+                    break;
                 }
             }
             //当前group加载失败 获取所有的加载其他group下的controll 直到第一个加载成功为止
@@ -230,13 +221,10 @@ class Importer
                 foreach ((array)$groupList as $group) {
                     $groupModules = self::getModuleList($group);
                     foreach ($groupModules as $groupModule) {
-                        $filePath = ROOT_DIR . $group . '/' . $groupModule . '/services/' . $serviceFileName;
-                        $files    = self::getDAOListByGroupAndModule($group, $groupModule);
-                        if (in_array($filePath, $files, true)) {
-                            $loadResult = self::importFileByFullPath($serviceFile);
-                            if ($loadResult) { //加载成功直接break
-                                break;
-                            }
+                        $filePath   = ROOT_DIR . $group . DS . $groupModule . DS . 'services' . DS . $serviceFileName;
+                        $loadResult = self::importFileByFullPath($filePath);
+                        if ($loadResult) { //加载成功直接break
+                            break;
                         }
                     }
                 }
@@ -265,23 +253,20 @@ class Importer
         $helperFileName = $helperName . '.class.php';
 
         //首先加载core目录下的helper
-        $helperFile = CORE_DIR . 'helper/' . $helperFileName;
+        $helperFile = CORE_DIR . 'helper' . DS . $helperFileName;
         $loadResult = self::importFileByFullPath($helperFile, false);
 
         if (!$loadResult) {
-            $helperFile = ROOT_DIR . $groupName . '/' . $moduleName . '/helper/' . $helperFileName;
+            $helperFile = ROOT_DIR . $groupName . DS . $moduleName . DS . 'helper' . DS . $helperFileName;
             $loadResult = self::importFileByFullPath($helperFile, false);
 
             if (!$loadResult) { //当前group module下加载controller失败
                 $modules = self::getModuleList($groupName);
                 foreach ($modules as $module) {
-                    $filePath = ROOT_DIR . $groupName . '/' . $module . '/helper/' . $helperFileName;
-                    $files    = self::getServiceListByGroupAndModule($groupName, $module);
-                    if (in_array($filePath, $files, true)) {
-                        $loadResult = self::importFileByFullPath($helperFile);
-                        if ($loadResult) { //加载成功直接break
-                            break;
-                        }
+                    $filePath   = ROOT_DIR . $groupName . DS . $module . DS . 'helper' . DS . $helperFileName;
+                    $loadResult = self::importFileByFullPath($filePath);
+                    if ($loadResult) { //加载成功直接break
+                        break;
                     }
                 }
                 //当前group加载失败 获取所有的加载其他group下的controll 直到第一个加载成功为止
@@ -290,13 +275,10 @@ class Importer
                     foreach ((array)$groupList as $group) {
                         $groupModules = self::getModuleList($group);
                         foreach ($groupModules as $groupModule) {
-                            $filePath = ROOT_DIR . $group . '/' . $groupModule . '/helpers/' . $helperFileName;
-                            $files    = self::getDAOListByGroupAndModule($group, $groupModule);
-                            if (in_array($filePath, $files, true)) {
-                                $loadResult = self::importFileByFullPath($helperFile);
-                                if ($loadResult) { //加载成功直接break
-                                    break;
-                                }
+                            $filePath = ROOT_DIR . $group . DS . $groupModule . DS . 'helpers' . DS . $helperFileName;
+                            $loadResult = self::importFileByFullPath($filePath);
+                            if ($loadResult) { //加载成功直接break
+                                break;
                             }
                         }
                     }
@@ -327,19 +309,16 @@ class Importer
 
         $daoFileName = $daoName . $daoFileSuffer;
 
-        $daoFile    = ROOT_DIR . $groupName . '/' . $moduleName . '/daos/' . $daoFileName;
+        $daoFile    = ROOT_DIR . $groupName . DS . $moduleName . DS . 'daos' . DS . $daoFileName;
         $loadResult = self::importFileByFullPath($daoFile);
 
         if (!$loadResult) { //当前group module下加载controller失败
             $modules = self::getModuleList($groupName);
             foreach ($modules as $module) {
-                $filePath = ROOT_DIR . $groupName . '/' . $module . '/daos/' . $daoFileName;
-                $files    = self::getDAOListByGroupAndModule($groupName, $module);
-                if (in_array($filePath, $files, true)) {
-                    $loadResult = self::importFileByFullPath($daoFile);
-                    if ($loadResult) { //加载成功直接break
-                        break;
-                    }
+                $filePath = ROOT_DIR . $groupName . DS . $module . DS . 'daos' . DS . $daoFileName;
+                $loadResult = self::importFileByFullPath($filePath);
+                if ($loadResult) { //加载成功直接break
+                    break;
                 }
             }
             //当前group加载失败 获取所有的加载其他group下的controll 直到第一个加载成功为止
@@ -348,13 +327,10 @@ class Importer
                 foreach ((array)$groupList as $group) {
                     $groupModules = self::getModuleList($group);
                     foreach ($groupModules as $groupModule) {
-                        $filePath = ROOT_DIR . $group . '/' . $groupModule . '/daos/' . $daoFileName;
-                        $files    = self::getDAOListByGroupAndModule($group, $groupModule);
-                        if (in_array($filePath, $files, true)) {
-                            $loadResult = self::importFileByFullPath($daoFile);
-                            if ($loadResult) { //加载成功直接break
-                                break;
-                            }
+                        $filePath = ROOT_DIR . $group . DS . $groupModule . DS . 'daos' . DS . $daoFileName;
+                        $loadResult = self::importFileByFullPath($filePath);
+                        if ($loadResult) { //加载成功直接break
+                            break;
                         }
                     }
                 }
@@ -424,10 +400,10 @@ class Importer
     public static function getFileStructBypath($path)
     {
         $tree = [];
-        if ('/' === substr($path, -1)) {
+        if (DS === substr($path, -1)) {
             $globPattern = $path . '*';
         } else {
-            $globPattern = $path . '/*';
+            $globPattern = $path . DS . '*';
         }
         foreach (glob($globPattern) as $single) {
             if (is_dir($single)) {
@@ -461,7 +437,7 @@ class Importer
         $finalData = [];
         $groupList = self::getGroupList();
         foreach ($groupList as $group) {
-            $groupBasePath = ROOT_DIR . $group . '/';
+            $groupBasePath = ROOT_DIR . $group . DS;
             $files         = glob($groupBasePath . '*');
             foreach ((array)$files as $file) {
                 if (is_dir($file)) {
@@ -487,13 +463,13 @@ class Importer
         if (C('APP_GROUP_LIST')) {
             $appGroupList = explode(',', C('APP_GROUP_LIST'));
             foreach ($appGroupList as $groupName) {
-                $groupBasePath                          = ROOT_DIR . $groupName . '/';
+                $groupBasePath                          = ROOT_DIR . $groupName . DS;
                 $files                                  = glob($groupBasePath . '*');
                 $finalFileStruct[$groupName]['_FILES_'] = $files;
                 foreach ($files as $file) {
                     if (is_dir($file)) { //当前group下的一个module
                         $moduleName     = basename($file);
-                        $moduleBasePath = $groupBasePath . $moduleName . '/';
+                        $moduleBasePath = $groupBasePath . $moduleName . DS;
                         $moduleFiles    = glob($moduleBasePath . '*');
 
                         $finalFileStruct[$groupName][$moduleName]['_FILES_'] = $moduleFiles;
@@ -542,7 +518,6 @@ class Importer
         } else if ($helperSuffer === substr($className, -$helperSufferLen)) { //辅助类
             self::loadHelper(lcfirst($className));
         } else {
-
             //尝试获取fileMapping
             $loadResult = self::loadMappingFile($className);
             if (!$loadResult) {
@@ -562,7 +537,7 @@ class Importer
 
                 foreach ($paths as $path) {
                     foreach ($fileExtensions as $fileExtension) {
-                        $fullFilePath  = $path . '/' . $className . $fileExtension;
+                        $fullFilePath  = $path . DS . $className . $fileExtension;
                         $tryFileList[] = $fullFilePath;
                         if (self::importFileByFullPath($fullFilePath, false)) {
                             $found = true;
