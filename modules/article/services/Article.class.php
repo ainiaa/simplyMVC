@@ -25,14 +25,20 @@ class ArticleService
     }
 
     /**
-     * @param $originData
+     * @param     $originData
+     * @param int $id
      *
      * @return array
      */
-    public function buildArticleData($originData)
+    public function buildArticleData($originData, $id = 0)
     {
-        $defaultData = $this->getArticleDefaultData();
-        $data        = array_merge($defaultData, $originData);
+        if ($id) {
+            $oldData = $this->getArticleInfo($id);
+        } else {
+            $oldData = $this->getArticleDefaultData();
+        }
+
+        $data = array_merge($oldData, $originData);
         if (!isset($originData['created_at'])) {
             $data['created_at'] = time();
         }

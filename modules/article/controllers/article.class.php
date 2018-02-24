@@ -50,16 +50,23 @@ class ArticleController extends ArticleBaseController
             $post_content   = I('post.post_content');
             $post_status    = I('post.post_status');
             $comment_status = I('post.comment_status');
+            $post_category  = I('post.post_category');
+            $id             = I('post.id');
             $data           = [
                     'post_title'     => $post_title,
                     'post_excerpt'   => $post_excerpt,
                     'post_password'  => $post_password,
                     'post_status'    => $post_status,
                     'post_content'   => $post_content,
+                    'post_category'  => $post_category,
                     'comment_status' => $comment_status,
             ];
-            $data           = $this->ArticleService->buildArticleData($data);
-            $id             = $this->ArticleService->addArticle($data);
+            $data           = $this->ArticleService->buildArticleData($data, $id);
+            if (empty($id)) {
+                $id = $this->ArticleService->addArticle($data);
+            } else {
+                $id = $this->ArticleService->updateArticle($data, ['id' => $id]);
+            }
             if (empty($id)) {
                 $error = $this->ArticleService->getDbError();
                 $this->displayError($error);
@@ -73,7 +80,7 @@ class ArticleController extends ArticleBaseController
                 if ($articleInfo) {
                     $parentCategorySelector = Api::get(
                             'category.generateCategorySelector',
-                            ['id' => $id, $articleInfo['post_category']]
+                            ['id' => $id, $articleInfo['post_category'], 'post_category']
                     );
                     $this->assign('articleInfo', $articleInfo);
                     $this->assign('id', $id);
