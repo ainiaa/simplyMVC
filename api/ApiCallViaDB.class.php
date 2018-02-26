@@ -39,7 +39,7 @@ class ApiCallViaDB extends ApiCallBase
      */
     public function get($api, $data = [], $timeout = self::TIMEOUT, $cookie = [])
     {
-        $handler = $this->getHanderByApi($api, $data);
+        $handler = $this->getHanderByApi($api);
         if ($handler) {
             return $handler->invoke($data);
         }

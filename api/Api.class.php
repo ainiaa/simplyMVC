@@ -66,6 +66,6 @@ class Api
     public static function get($api, $data = [], $second = self::TIMEOUT, $cookie = [])
     {
         $instance = self::getInstance();
-        return $instance->get($api, $second, $data, $cookie);
+        return $instance->get($api, $data, $second, $cookie);
     }
 }

@@ -25,6 +25,7 @@ class ArticleController extends ArticleBaseController
                         'post_excerpt',
                         'post_password',
                         'post_content',
+                        'post_category',
                         'post_author',
                         'post_status',
                         'comment_status',
@@ -80,7 +81,7 @@ class ArticleController extends ArticleBaseController
                 if ($articleInfo) {
                     $parentCategorySelector = Api::get(
                             'category.generateCategorySelector',
-                            ['id' => $id, $articleInfo['post_category'], 'post_category']
+                            [$id, $articleInfo['post_category'], 'post_category']
                     );
                     $this->assign('articleInfo', $articleInfo);
                     $this->assign('id', $id);
@@ -126,75 +127,6 @@ JS_CONTENT;
             }
         } else {
             //todo id传递有问题
-        }
-    }
-
-    /**
-     * 编辑
-     * @author Jeff.Liu<jeff.liu.guo@gmail.com>
-     */
-    public function editAction()
-    {
-        $this->assign('action', make_url('edit'));
-        $id = I('id');
-        if ($id) {
-            if (IS_POST) {
-                $post_title     = I('post.post_title');
-                $post_excerpt   = I('post.post_excerpt');
-                $post_password  = I('post.post_password');
-                $post_content   = I('post.post_content');
-                $post_status    = I('post.post_status');
-                $comment_status = I('post.comment_status');
-                $data           = [
-                        'post_title'     => $post_title,
-                        'post_excerpt'   => $post_excerpt,
-                        'post_password'  => $post_password,
-                        'post_status'    => $post_status,
-                        'post_content'   => $post_content,
-                        'comment_status' => $comment_status,
-                ];
-                $data           = $this->ArticleService->buildArticleData($data);
-                $id             = $this->ArticleService->updateArticle($data, ['id' => $id]);
-                if (empty($id)) {
-                    $error = $this->ArticleService->getDbError();
-                    $this->displayError($error);
-                } else {
-                    $this->redirect(make_url('index'));
-                }
-            } else {//显示
-                $categoryInfo = $this->ArticleService->getArticleInfo($id);
-                if ($categoryInfo) {
-                    $artileList             = $this->ArticleService->getArticleList();
-                    $parentCategorySelector = $this->ArticleService->generateCategorySelector(
-                            $id,
-                            $categoryInfo['parent_id']
-                    );
-                    $jscontent              = <<<JS_CONTENT
-        <script type="text/javascript">            
-          $(function () {
-            CKEDITOR.replace('post_content');
-          });
-        </script>  
-JS_CONTENT;
-                    $categoryList           = Api::get('category.getList');
-
-                    $this->assign('categoryList', $categoryList);
-                    $this->assign('jscontent', $jscontent);
-                    $this->assign('jslist', ['assets/bower_components/ckeditor/ckeditor.js']);
-                    $this->assign('list', $artileList);
-                    $this->assign('parentCategorySelector', $parentCategorySelector);
-                    $this->assign('articleInfo', $categoryInfo);
-                    $this->setMainTpl('article_add.tpl.html');
-                    $this->assign('id', $id);
-                    $this->display();
-                } else {
-                    $error = 'category id:' . $id . ' not found!';
-                    $this->displayError($error);
-                }
-            }
-        } else {
-            $error = 'category id:' . $id . ' is missing!';
-            $this->displayError($error);
         }
     }
 

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ *
+ */
 class ApiBaseService extends BaseService
 {
 
@@ -8,7 +11,6 @@ class ApiBaseService extends BaseService
     private $conf;
 
     /**
-     * ApiBaseService constructor.
      *
      * @param $api
      * @param $params
@@ -55,15 +57,19 @@ class ApiBaseService extends BaseService
      */
     public function getConf($api)
     {
-        $key = 'API_SERVICE.' . $api;
+        $key  = 'API_SERVICE.' . $api;
         $conf = C($key);
         return $conf;
     }
 
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
     public function invoke($params)
     {
-        $method = $this->conf['method'];
-        return $this->service->$method($params);
+        return call_user_func_array([$this->service, $this->conf['method']], $params);
     }
 
     /**
@@ -77,6 +83,11 @@ class ApiBaseService extends BaseService
         return $this->invoke($params);
     }
 
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
     public function postData($params)
     {
         return $this->invoke($params);
